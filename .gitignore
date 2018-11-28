@@ -1,0 +1,6 @@
+target
+.idea
+*.iml
+*sw?
+spark-warehouse
+derby.log

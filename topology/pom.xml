@@ -10,7 +10,6 @@
     </parent>
 
     <artifactId>topology</artifactId>
-    <packaging>jar</packaging>
     <name>Topology</name>
 
     <dependencies>
@@ -32,6 +31,17 @@
         <dependency>
             <groupId>graphframes</groupId>
             <artifactId>graphframes</artifactId>
+        </dependency>
+        <dependency>
+            <!--Converge logging to SLF4J-->
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.tashoyan</groupId>
+            <artifactId>test-resources</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.scalatest</groupId>

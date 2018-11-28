@@ -15,8 +15,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.hpe.oss.streaming</groupId>
-            <artifactId>utils</artifactId>
+            <groupId>com.github.tashoyan</groupId>
+            <artifactId>util</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

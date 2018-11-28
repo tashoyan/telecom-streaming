@@ -10,7 +10,6 @@
     </parent>
 
     <artifactId>event-producer</artifactId>
-    <packaging>jar</packaging>
     <name>Event Producer</name>
 
     <dependencies>
@@ -46,21 +45,6 @@
 
     <build>
         <plugins>
-
-            <plugin>
-                <groupId>org.scalatest</groupId>
-                <artifactId>scalatest-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <!--No tests - prevent Scalatest (enabled by profile) from running to avoid failure-->
-                        <id>test-scala</id>
-                        <phase>none</phase>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

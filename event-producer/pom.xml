@@ -14,7 +14,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.github.tashoyan</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>util</artifactId>
             <version>${project.version}</version>
         </dependency>

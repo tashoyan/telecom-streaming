@@ -38,7 +38,7 @@
             <artifactId>jcl-over-slf4j</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.tashoyan</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>test-resources</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>

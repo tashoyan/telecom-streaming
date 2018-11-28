@@ -11,8 +11,8 @@
 
     <modules>
         <module>test-resources</module>
-        <module>util</module>
-        <module>event-producer</module>
+        <!--<module>util</module>-->
+        <!--<module>event-producer</module>-->
         <module>topology</module>
     </modules>
 

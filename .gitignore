@@ -3,4 +3,5 @@ target
 *.iml
 *sw?
 spark-warehouse
+checkpoint
 derby.log

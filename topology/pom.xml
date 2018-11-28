@@ -30,6 +30,10 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>graphframes</groupId>
+            <artifactId>graphframes</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.scalatest</groupId>
             <artifactId>scalatest_${compiler.scala.compat.version}</artifactId>
             <scope>test</scope>
@@ -45,5 +49,21 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <!--GraphFrames are not yet in Maven Central-->
+            <id>spark-packages</id>
+            <url>https://dl.bintray.com/spark-packages/maven/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+                <checksumPolicy>fail</checksumPolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
 </project>

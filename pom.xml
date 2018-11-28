@@ -37,9 +37,9 @@
         <scalastyle-maven-plugin.version>1.0.0</scalastyle-maven-plugin.version>
         <scalatest-maven-plugin.version>2.0.0</scalatest-maven-plugin.version>
 
-        <build-resources.version>1.0</build-resources.version>
         <spark.version>2.2.1</spark.version>
         <kafka.version>1.1.0</kafka.version>
+        <graphframes.version>0.6.0-spark2.2-s_${compiler.scala.compat.version}</graphframes.version>
         <scopt.version>3.7.0</scopt.version>
         <scala-parser-combinators.version>1.0.4</scala-parser-combinators.version>
         <scalatest.version>3.0.4</scalatest.version>
@@ -125,6 +125,11 @@
                         <artifactId>unused</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>graphframes</groupId>
+                <artifactId>graphframes</artifactId>
+                <version>${graphframes.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.scala-lang</groupId>
@@ -315,13 +320,6 @@
                     <groupId>org.scalastyle</groupId>
                     <artifactId>scalastyle-maven-plugin</artifactId>
                     <version>${scalastyle-maven-plugin.version}</version>
-                    <dependencies>
-                        <dependency>
-                            <groupId>com.hp.ossa</groupId>
-                            <artifactId>build-resources</artifactId>
-                            <version>${build-resources.version}</version>
-                        </dependency>
-                    </dependencies>
                     <configuration>
                         <verbose>false</verbose>
                         <failOnViolation>true</failOnViolation>

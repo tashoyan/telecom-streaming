@@ -1,11 +1,11 @@
 package com.github.tashoyan.telecom.generator
 
+import com.github.tashoyan.telecom.event.Event._
 import com.github.tashoyan.telecom.spark.DataFrames.RichDataFrame
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.streaming.OutputMode
-import com.github.tashoyan.telecom.event.Event._
 import org.apache.spark.sql.types.StringType
-import org.apache.spark.sql.{Dataset, Row, SparkSession}
 
 object EventGeneratorMain extends EventGeneratorArgParser {
 
@@ -27,7 +27,7 @@ object EventGeneratorMain extends EventGeneratorArgParser {
       .parquet(config.schemaFile)
       .schema
 
-    val inputEvents: Dataset[Row] = spark.readStream
+    val inputEvents = spark.readStream
       .schema(schema)
       .parquet(config.inputDir)
 

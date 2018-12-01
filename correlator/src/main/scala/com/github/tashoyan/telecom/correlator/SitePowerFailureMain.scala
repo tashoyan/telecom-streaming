@@ -1,6 +1,6 @@
 package com.github.tashoyan.telecom.correlator
 
-import com.github.tashoyan.telecom.util.DataFrames.RichDataFrame
+import com.github.tashoyan.telecom.spark.DataFrames.RichDataFrame
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.streaming.OutputMode
 import org.apache.spark.sql.types.StringType

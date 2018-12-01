@@ -1,7 +1,7 @@
-package com.github.tashoyan.telecom.util
+package com.github.tashoyan.telecom.spark
 
 import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.functions._
+import org.apache.spark.sql.functions.{col, from_json, struct, to_json}
 import org.apache.spark.sql.types.StructType
 
 object DataFrames {

@@ -2,7 +2,7 @@ package com.github.tashoyan.telecom.correlator
 
 import java.sql.Timestamp
 
-import com.github.tashoyan.telecom.util.DataFrames.RichDataFrame
+import com.github.tashoyan.telecom.spark.DataFrames.RichDataFrame
 import com.github.tashoyan.telecom.util.Timestamps._
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._

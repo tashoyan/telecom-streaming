@@ -1,10 +1,10 @@
-package com.github.tashoyan.telecom.util
+package com.github.tashoyan.telecom.spark
 
 import java.sql.Timestamp
 import java.time.{ZoneId, ZonedDateTime}
 
+import com.github.tashoyan.telecom.spark.DataFrames.RichDataFrame
 import com.github.tashoyan.telecom.test.SparkTestHarness
-import com.github.tashoyan.telecom.util.DataFrames.RichDataFrame
 import org.apache.spark.sql.types._
 import org.scalatest.FunSuite
 

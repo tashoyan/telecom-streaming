@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>shared-resources</artifactId>
-    <name>Util</name>
+    <name>Shared Resources</name>
 
     <dependencies>
         <dependency>

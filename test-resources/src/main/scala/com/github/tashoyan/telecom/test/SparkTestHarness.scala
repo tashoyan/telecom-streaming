@@ -1,4 +1,4 @@
-package com.github.tashoyan.test
+package com.github.tashoyan.telecom.test
 
 import org.apache.spark.sql.SparkSession
 import org.scalatest.{BeforeAndAfter, Suite}

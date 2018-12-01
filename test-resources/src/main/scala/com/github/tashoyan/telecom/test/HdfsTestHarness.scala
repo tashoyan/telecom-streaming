@@ -1,10 +1,10 @@
-package com.github.tashoyan.test
+package com.github.tashoyan.telecom.test
 
 import java.io.{File, IOException}
 import java.net.{URI, URL}
 import java.nio.file.Paths
 
-import com.github.tashoyan.test.HdfsTestHarness._
+import HdfsTestHarness._
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FileSystem, FileUtil, Path, RemoteIterator}
 import org.apache.hadoop.hdfs.MiniDFSCluster

@@ -11,9 +11,9 @@
 
     <modules>
         <module>test-resources</module>
-        <!--<module>util</module>-->
-        <!--<module>event-producer</module>-->
-        <module>topology</module>
+        <module>util</module>
+        <module>generator</module>
+        <!--<module>topology</module>-->
     </modules>
 
     <properties>
@@ -120,6 +120,17 @@
             <dependency>
                 <groupId>org.apache.spark</groupId>
                 <artifactId>spark-sql-kafka-0-10_${compiler.scala.compat.version}</artifactId>
+                <version>${spark.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.spark-project.spark</groupId>
+                        <artifactId>unused</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.spark</groupId>
+                <artifactId>spark-tags_${compiler.scala.compat.version}</artifactId>
                 <version>${spark.version}</version>
                 <exclusions>
                     <exclusion>

@@ -13,6 +13,7 @@
         <module>test-resources</module>
         <module>util</module>
         <module>generator</module>
+        <module>correlator</module>
         <!--<module>topology</module>-->
     </modules>
 

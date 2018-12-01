@@ -8,3 +8,10 @@ case class Event(
     siteId: Long,
     info: String
 )
+
+object Event {
+  val siteIdColumn = "siteId"
+
+  val keyColumn = "key"
+  val valueColumn = "value"
+}

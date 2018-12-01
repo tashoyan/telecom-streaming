@@ -9,7 +9,7 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>util</artifactId>
+    <artifactId>shared-resources</artifactId>
     <name>Util</name>
 
     <dependencies>

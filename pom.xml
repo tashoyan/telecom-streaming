@@ -11,7 +11,7 @@
 
     <modules>
         <module>test-resources</module>
-        <module>util</module>
+        <module>shared-resources</module>
         <module>generator</module>
         <module>correlator</module>
         <!--<module>topology</module>-->

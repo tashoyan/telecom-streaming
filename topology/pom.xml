@@ -34,8 +34,18 @@
             <artifactId>graphframes</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-reflect</artifactId>
+        </dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>test-resources</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>shared-resources</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>

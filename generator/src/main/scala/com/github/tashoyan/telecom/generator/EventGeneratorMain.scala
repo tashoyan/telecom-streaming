@@ -23,12 +23,12 @@ object EventGeneratorMain extends EventGeneratorArgParser {
     spark.sparkContext
       .setLogLevel("WARN")
 
-    val schema = spark.read
-      .parquet(config.schemaFile)
-      .schema
+    //    val schema = spark.read
+    //      .parquet(config.schemaFile)
+    //      .schema
 
     val inputEvents = spark.readStream
-      .schema(schema)
+      //      .schema(schema)
       .parquet(config.inputDir)
 
     val kafkaEvents = inputEvents

@@ -3,7 +3,7 @@ package com.github.tashoyan.telecom.generator
 import com.github.tashoyan.telecom.generator.EventGeneratorConfig._
 
 case class EventGeneratorConfig(
-    schemaFile: String = "",
+    //    schemaFile: String = "",
     inputDir: String = "",
     kafkaBrokers: String = "",
     kafkaTopic: String = "",

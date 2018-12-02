@@ -12,9 +12,10 @@
     <modules>
         <module>test-resources</module>
         <module>shared-resources</module>
+        <module>sampler</module>
         <module>generator</module>
         <module>correlator</module>
-        <module>topology</module>
+        <!--<module>topology</module>-->
     </modules>
 
     <properties>
@@ -69,6 +70,7 @@
         <fasterxml.jackson-databind.version>2.6.7.1</fasterxml.jackson-databind.version>
         <scala-xml.version>1.0.6</scala-xml.version>
         <commons-compress.version>1.8.1</commons-compress.version>
+        <commons-io.version>2.6</commons-io.version>
 
     </properties>
 
@@ -230,6 +232,11 @@
                 <groupId>org.scalactic</groupId>
                 <artifactId>scalactic_${compiler.scala.compat.version}</artifactId>
                 <version>${scalactic.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
             </dependency>
 
             <!--BEGIN: Dependency convergence-->

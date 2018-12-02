@@ -1,54 +1,17 @@
-package com.github.tashoyan.telecom.topology
+package com.github.tashoyan.telecom.sampler
 
-import java.sql.Timestamp
-
-import com.github.tashoyan.telecom.event.Event
-import com.github.tashoyan.telecom.event.Event._
+import com.github.tashoyan.telecom.sampler.Sampler._
 import com.github.tashoyan.telecom.test.SparkTestHarness
-import org.apache.spark.sql.Dataset
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions._
 import org.scalatest.FunSuite
 
-//TODO Move to a special module - event-sampler or so
 class SampleGeneratorTest extends FunSuite with SparkTestHarness {
-
-  private val eventsPerStation = 2
-
-  private def generateEvents(stations: Dataset[Integer]): Dataset[Event] = {
-    val spark0 = spark
-    import spark0.implicits._
-
-    val stationCount = eventsPerStation
-    val stationsUdf = udf { station: Integer =>
-      Seq.fill(stationCount)(station.toLong)
-    }
-    val infoUdf = udf { siteId: Long =>
-      s"Communication failure at site $siteId"
-    }
-
-    stations
-      .withColumn("stations", stationsUdf(col("station")))
-      .withColumn(siteIdColumn, explode(col("stations")))
-      .withColumn(idColumn, monotonically_increasing_id())
-      //Let the Event Generator set timestamps of the generated events
-      .withColumn(timestampColumn, lit(new Timestamp(0L)))
-      .withColumn(severityColumn, lit("MAJOR"))
-      .withColumn(infoColumn, infoUdf(col(siteIdColumn)))
-      .drop("station", "stations")
-      .as[Event]
-  }
-
-  private def writeEvents(events: Dataset[Event], path: String): Unit = {
-    events
-      .repartition(1)
-      .write
-      .parquet(path)
-  }
 
   test("controllers 2715, 2016 - all") {
     val spark0 = spark
     import spark0.implicits._
+    val sampler = new Sampler(2)
 
     val topologyFile = this.getClass
       .getResource("topology_controller_station.parquet")
@@ -62,13 +25,14 @@ class SampleGeneratorTest extends FunSuite with SparkTestHarness {
       .select("station")
       .as[Integer]
 
-    val events = generateEvents(stations)
+    val events = sampler.generateEvents(stations)
     writeEvents(events, "target/events_controllers_2715_2716_all")
   }
 
   test("controllers 2715, 2016 - half 1, 2") {
     val spark0 = spark
     import spark0.implicits._
+    val sampler = new Sampler(2)
 
     val topologyFile = this.getClass
       .getResource("topology_controller_station.parquet")
@@ -88,7 +52,7 @@ class SampleGeneratorTest extends FunSuite with SparkTestHarness {
         .where(col("half") === half)
         .select("station")
         .as[Integer]
-      val events = generateEvents(stations)
+      val events = sampler.generateEvents(stations)
       writeEvents(events, s"target/events_controllers_2715_2716_half$half")
     }
   }

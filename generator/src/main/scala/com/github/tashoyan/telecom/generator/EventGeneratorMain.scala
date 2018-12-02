@@ -19,6 +19,11 @@ object EventGeneratorMain extends EventGeneratorArgParser {
   private def doMain(config: EventGeneratorConfig): Unit = {
     val spark = SparkSession.builder()
       .appName(getClass.getSimpleName)
+      /*
+      TODO: Explain in the article: In production, schema inference is not recommended:
+      http://spark.apache.org/docs/latest/structured-streaming-programming-guide.html#schema-inference-and-partition-of-streaming-dataframesdatasets
+      */
+      .config("spark.sql.streaming.schemaInference", true)
       .getOrCreate()
     spark.sparkContext
       .setLogLevel("WARN")
@@ -28,7 +33,7 @@ object EventGeneratorMain extends EventGeneratorArgParser {
     //      .schema
 
     val inputEvents = spark.readStream
-      .option("inferSchema", value = true)
+      //      .option("inferSchema", value = true)
       //      .schema(schema)
       .parquet(config.inputDir)
 

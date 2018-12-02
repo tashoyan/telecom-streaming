@@ -28,6 +28,7 @@ object EventGeneratorMain extends EventGeneratorArgParser {
     //      .schema
 
     val inputEvents = spark.readStream
+        .option("inferSchema", value = true)
       //      .schema(schema)
       .parquet(config.inputDir)
 

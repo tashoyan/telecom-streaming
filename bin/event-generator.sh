@@ -26,7 +26,7 @@ spark-submit \
 --conf spark.executor.instances=10 \
 --conf spark.sql.shuffle.partitions=10 \
 --class com.github.tashoyan.telecom.generator.EventGeneratorMain \
-event-producer-1.0.0-SNAPSHOT.jar \
+"$jar_file" \
 --kafka-brokers localhost:9092 \
 --kafka-topic events \
 --input-dir "$input_dir" \

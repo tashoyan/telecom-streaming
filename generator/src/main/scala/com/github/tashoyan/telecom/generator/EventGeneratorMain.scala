@@ -28,7 +28,7 @@ object EventGeneratorMain extends EventGeneratorArgParser {
     //      .schema
 
     val inputEvents = spark.readStream
-        .option("inferSchema", value = true)
+      .option("inferSchema", value = true)
       //      .schema(schema)
       .parquet(config.inputDir)
 
@@ -40,6 +40,7 @@ object EventGeneratorMain extends EventGeneratorArgParser {
       We ensure that events from the same site go through the same partition and preserve their order.
       Note that each Spark executor may send records to each Kafka broker hosting a partition.
       */
+      //TODO Exactly once delivery: Kafka transactions and https://issues.apache.org/jira/browse/SPARK-25005
       .withColumn(keyColumn, col(siteIdColumn) cast StringType)
 
     /*

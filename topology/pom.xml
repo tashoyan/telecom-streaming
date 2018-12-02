@@ -15,12 +15,12 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-sql_${compiler.scala.compat.version}</artifactId>
+            <artifactId>spark-core_${compiler.scala.compat.version}</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-catalyst_${compiler.scala.compat.version}</artifactId>
+            <artifactId>spark-sql_${compiler.scala.compat.version}</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -30,18 +30,8 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-reflect</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>graphframes</groupId>
             <artifactId>graphframes</artifactId>
-        </dependency>
-        <dependency>
-            <!--Converge logging to SLF4J-->
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -57,11 +47,6 @@
         <dependency>
             <groupId>org.scalactic</groupId>
             <artifactId>scalactic_${compiler.scala.compat.version}</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.scala-lang.modules</groupId>
-            <artifactId>scala-parser-combinators_${compiler.scala.compat.version}</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -81,5 +66,32 @@
             </snapshots>
         </repository>
     </repositories>
+
+    <build>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>Check dependencies</id>
+                            <goals>
+                                <goal>analyze-only</goal>
+                            </goals>
+                            <configuration>
+                                <ignoredUnusedDeclaredDependencies>
+                                    <!--Required by graphframes, otherwise fails: NoClassDefFoundError: org/apache/spark/graphx/VertexRDD-->
+                                    <ignoredUnusedDeclaredDependency>org.apache.spark:spark-graphx_${compiler.scala.compat.version}</ignoredUnusedDeclaredDependency>
+                                </ignoredUnusedDeclaredDependencies>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+    </build>
 
 </project>

@@ -14,7 +14,7 @@
         <module>shared-resources</module>
         <module>generator</module>
         <module>correlator</module>
-        <!--<module>topology</module>-->
+        <module>topology</module>
     </modules>
 
     <properties>

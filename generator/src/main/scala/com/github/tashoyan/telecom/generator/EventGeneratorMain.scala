@@ -20,21 +20,19 @@ object EventGeneratorMain extends EventGeneratorArgParser {
     val spark = SparkSession.builder()
       .appName(getClass.getSimpleName)
       .getOrCreate()
+    spark.sparkContext
+      .setLogLevel("WARN")
+
     /*
     TODO: Explain in the article: In production, schema inference is not recommended:
     http://spark.apache.org/docs/latest/structured-streaming-programming-guide.html#schema-inference-and-partition-of-streaming-dataframesdatasets
     */
-    spark.conf.set("spark.sql.streaming.schemaInference", value = true)
-    spark.sparkContext
-      .setLogLevel("WARN")
-
-    //    val schema = spark.read
-    //      .parquet(config.schemaFile)
-    //      .schema
+    val schema = spark.read
+      .parquet(config.schemaFile)
+      .schema
 
     val inputEvents = spark.readStream
-      //      .option("inferSchema", value = true)
-      //      .schema(schema)
+      .schema(schema)
       .parquet(config.inputDir)
 
     val kafkaEvents = inputEvents

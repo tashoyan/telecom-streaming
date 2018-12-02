@@ -29,5 +29,6 @@ spark-submit \
 "$jar_file" \
 --kafka-brokers localhost:9092 \
 --kafka-topic events \
+--schema-file /stream/event-schema \
 --input-dir "$input_dir" \
 --checkpoint-dir "$checkpoint_dir"

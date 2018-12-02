@@ -8,15 +8,15 @@ trait EventGeneratorArgParser {
   val parser: OptionParser[EventGeneratorConfig] = new OptionParser[EventGeneratorConfig]("event-producer") {
     head("Event Producer")
 
-    //    opt[String]("schema-file")
-    //      .required()
-    //      .valueName("<path>")
-    //      .action((value, conf) => conf.copy(schemaFile = value))
-    //      .validate { value =>
-    //        if (value.isEmpty) failure("Path to events schema file must not be empty string")
-    //        else success
-    //      }
-    //      .text("Full path to the Parquet location having event's schema")
+    opt[String]("schema-file")
+      .required()
+      .valueName("<path>")
+      .action((value, conf) => conf.copy(schemaFile = value))
+      .validate { value =>
+        if (value.isEmpty) failure("Path to events schema file must not be empty string")
+        else success
+      }
+      .text("Full path to the Parquet location having event's schema")
 
     opt[String]("input-dir")
       .required()

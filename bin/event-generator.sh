@@ -2,10 +2,11 @@
 
 set -o nounset
 set -o errexit
-set +o pipefail
+set -o pipefail
 
 input_dir="/stream/input"
 checkpoint_dir="/stream/checkpoint-event-generator"
+event_schema_file="/stream/event_schema.parquet"
 
 jar_file="$(ls generator/target/generator-*.jar | grep -vi javadoc || true)"
 if test -z "$jar_file"
@@ -16,7 +17,9 @@ fi
 
 hdfs dfs -test -e "$checkpoint_dir" && hdfs dfs -rm -r -skipTrash "$checkpoint_dir"
 hdfs dfs -test -e "$input_dir" && hdfs dfs -rm -r -skipTrash "$input_dir"
+hdfs dfs -test -e "$event_schema_file" && hdfs dfs -rm -r -skipTrash "$event_schema_file"
 hdfs dfs -mkdir -p "$input_dir"
+hdfs dfs -put "sampler/target/event_schema.parquet" "$event_schema_file"
 hdfs dfs -ls "$input_dir"/../
 
 spark-submit \
@@ -29,6 +32,6 @@ spark-submit \
 "$jar_file" \
 --kafka-brokers localhost:9092 \
 --kafka-topic events \
---schema-file /stream/event-schema \
+--schema-file "$event_schema_file" \
 --input-dir "$input_dir" \
 --checkpoint-dir "$checkpoint_dir"

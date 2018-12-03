@@ -1,6 +1,5 @@
 package com.github.tashoyan.telecom.generator
 
-import com.github.tashoyan.telecom.generator.EventGeneratorConfig._
 import scopt.OptionParser
 
 trait EventGeneratorArgParser {
@@ -49,14 +48,14 @@ trait EventGeneratorArgParser {
       .text("Kafka topic to send events to")
 
     opt[String]("checkpoint-dir")
-      .optional()
+      .required()
       .valueName("<path>")
       .action((value, conf) => conf.copy(checkpointDir = value))
       .validate { value =>
         if (value.isEmpty) failure("Checkpoint directory must not be empty string")
         else success
       }
-      .text(s"Checkpoint directory on HDFS. Default is $defaultCheckpointDir.")
+      .text(s"Checkpoint directory on HDFS.")
 
     help("help")
     version("version")

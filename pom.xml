@@ -14,6 +14,7 @@
         <module>shared-resources</module>
         <module>sampler</module>
         <module>generator</module>
+        <module>writer</module>
         <module>correlator</module>
         <!--<module>topology</module>-->
     </modules>

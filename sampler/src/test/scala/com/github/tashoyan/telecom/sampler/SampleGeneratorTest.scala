@@ -1,5 +1,6 @@
 package com.github.tashoyan.telecom.sampler
 
+import com.github.tashoyan.telecom.event.Event
 import com.github.tashoyan.telecom.sampler.Sampler._
 import com.github.tashoyan.telecom.test.SparkTestHarness
 import org.apache.spark.sql.expressions.Window
@@ -7,6 +8,14 @@ import org.apache.spark.sql.functions._
 import org.scalatest.FunSuite
 
 class SampleGeneratorTest extends FunSuite with SparkTestHarness {
+
+  test("event schema") {
+    val spark0 = spark
+    import spark0.implicits._
+
+    val empty = spark.emptyDataset[Event]
+    writeEvents(empty, "target/event_schema")
+  }
 
   test("controllers 2715, 2016 - all") {
     val spark0 = spark

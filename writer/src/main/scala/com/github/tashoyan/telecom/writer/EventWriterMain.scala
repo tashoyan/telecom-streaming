@@ -2,6 +2,7 @@ package com.github.tashoyan.telecom.writer
 
 import java.sql.Timestamp
 
+import com.github.tashoyan.telecom.event.Event._
 import com.github.tashoyan.telecom.spark.DataFrames.RichDataFrame
 import com.github.tashoyan.telecom.util.Timestamps._
 import org.apache.spark.sql.SparkSession
@@ -44,12 +45,14 @@ object EventWriterMain extends EventWriterArgParser {
       .select(col("value") cast StringType as jsonColumn)
       .parseJsonColumn(jsonColumn, schema)
       .drop(jsonColumn)
-      .withColumn(yearMonthColumn, yearMonthUdf(col("originaleventtime")))
+      .withColumn(yearMonthColumn, yearMonthUdf(col(timestampColumn)))
+      //TODO Is it really necessary - repartition Spark data frame?
       .repartition(col(yearMonthColumn))
 
     val query = events
       .writeStream
       .outputMode(OutputMode.Append())
+      //TODO Explain in the article - partition Parquet storage
       .partitionBy(yearMonthColumn)
       .format("parquet")
       .option("path", config.outputDir)

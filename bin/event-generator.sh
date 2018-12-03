@@ -7,6 +7,7 @@ set -o pipefail
 input_dir="/stream/input"
 checkpoint_dir="/stream/checkpoint-event-generator"
 event_schema_file="/stream/event_schema.parquet"
+kafka_brokers="ossv147:9092"
 
 jar_file="$(ls generator/target/generator-*.jar | grep -vi javadoc || true)"
 if test -z "$jar_file"
@@ -30,7 +31,7 @@ spark-submit \
 --conf spark.sql.shuffle.partitions=10 \
 --class com.github.tashoyan.telecom.generator.EventGeneratorMain \
 "$jar_file" \
---kafka-brokers localhost:9092 \
+--kafka-brokers "$kafka_brokers" \
 --kafka-topic events \
 --schema-file "$event_schema_file" \
 --input-dir "$input_dir" \

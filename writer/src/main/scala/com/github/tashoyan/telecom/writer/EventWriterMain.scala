@@ -20,6 +20,7 @@ object EventWriterMain extends EventWriterArgParser {
   }
 
   private def doMain(config: EventWriterConfig): Unit = {
+    println("Class simple name: " + getClass.getSimpleName)
     val spark = SparkSession.builder()
       .appName(getClass.getSimpleName)
       .getOrCreate()

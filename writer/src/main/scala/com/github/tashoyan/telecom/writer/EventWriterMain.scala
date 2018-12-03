@@ -12,7 +12,6 @@ import org.apache.spark.sql.types.StringType
 
 object EventWriterMain extends EventWriterArgParser {
   private val spark = SparkSession.builder()
-    .appName(getClass.getSimpleName)
     .getOrCreate()
   spark.sparkContext
     .setLogLevel("WARN")
@@ -25,7 +24,6 @@ object EventWriterMain extends EventWriterArgParser {
   }
 
   private def doMain(config: EventWriterConfig): Unit = {
-
     val schema = spark.read
       .parquet(config.schemaFile)
       .schema

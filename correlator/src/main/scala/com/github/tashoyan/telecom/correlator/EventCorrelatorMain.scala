@@ -10,6 +10,10 @@ import org.apache.spark.sql.streaming.OutputMode
 import org.apache.spark.sql.types.StringType
 
 object EventCorrelatorMain extends EventCorrelatorArgParser {
+  private val spark = SparkSession.builder()
+    .getOrCreate()
+  spark.sparkContext
+    .setLogLevel("WARN")
 
   def main(args: Array[String]): Unit = {
     parser.parse(args, EventCorrelatorConfig()) match {
@@ -19,12 +23,6 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
   }
 
   private def doMain(config: EventCorrelatorConfig): Unit = {
-    val spark = SparkSession.builder()
-      .appName(getClass.getSimpleName)
-      .getOrCreate()
-    spark.sparkContext
-      .setLogLevel("WARN")
-
     val schema = spark.read
       .parquet(config.schemaFile)
       .schema

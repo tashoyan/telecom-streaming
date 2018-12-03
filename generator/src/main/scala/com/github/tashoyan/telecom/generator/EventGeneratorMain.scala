@@ -8,6 +8,10 @@ import org.apache.spark.sql.streaming.OutputMode
 import org.apache.spark.sql.types.StringType
 
 object EventGeneratorMain extends EventGeneratorArgParser {
+  private val spark = SparkSession.builder()
+    .getOrCreate()
+  spark.sparkContext
+    .setLogLevel("WARN")
 
   def main(args: Array[String]): Unit = {
     parser.parse(args, EventGeneratorConfig()) match {
@@ -17,12 +21,6 @@ object EventGeneratorMain extends EventGeneratorArgParser {
   }
 
   private def doMain(config: EventGeneratorConfig): Unit = {
-    val spark = SparkSession.builder()
-      .appName(getClass.getSimpleName)
-      .getOrCreate()
-    spark.sparkContext
-      .setLogLevel("WARN")
-
     /*
     TODO: Explain in the article: In production, schema inference is not recommended:
     http://spark.apache.org/docs/latest/structured-streaming-programming-guide.html#schema-inference-and-partition-of-streaming-dataframesdatasets

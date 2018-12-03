@@ -9,16 +9,16 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.streaming.OutputMode
 import org.apache.spark.sql.types.StringType
 
-object EventWriterMain extends EventWriterArgParser {
+object EventCorrelatorMain extends EventCorrelatorArgParser {
 
   def main(args: Array[String]): Unit = {
-    parser.parse(args, EventWriterConfig()) match {
+    parser.parse(args, EventCorrelatorConfig()) match {
       case Some(config) => doMain(config)
       case None => sys.exit(1)
     }
   }
 
-  private def doMain(config: EventWriterConfig): Unit = {
+  private def doMain(config: EventCorrelatorConfig): Unit = {
     val spark = SparkSession.builder()
       .appName(getClass.getSimpleName)
       .getOrCreate()

@@ -1,11 +1,10 @@
 package com.github.tashoyan.telecom.correlator
 
-import com.github.tashoyan.telecom.correlator.EventWriterConfig._
 import scopt.OptionParser
 
-trait EventWriterArgParser {
+trait EventCorrelatorArgParser {
 
-  val parser: OptionParser[EventWriterConfig] = new OptionParser[EventWriterConfig]("event-writer") {
+  val parser: OptionParser[EventCorrelatorConfig] = new OptionParser[EventCorrelatorConfig]("event-writer") {
     head("Event Writer")
 
     opt[String]("schema-file")
@@ -39,14 +38,14 @@ trait EventWriterArgParser {
       .text("Kafka topic to receive events from")
 
     opt[String]("checkpoint-dir")
-      .optional()
+      .required()
       .valueName("<path>")
       .action((value, conf) => conf.copy(checkpointDir = value))
       .validate { value =>
         if (value.isEmpty) failure("Checkpoint directory must not be empty string")
         else success
       }
-      .text(s"Checkpoint directory on HDFS. Default is $defaultCheckpointDir.")
+      .text(s"Checkpoint directory on HDFS.")
 
     opt[String]("output-dir")
       .required()

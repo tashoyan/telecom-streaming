@@ -19,7 +19,7 @@ hdfs dfs -test -e "$checkpoint_dir" && hdfs dfs -rm -r -skipTrash "$checkpoint_d
 hdfs dfs -test -e "$input_dir" && hdfs dfs -rm -r -skipTrash "$input_dir"
 hdfs dfs -test -e "$event_schema_file" && hdfs dfs -rm -r -skipTrash "$event_schema_file"
 hdfs dfs -mkdir -p "$input_dir"
-hdfs dfs -put "sampler/target/event_schema.parquet" "$event_schema_file"
+hdfs dfs -put "sampler/target/event_schema.parquet" "$(dirname $event_schema_file)"
 hdfs dfs -ls "$input_dir"/../
 
 spark-submit \

@@ -66,7 +66,11 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
       .join(totalStationCounts, Seq(controllerColumn), "inner")
       .where(col("affected_station_count") === col("total_station_count"))
 
-    val query = controllerAlarms
+    val kafkaAlarms = controllerAlarms
+      .withJsonColumn(valueColumn)
+      .withColumn(keyColumn, col(controllerColumn) cast StringType)
+
+    val query = kafkaAlarms
       .writeStream
       .outputMode(OutputMode.Update())
       .queryName(getClass.getSimpleName)

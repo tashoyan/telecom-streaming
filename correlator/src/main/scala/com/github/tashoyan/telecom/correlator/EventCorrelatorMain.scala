@@ -66,7 +66,7 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
 
     val query = controllerAlarms
       .writeStream
-      .outputMode(OutputMode.Append())
+      .outputMode(OutputMode.Update())
       .queryName(getClass.getSimpleName)
       .format("kafka")
       .option("kafka.bootstrap.servers", config.kafkaBrokers)

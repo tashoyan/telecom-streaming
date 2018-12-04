@@ -4,7 +4,7 @@ import scopt.OptionParser
 
 trait EventCorrelatorArgParser {
 
-  val parser: OptionParser[EventCorrelatorConfig] = new OptionParser[EventCorrelatorConfig]("event-writer") {
+  val parser: OptionParser[EventCorrelatorConfig] = new OptionParser[EventCorrelatorConfig]("event-correlator") {
     head("Event Writer")
 
     opt[String]("schema-file")
@@ -17,6 +17,16 @@ trait EventCorrelatorArgParser {
       }
       .text("Full path to the Parquet location having event's schema")
 
+    opt[String]("topology-file")
+      .required()
+      .valueName("<path>")
+      .action((value, conf) => conf.copy(topologyFile = value))
+      .validate { value =>
+        if (value.isEmpty) failure("Path to topology file must not be empty string")
+        else success
+      }
+      .text("Full path to the Parquet location with topology file")
+
     opt[String]("kafka-brokers")
       .required()
       .valueName("host1:9092[,host2:9092,...]")
@@ -27,10 +37,10 @@ trait EventCorrelatorArgParser {
       }
       .text("List of comma-separated Kafka brokers")
 
-    opt[String]("kafka-topic")
+    opt[String]("kafka-input-topic")
       .required()
       .valueName("<topic>")
-      .action((value, conf) => conf.copy(kafkaTopic = value))
+      .action((value, conf) => conf.copy(kafkaInputTopic = value))
       .validate { value =>
         if (value.isEmpty) failure("Kafka topic must not be empty string")
         else success
@@ -47,15 +57,15 @@ trait EventCorrelatorArgParser {
       }
       .text(s"Checkpoint directory on HDFS.")
 
-    opt[String]("output-dir")
+    opt[String]("kafka-output-topic")
       .required()
-      .valueName("<path>")
-      .action((value, conf) => conf.copy(outputDir = value))
+      .valueName("<topic>")
+      .action((value, conf) => conf.copy(kafkaOutputTopic = value))
       .validate { value =>
-        if (value.isEmpty) failure("Output events path must not be empty string")
+        if (value.isEmpty) failure("Kafka topic must not be empty string")
         else success
       }
-      .text("Full path to the output directory where Parquet files with events will be written")
+      .text("Kafka topic to send events to")
 
     help("help")
     version("version")

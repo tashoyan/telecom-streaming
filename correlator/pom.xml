@@ -41,11 +41,6 @@
             <artifactId>spark-catalyst_${compiler.scala.compat.version}</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-reflect</artifactId>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
 
     <build>

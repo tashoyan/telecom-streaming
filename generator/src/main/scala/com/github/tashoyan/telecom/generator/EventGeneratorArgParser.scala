@@ -4,7 +4,7 @@ import scopt.OptionParser
 
 trait EventGeneratorArgParser {
 
-  val parser: OptionParser[EventGeneratorConfig] = new OptionParser[EventGeneratorConfig]("event-producer") {
+  val parser: OptionParser[EventGeneratorConfig] = new OptionParser[EventGeneratorConfig]("event-generator") {
     head("Event Producer")
 
     opt[String]("schema-file")

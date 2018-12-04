@@ -54,6 +54,7 @@ object EventWriterMain extends EventWriterArgParser {
     val query = events
       .writeStream
       .outputMode(OutputMode.Append())
+      .queryName(getClass.getSimpleName)
       //TODO Explain in the article - partition Parquet storage
       .partitionBy(siteIdColumn, yearMonthColumn)
       .format("parquet")

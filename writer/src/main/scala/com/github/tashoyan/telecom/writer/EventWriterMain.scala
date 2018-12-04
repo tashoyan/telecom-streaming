@@ -39,6 +39,8 @@ object EventWriterMain extends EventWriterArgParser {
       .option("startingOffsets", "latest")
       .option("failOnDataLoss", "false")
       .load()
+      //TODO Explain in the article: partition by stations, to evenly distribute the load on Spark executors
+      .repartition(col(siteIdColumn))
 
     val jsonColumn = "json_value"
     val yearMonthColumn = "year_month"
@@ -48,14 +50,12 @@ object EventWriterMain extends EventWriterArgParser {
       .parseJsonColumn(jsonColumn, schema)
       .drop(jsonColumn)
       .withColumn(yearMonthColumn, yearMonthUdf(col(timestampColumn)))
-      //TODO Is it really necessary - repartition Spark data frame?
-      .repartition(col(yearMonthColumn))
 
     val query = events
       .writeStream
       .outputMode(OutputMode.Append())
       //TODO Explain in the article - partition Parquet storage
-      .partitionBy(yearMonthColumn)
+      .partitionBy(siteIdColumn, yearMonthColumn)
       .format("parquet")
       .option("path", config.outputDir)
       .option("checkpointLocation", config.checkpointDir)

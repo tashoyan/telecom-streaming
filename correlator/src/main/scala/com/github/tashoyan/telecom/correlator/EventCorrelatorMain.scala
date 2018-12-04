@@ -60,7 +60,7 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
       .withWatermark(timestampColumn, "10 minutes")
       //TODO Configurable window
       .groupBy(window(col(timestampColumn), "1 minute", "30 seconds"), col(controllerColumn))
-      .agg(countDistinct(siteIdColumn) as "affected_station_count")
+      .agg(approx_count_distinct(siteIdColumn) as "affected_station_count")
 
     val controllerAlarms = affectedStationCounts
       .join(totalStationCounts, Seq(controllerColumn), "inner")

@@ -28,6 +28,10 @@ object EventWriterMain extends EventWriterArgParser {
       .parquet(config.schemaFile)
       .schema
 
+    /*
+    TODO Why only one Kafka consumer?
+    https://stackoverflow.com/questions/53605061/spark-structured-streaming-kafka-source-how-many-consumers
+     */
     val kafkaEvents = spark.readStream
       .format("kafka")
       .option("kafka.bootstrap.servers", config.kafkaBrokers)

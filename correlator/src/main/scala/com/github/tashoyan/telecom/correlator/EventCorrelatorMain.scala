@@ -56,6 +56,8 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
     val affectedStationCounts = events
       //TODO Broadcast join with topology
       .join(topology, col(siteIdColumn) === col(stationColumn), "inner")
+      //TODO Configurable whatermark, explain in the article
+      .withWatermark(timestampColumn, "10 minutes")
       //TODO Configurable window
       .groupBy(window(col(timestampColumn), "1 minute", "30 seconds"), col(controllerColumn))
       .agg(countDistinct(siteIdColumn) as "affected_station_count")

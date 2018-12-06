@@ -49,6 +49,8 @@ object KillYarnApps {
         .asString
       if (response.code != 200)
         killApp(appId, attempt + 1)
+      else
+        Console.err.println(s"Killed app $appId on attempt $attempt")
     } else {
       Console.err.println(s"Failed to kill app $appId in $maxAttempts attempts")
     }

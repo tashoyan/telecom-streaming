@@ -40,8 +40,6 @@ object EventWriterMain extends EventWriterArgParser {
       .option("startingOffsets", "latest")
       .option("failOnDataLoss", "false")
       .load()
-      //TODO Explain in the article: partition by stations, to evenly distribute the load on Spark executors
-      .repartition(col(siteIdColumn))
 
     val jsonColumn = "json_value"
     val yearMonthColumn = "year_month"
@@ -50,6 +48,8 @@ object EventWriterMain extends EventWriterArgParser {
       .select(col("value") cast StringType as jsonColumn)
       .parseJsonColumn(jsonColumn, schema)
       .drop(jsonColumn)
+      //TODO Explain in the article: partition by stations, to evenly distribute the load on Spark executors
+      .repartition(col(siteIdColumn))
       .withColumn(yearMonthColumn, yearMonthUdf(col(timestampColumn)))
 
     val query = events

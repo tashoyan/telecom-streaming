@@ -6,7 +6,7 @@ set -o pipefail
 
 app_ids="$@"
 
-jar_file="$(ls writer/target/yarn-killer-*.jar | grep -vi javadoc || true)"
+jar_file="$(ls yarn-killer/target/yarn-killer-*.jar | grep -vi javadoc || true)"
 if test -z "$jar_file"
 then
     echo "Cannot find the application jar file. Is the project built? Exiting."

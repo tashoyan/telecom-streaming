@@ -24,6 +24,7 @@ object EventWriterMain extends EventWriterArgParser {
   }
 
   private def doMain(config: EventWriterConfig): Unit = {
+    println(config)
     val schema = spark.read
       .parquet(config.schemaFile)
       .schema

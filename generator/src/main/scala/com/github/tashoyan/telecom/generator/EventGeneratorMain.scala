@@ -21,6 +21,7 @@ object EventGeneratorMain extends EventGeneratorArgParser {
   }
 
   private def doMain(config: EventGeneratorConfig): Unit = {
+    println(config)
     /*
     TODO: Explain in the article: In production, schema inference is not recommended:
     http://spark.apache.org/docs/latest/structured-streaming-programming-guide.html#schema-inference-and-partition-of-streaming-dataframesdatasets

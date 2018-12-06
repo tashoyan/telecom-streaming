@@ -24,6 +24,7 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
   //TODO Refactor and enable scalastyle
   //scalastyle:off
   private def doMain(config: EventCorrelatorConfig): Unit = {
+    println(config)
     val schema = spark.read
       .parquet(config.schemaFile)
       .schema

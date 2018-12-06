@@ -5,7 +5,7 @@ import org.apache.spark.sql.SparkSession
 
 import scala.util.control.NonFatal
 
-class KillYarnApps {
+object KillYarnApps {
 
   private val spark = SparkSession.builder()
     .getOrCreate()

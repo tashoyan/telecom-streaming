@@ -16,6 +16,7 @@
         <module>generator</module>
         <module>writer</module>
         <module>correlator</module>
+        <module>yarn-killer</module>
         <!--<module>topology</module>-->
     </modules>
 
@@ -44,6 +45,7 @@
         <spark.version>2.4.0</spark.version>
         <graphframes.version>0.6.0-spark2.2-s_${compiler.scala.compat.version}</graphframes.version>
         <scopt.version>3.7.0</scopt.version>
+        <scalaj-http.version>2.4.1</scalaj-http.version>
         <scala-parser-combinators.version>1.0.4</scala-parser-combinators.version>
         <scalatest.version>3.0.4</scalatest.version>
         <scalactic.version>3.0.4</scalactic.version>
@@ -193,6 +195,11 @@
                 <groupId>com.github.scopt</groupId>
                 <artifactId>scopt_${compiler.scala.compat.version}</artifactId>
                 <version>${scopt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.scalaj</groupId>
+                <artifactId>scalaj-http_${compiler.scala.compat.version}</artifactId>
+                <version>${scalaj-http.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.scala-lang.modules</groupId>

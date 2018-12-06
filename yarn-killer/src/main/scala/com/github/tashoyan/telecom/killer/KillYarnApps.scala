@@ -1,11 +1,14 @@
 package com.github.tashoyan.telecom.killer
 
-import scalaj.http.Http
 import org.apache.spark.sql.SparkSession
+import scalaj.http.Http
 
+import scala.annotation.tailrec
 import scala.util.control.NonFatal
 
 object KillYarnApps {
+
+  private val maxAttempts = 3
 
   private val spark = SparkSession.builder()
     .getOrCreate()
@@ -26,9 +29,9 @@ object KillYarnApps {
       sys.exit(1)
     }
 
-    appIds.foreach { appId =>
+    appIds.par.foreach { appId =>
       try {
-        killApp(appId)
+        killApp(appId, 1)
       } catch {
         case NonFatal(e) =>
           Console.err.println(s"Failed to kill app $appId, advancing to the next one. Exception: ${e.getMessage}")
@@ -37,37 +40,18 @@ object KillYarnApps {
 
   }
 
-  private def killApp(appId: String): Unit = {
-    val response = Http(s"http://$rmUrl/ws/v1/cluster/apps/$appId/state")
-      .header("Content-Type", "application/json")
-      .put("""{"state": "KILLED"}""")
-      .asParamMap
-    println(response)
+  @tailrec
+  private def killApp(appId: String, attempt: Int): Unit = {
+    if (attempt <= maxAttempts) {
+      val response = Http(s"http://$rmUrl/ws/v1/cluster/apps/$appId/state")
+        .header("Content-Type", "application/json")
+        .put("""{"state": "KILLED"}""")
+        .asString
+      if (response.code != 200)
+        killApp(appId, attempt + 1)
+    } else {
+      Console.err.println(s"Failed to kill app $appId in $maxAttempts attempts")
+    }
   }
-
-  //  private def httpPutJson(url: String, jsonData: String): (Int, String) = {
-  //    val connection: HttpURLConnection = new URL(url).openConnection().asInstanceOf[HttpURLConnection]
-  //    connection.setDoOutput(true)
-  //    connection.setRequestMethod("PUT")
-  //    connection.setRequestProperty("Content-Type", "application/json")
-  //    var out: Writer = null
-  //    try {
-  //      out = new OutputStreamWriter(connection.getOutputStream)
-  //      out.write(jsonData)
-  //    } finally {
-  //      if (out != null)
-  //        out.close()
-  //    }
-  //
-  //    val responseCode = connection.getResponseCode
-  //    try {
-  //      val responseText = connection.getInputStream.text
-  //      new Tuple2<>(responseCode, responseText)
-  //    } catch (IOException) {
-  //      String responseText = connection.errorStream.text
-  //      new Tuple2<>(responseCode, responseText)
-  //    }
-  //
-  //  }
 
 }

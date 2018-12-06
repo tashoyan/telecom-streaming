@@ -61,12 +61,14 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
       .withWatermark(timestampColumn, "10 minutes")
       //TODO Configurable window
       .groupBy(window(col(timestampColumn), "1 minute", "30 seconds"), col(controllerColumn))
+      //TODO Explain in the article: Workaround for countDistinct() missing for streaming data sets
       .agg(collect_set(siteIdColumn) as "affected_stations")
       .withColumn("affected_station_count", size(col("affected_stations")))
+      .drop("affected_stations")
 
     val controllerAlarms = affectedStationCounts
       .join(totalStationCounts, Seq(controllerColumn), "inner")
-    //      .where(col("affected_station_count") === col("total_station_count"))
+      .where(col("affected_station_count") === col("total_station_count"))
 
     val kafkaAlarms = controllerAlarms
       .withJsonColumn(valueColumn)

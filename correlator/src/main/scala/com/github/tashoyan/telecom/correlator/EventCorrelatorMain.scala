@@ -53,19 +53,20 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
       //TODO Redundant repartition - join will do repartition
       .repartition(col(siteIdColumn))
 
-    //TODO Inner join - drop events with unknown stations?
     val affectedStationCounts = events
+      //TODO Inner join - drop events with unknown stations?
       //TODO Broadcast join with topology
       .join(topology, col(siteIdColumn) === col(stationColumn), "inner")
       //TODO Configurable whatermark, explain in the article
       .withWatermark(timestampColumn, "10 minutes")
       //TODO Configurable window
       .groupBy(window(col(timestampColumn), "1 minute", "30 seconds"), col(controllerColumn))
-      .agg(approx_count_distinct(siteIdColumn) as "affected_station_count")
+      .agg(collect_set(siteIdColumn) as "affected_stations")
+      .withColumn("affected_station_count", size(col("affected_stations")))
 
     val controllerAlarms = affectedStationCounts
       .join(totalStationCounts, Seq(controllerColumn), "inner")
-//      .where(col("affected_station_count") === col("total_station_count"))
+    //      .where(col("affected_station_count") === col("total_station_count"))
 
     val kafkaAlarms = controllerAlarms
       .withJsonColumn(valueColumn)

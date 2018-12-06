@@ -24,7 +24,8 @@ hdfs dfs -mkdir -p "$output_dir"
 hdfs dfs -put "sampler/target/event_schema.parquet" "$event_schema_file"
 hdfs dfs -ls "$output_dir"/../
 
-app_name="$(basename $0)"
+#app_name="$(basename $0)"
+app_name="Pattern Mining 1.1.1SNAPSHOT"
 spark-submit \
 --name "$app_name" \
 --master yarn \

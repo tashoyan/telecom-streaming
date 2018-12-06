@@ -18,4 +18,5 @@ spark-submit \
 --name "$app_name" \
 --master local \
 --class com.github.tashoyan.telecom.killer.KillYarnApps \
-"$jar_file"
+"$jar_file" \
+"$app_ids"

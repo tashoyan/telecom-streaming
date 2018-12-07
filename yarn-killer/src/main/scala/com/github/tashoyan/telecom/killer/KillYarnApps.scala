@@ -18,9 +18,9 @@ object KillYarnApps {
   private val rmUrl: String = Option(spark.sparkContext
     .hadoopConfiguration)
     .map(_.get("yarn.resourcemanager.webapp.address")).getOrElse {
-      Console.err.println("Cannot get Resource Manager URL from the Hadoop configuration. Is HADOOP_CONF_DIR variable defined? Exiting.")
-      sys.exit(1)
-    }
+    Console.err.println("Cannot get Resource Manager URL from the Hadoop configuration. Is HADOOP_CONF_DIR variable defined? Exiting.")
+    sys.exit(1)
+  }
 
   def main(args: Array[String]): Unit = {
     val appIds = args
@@ -29,16 +29,20 @@ object KillYarnApps {
       sys.exit(1)
     }
 
-    appIds.par.foreach { appId =>
-      try {
-        killApp(appId, 1)
-      } catch {
-        case NonFatal(e) =>
-          Console.err.println(s"Failed to kill app $appId, advancing to the next one. Exception: ${e.getMessage}")
+    appIds.par
+      .foreach { appId =>
+        try {
+          killApp(appId)
+        } catch {
+          case NonFatal(e) =>
+            Console.err.println(s"Failed to kill app $appId. Exception: ${e.getMessage}")
+        }
       }
-    }
 
   }
+
+  private def killApp(appId: String): Unit =
+    killApp(appId, 1)
 
   @tailrec
   private def killApp(appId: String, attempt: Int): Unit = {

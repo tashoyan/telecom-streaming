@@ -60,6 +60,8 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
       //TODO Inner join - drop events with unknown stations?
       //TODO Broadcast join with topology
       .join(topology, col(siteIdColumn) === col(stationColumn), "inner")
+      //TODO Configurable whatermark, explain in the article
+      .withWatermark(timestampColumn, "10 minutes")
       //TODO Configurable window
       //TODO Explain in the article: count affected stations for each controller within a time window.
       .groupBy(window(col(timestampColumn), "1 minute", "30 seconds"), col(controllerColumn))

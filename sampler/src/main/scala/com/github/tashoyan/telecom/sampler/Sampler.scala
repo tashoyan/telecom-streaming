@@ -10,6 +10,20 @@ import org.apache.spark.sql.Dataset
 
 object Sampler {
 
+  /**
+    * Generates event sample evenly distributed per stations and within a time range.
+    *
+    * @param stations             Stations - sources of the events.
+    * @param timeRangeMillis      - Time range width in ms, where the events will have their timestamps.
+    * @param perStationMultiplier - How many events generate for each station.
+    *                             For each station, all events have the same timestamp.
+    *                             The purpose is to simulate duplicated events.
+    * @return Sample of events.
+    *         The events will have a dummy timestamp,
+    *         just the offset in milliseconds from the time range boundary.
+    *         Event Generator is expected to substitute real timestamps:
+    *         real_timestamp = current_time - offset
+    */
   def generateEvents(stations: Seq[Int], timeRangeMillis: Long, perStationMultiplier: Int): Seq[Event] = {
     require(stations.nonEmpty, "stations set must be non empty")
     require(timeRangeMillis > 0, "timeRangeMillis must be > 0")

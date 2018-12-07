@@ -20,6 +20,7 @@ object Sampler {
     stations
       .zipWithIndex
       .map { case (station, index) =>
+        //Dummy timestamp - will be used as event offset within the event time range
         (station.toLong, new Timestamp(index * eventIntervalMillis))
       }
       .flatMap(Seq.fill(perStationMultiplier)(_))

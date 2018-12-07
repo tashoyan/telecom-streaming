@@ -1,5 +1,7 @@
 package com.github.tashoyan.telecom.sampler
 
+import java.util.concurrent.TimeUnit
+
 import com.github.tashoyan.telecom.event.Event
 import com.github.tashoyan.telecom.sampler.Sampler._
 import com.github.tashoyan.telecom.test.SparkTestHarness
@@ -17,10 +19,9 @@ class SampleGeneratorTest extends FunSuite with SparkTestHarness {
     writeEvents(empty, "target/event_schema")
   }
 
-  test("controllers 2715, 2016 - all") {
+  test("controllers 2715, 2016 - all - 1 min - duplicates") {
     val spark0 = spark
     import spark0.implicits._
-    val sampler = new Sampler(2)
 
     val topologyFile = this.getClass
       .getResource("topology_controller_station.parquet")
@@ -32,16 +33,18 @@ class SampleGeneratorTest extends FunSuite with SparkTestHarness {
         col("controller") === 2716
     )
       .select("station")
-      .as[Integer]
+      .as[Int]
+      .collect()
 
-    val events = sampler.generateEvents(stations)
-    writeEvents(events, "target/events_controllers_2715_2716_all")
+    val events = Sampler
+      .generateEvents(stations, TimeUnit.MINUTES.toMillis(1), 2)
+      .toDS()
+    writeEvents(events, "target/events_controllers_2715_2716_all_1min_dup")
   }
 
-  test("controllers 2715, 2016 - half 1, 2") {
+  test("controllers 2715, 2016 - half 1, 2 - 1 min - duplicates") {
     val spark0 = spark
     import spark0.implicits._
-    val sampler = new Sampler(2)
 
     val topologyFile = this.getClass
       .getResource("topology_controller_station.parquet")
@@ -60,9 +63,12 @@ class SampleGeneratorTest extends FunSuite with SparkTestHarness {
       val stations = bothControllers
         .where(col("half") === half)
         .select("station")
-        .as[Integer]
-      val events = sampler.generateEvents(stations)
-      writeEvents(events, s"target/events_controllers_2715_2716_half$half")
+        .as[Int]
+        .collect()
+      val events = Sampler
+        .generateEvents(stations, TimeUnit.MINUTES.toMillis(1), 2)
+        .toDS()
+      writeEvents(events, s"target/events_controllers_2715_2716_half${half}_1min_dup")
     }
   }
 

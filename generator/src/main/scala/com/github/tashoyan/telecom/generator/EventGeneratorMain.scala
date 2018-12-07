@@ -39,17 +39,17 @@ object EventGeneratorMain extends EventGeneratorArgParser {
       .schema(schema)
       .parquet(config.inputDir)
 
-    //TODO Configurable event timestamp interval
-    val timestampIntervalSec = TimeUnit.MINUTES.toSeconds(1)
-    val eventTimestampUdf = udf { (currentTimeSec: Long, random: Double) =>
-      val eventTimestampSec = currentTimeSec - math.round(random * timestampIntervalSec)
-      new Timestamp(TimeUnit.SECONDS.toMillis(eventTimestampSec))
+    val eventTimestampUdf = udf { (currentTimeSec: Long, dummyTimestamp: Timestamp) =>
+      val timestampMillis: Long = TimeUnit.SECONDS.toMillis(currentTimeSec) - dummyTimestamp.getTime
+      new Timestamp(timestampMillis)
     }
     val events = inputEvents
-      .withColumn("current_time_seq", unix_timestamp())
-      .withColumn("random", rand())
-      .withColumn(timestampColumn, eventTimestampUdf(col("current_time_seq"), col("random")))
-      .drop("current_time_seq", "random")
+      .withColumn("current_time_sec", unix_timestamp())
+      .withColumn(
+        timestampColumn,
+        eventTimestampUdf(col("current_time_seq"), col(timestampColumn))
+      )
+      .drop("current_time_seq")
 
     val kafkaEvents = events
       .withJsonColumn(valueColumn)

@@ -5,38 +5,28 @@ import java.nio.file.Files
 import java.sql.Timestamp
 
 import com.github.tashoyan.telecom.event.Event
-import com.github.tashoyan.telecom.event.Event._
 import org.apache.commons.io.FileUtils.deleteDirectory
-import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{Dataset, SparkSession}
-
-class Sampler(val eventsPerStation: Int)(implicit spark: SparkSession) {
-
-  def generateEvents(stations: Dataset[Integer]): Dataset[Event] = {
-    import spark.implicits._
-
-    val stationCount = eventsPerStation
-    val stationsUdf = udf { station: Integer =>
-      Seq.fill(stationCount)(station.toLong)
-    }
-    val infoUdf = udf { siteId: Long =>
-      s"Communication failure at site $siteId"
-    }
-
-    stations
-      .withColumn("stations", stationsUdf(col("station")))
-      .withColumn(siteIdColumn, explode(col("stations")))
-      //Let the Event Generator set timestamps of the generated events
-      .withColumn(timestampColumn, lit(new Timestamp(0L)))
-      .withColumn(severityColumn, lit("MAJOR"))
-      .withColumn(infoColumn, infoUdf(col(siteIdColumn)))
-      .drop("station", "stations")
-      .as[Event]
-  }
-
-}
+import org.apache.spark.sql.Dataset
 
 object Sampler {
+
+  def generateEvents(stations: Seq[Int], timeRangeMillis: Long, perStationMultiplier: Int): Seq[Event] = {
+    require(stations.nonEmpty, "stations set must be non empty")
+    require(timeRangeMillis > 0, "timeRangeMillis must be > 0")
+    require(perStationMultiplier > 0, "perStationMultiplier must be > 0")
+
+    val eventIntervalMillis: Long = timeRangeMillis / stations.size
+
+    stations
+      .zipWithIndex
+      .map { case (station, index) =>
+        (station.toLong, new Timestamp(index * eventIntervalMillis))
+      }
+      .flatMap(Seq.fill(perStationMultiplier)(_))
+      .map { case (siteId, timestamp: Timestamp) =>
+        Event(timestamp, siteId, "MAJOR", s"Communication failure at site $siteId")
+      }
+  }
 
   def writeEvents(events: Dataset[Event], path: String): Unit = {
     events

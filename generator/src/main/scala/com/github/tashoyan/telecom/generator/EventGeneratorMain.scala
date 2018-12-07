@@ -41,7 +41,7 @@ object EventGeneratorMain extends EventGeneratorArgParser {
 
     val now = System.currentTimeMillis()
     //TODO Configurable event timestamp interval
-    val timestampInterval = TimeUnit.MINUTES.toMillis(5)
+    val timestampInterval = TimeUnit.MINUTES.toMillis(1)
     val eventTimestampUdf = udf { random: Double =>
       val tsMillis: Long = now - math.round(timestampInterval * random)
       new Timestamp(tsMillis)

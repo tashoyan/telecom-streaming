@@ -17,10 +17,11 @@ object KillYarnApps {
 
   private val rmUrl: String = Option(spark.sparkContext
     .hadoopConfiguration)
-    .map(_.get("yarn.resourcemanager.webapp.address")).getOrElse {
-    Console.err.println("Cannot get Resource Manager URL from the Hadoop configuration. Is HADOOP_CONF_DIR variable defined? Exiting.")
-    sys.exit(1)
-  }
+    .flatMap(hadoopConf => Option(hadoopConf.get("yarn.resourcemanager.webapp.address")))
+    .getOrElse {
+      Console.err.println("Cannot get Resource Manager URL from the Hadoop configuration. Is HADOOP_CONF_DIR variable defined? Exiting.")
+      sys.exit(1)
+    }
 
   def main(args: Array[String]): Unit = {
     val appIds = args

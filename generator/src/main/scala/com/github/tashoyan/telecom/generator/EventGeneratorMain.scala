@@ -46,10 +46,10 @@ object EventGeneratorMain extends EventGeneratorArgParser {
       new Timestamp(TimeUnit.SECONDS.toMillis(eventTimestampSec))
     }
     val events = inputEvents
-      .withColumn("random", rand())
       .withColumn("current_time_seq", unix_timestamp())
-      .withColumn(timestampColumn, eventTimestampUdf(col("random"), col("current_time_seq")))
-      .drop("random", "current_time_seq")
+      .withColumn("random", rand())
+      .withColumn(timestampColumn, eventTimestampUdf(col("current_time_seq"), col("random")))
+      .drop("current_time_seq", "random")
 
     val kafkaEvents = events
       .withJsonColumn(valueColumn)

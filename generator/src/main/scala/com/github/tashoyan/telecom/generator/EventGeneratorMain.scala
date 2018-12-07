@@ -1,5 +1,8 @@
 package com.github.tashoyan.telecom.generator
 
+import java.sql.Timestamp
+import java.util.concurrent.TimeUnit
+
 import com.github.tashoyan.telecom.event.Event._
 import com.github.tashoyan.telecom.spark.DataFrames.RichDataFrame
 import org.apache.spark.sql.SparkSession
@@ -20,6 +23,8 @@ object EventGeneratorMain extends EventGeneratorArgParser {
     }
   }
 
+  //TODO Refactor and enable scalastyle
+  //scalastyle:off
   private def doMain(config: EventGeneratorConfig): Unit = {
     println(config)
     /*
@@ -34,7 +39,18 @@ object EventGeneratorMain extends EventGeneratorArgParser {
       .schema(schema)
       .parquet(config.inputDir)
 
-    val kafkaEvents = inputEvents
+    val now = System.currentTimeMillis()
+    //TODO Configurable event timestamp interval
+    val timestampInterval = TimeUnit.MINUTES.toMillis(5)
+    val eventTimestampUdf = udf { random: Double =>
+      val tsMillis: Long = now - math.round(timestampInterval * random)
+      new Timestamp(tsMillis)
+    }
+    val events = inputEvents
+      .withColumn("random", rand())
+      .withColumn(timestampColumn, eventTimestampUdf(col("random")))
+
+    val kafkaEvents = events
       .withJsonColumn(valueColumn)
       /*
       TODO Explain in the article:
@@ -63,5 +79,6 @@ object EventGeneratorMain extends EventGeneratorArgParser {
       .start()
     query.awaitTermination()
   }
+  //scalastyle:on
 
 }

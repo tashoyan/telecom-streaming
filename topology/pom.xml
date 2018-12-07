@@ -34,10 +34,6 @@
             <artifactId>graphframes</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-reflect</artifactId>
-        </dependency>
-        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>test-resources</artifactId>
             <version>${project.version}</version>

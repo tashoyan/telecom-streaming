@@ -26,7 +26,6 @@ class Sampler(val eventsPerStation: Int)(implicit spark: SparkSession) {
     stations
       .withColumn("stations", stationsUdf(col("station")))
       .withColumn(siteIdColumn, explode(col("stations")))
-      .withColumn(idColumn, monotonically_increasing_id())
       //Let the Event Generator set timestamps of the generated events
       .withColumn(timestampColumn, lit(new Timestamp(0L)))
       .withColumn(severityColumn, lit("MAJOR"))

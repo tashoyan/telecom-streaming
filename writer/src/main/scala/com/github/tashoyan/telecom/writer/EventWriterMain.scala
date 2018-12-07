@@ -48,6 +48,13 @@ object EventWriterMain extends EventWriterArgParser {
       .select(col("value") cast StringType as jsonColumn)
       .parseJsonColumn(jsonColumn, schema)
       .drop(jsonColumn)
+      //TODO Configurable whatermark
+      /*
+      TODO Explain in the article: deduplicate events by site and timestamp
+      We have a case when a station does not provide unique identifiers for events.
+      */
+      .withWatermark(timestampColumn, "10 minutes")
+      .dropDuplicates(timestampColumn, siteIdColumn)
       //TODO Explain in the article: partition by stations, to evenly distribute the load on Spark executors
       .repartition(col(siteIdColumn))
       .withColumn(yearMonthColumn, yearMonthUdf(col(timestampColumn)))

@@ -50,6 +50,9 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
       .select(col("value") cast StringType as jsonColumn)
       .parseJsonColumn(jsonColumn, schema)
       .drop(jsonColumn)
+      //TODO Configurable whatermark, explain in the article
+      .withWatermark(timestampColumn, "10 minutes")
+      .dropDuplicates(timestampColumn, siteIdColumn)
       //TODO Redundant repartition - join will do repartition
       .repartition(col(siteIdColumn))
 
@@ -57,9 +60,8 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
       //TODO Inner join - drop events with unknown stations?
       //TODO Broadcast join with topology
       .join(topology, col(siteIdColumn) === col(stationColumn), "inner")
-      //TODO Configurable whatermark, explain in the article
-      .withWatermark(timestampColumn, "10 minutes")
       //TODO Configurable window
+      //TODO Explain in the article: count affected stations for each controller within a time window.
       .groupBy(window(col(timestampColumn), "1 minute", "30 seconds"), col(controllerColumn))
       //TODO Explain in the article: Workaround for countDistinct() missing for streaming data sets
       .agg(collect_set(siteIdColumn) as "affected_stations")

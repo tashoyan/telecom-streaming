@@ -49,7 +49,7 @@ class SampleGeneratorTest extends FunSuite with SparkTestHarness {
     val topology = spark.read.parquet(topologyFile)
     val window = Window.partitionBy("controller")
       .orderBy("station")
-    //Total: 242 = 126 + 116
+    //Total: 242 = 126[2715] + 116[2716]
     val bothControllers = topology.where(
       col("controller") === 2715 or
         col("controller") === 2716

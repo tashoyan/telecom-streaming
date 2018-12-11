@@ -3,10 +3,10 @@ package com.github.tashoyan.telecom.correlator
 import com.github.tashoyan.telecom.event.Event._
 import com.github.tashoyan.telecom.spark.DataFrames.RichDataFrame
 import com.github.tashoyan.telecom.topology.Topology._
-import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.streaming.OutputMode
-import org.apache.spark.sql.types.StringType
+import org.apache.spark.sql.streaming.{OutputMode, StreamingQuery}
+import org.apache.spark.sql.types.{StringType, StructType}
+import org.apache.spark.sql.{DataFrame, SparkSession}
 
 object EventCorrelatorMain extends EventCorrelatorArgParser {
   private val spark = SparkSession.builder()
@@ -21,8 +21,6 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
     }
   }
 
-  //TODO Refactor and enable scalastyle
-  //scalastyle:off
   private def doMain(config: EventCorrelatorConfig): Unit = {
     println(config)
     val schema = spark.read
@@ -35,21 +33,7 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
       .groupBy(controllerColumn)
       .agg(count(stationColumn) as "total_station_count")
 
-    val kafkaEvents = spark.readStream
-      .format("kafka")
-      .option("kafka.bootstrap.servers", config.kafkaBrokers)
-      .option("subscribe", config.kafkaInputTopic)
-      .option("startingOffsets", "latest")
-      .option("failOnDataLoss", "false")
-      .load()
-
-    val jsonColumn = "json_value"
-    val events = kafkaEvents
-      .select(col("value") cast StringType as jsonColumn)
-      .parseJsonColumn(jsonColumn, schema)
-      .drop(jsonColumn)
-      .withWatermark(timestampColumn, s"${config.watermarkIntervalSec} seconds")
-      .dropDuplicates(timestampColumn, siteIdColumn)
+    val events = loadEvents(config, schema)
 
     val affectedStationCounts = events
       /*
@@ -72,7 +56,31 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
       .join(totalStationCounts, Seq(controllerColumn), "inner")
       .where(col("affected_station_count") === col("total_station_count"))
 
-    val kafkaAlarms = controllerAlarms
+    val query = createAndStartAlarmQuery(config, controllerAlarms)
+    query.awaitTermination()
+  }
+
+  private def loadEvents(config: EventCorrelatorConfig, schema: StructType): DataFrame = {
+    val kafkaEvents = spark.readStream
+      .format("kafka")
+      .option("kafka.bootstrap.servers", config.kafkaBrokers)
+      .option("subscribe", config.kafkaInputTopic)
+      .option("startingOffsets", "latest")
+      .option("failOnDataLoss", "false")
+      .load()
+
+    val jsonColumn = "json_value"
+    val events = kafkaEvents
+      .select(col("value") cast StringType as jsonColumn)
+      .parseJsonColumn(jsonColumn, schema)
+      .drop(jsonColumn)
+      .withWatermark(timestampColumn, s"${config.watermarkIntervalSec} seconds")
+      .dropDuplicates(timestampColumn, siteIdColumn)
+    events
+  }
+
+  private def createAndStartAlarmQuery(config: EventCorrelatorConfig, alarms: DataFrame): StreamingQuery = {
+    val kafkaAlarms = alarms
       .withJsonColumn(valueColumn)
       .withColumn(keyColumn, col(controllerColumn) cast StringType)
 
@@ -85,8 +93,7 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
       .option("topic", config.kafkaOutputTopic)
       .option("checkpointLocation", config.checkpointDir)
       .start()
-    query.awaitTermination()
+    query
   }
-  //scalastyle:on
 
 }

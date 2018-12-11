@@ -23,7 +23,6 @@ object EventGeneratorMain extends EventGeneratorArgParser {
     }
   }
 
-  //scalastyle:off
   private def doMain(config: EventGeneratorConfig): Unit = {
     println(config)
     val schema = spark.read
@@ -65,6 +64,5 @@ object EventGeneratorMain extends EventGeneratorArgParser {
       .start()
     query.awaitTermination()
   }
-  //scalastyle:on
 
 }

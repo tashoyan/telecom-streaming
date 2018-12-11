@@ -10,6 +10,7 @@ kafka_brokers="ossv147:9092"
 kafka_input_topic="events"
 kafka_output_topic="alarms"
 checkpoint_dir="/stream/checkpoint-correlator"
+watermark_interval_sec=600
 
 jar_file="$(ls correlator/target/correlator-*.jar | grep -vi javadoc || true)"
 if test -z "$jar_file"
@@ -41,4 +42,5 @@ spark-submit \
 --kafka-brokers "$kafka_brokers" \
 --kafka-input-topic "$kafka_input_topic" \
 --kafka-output-topic "$kafka_output_topic" \
---checkpoint-dir "$checkpoint_dir"
+--checkpoint-dir "$checkpoint_dir" \
+--watermark-interval-sec "$watermark_interval_sec"

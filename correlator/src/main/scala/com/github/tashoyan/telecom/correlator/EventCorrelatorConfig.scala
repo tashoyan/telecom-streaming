@@ -6,5 +6,6 @@ case class EventCorrelatorConfig(
     kafkaBrokers: String = "",
     kafkaInputTopic: String = "",
     checkpointDir: String = "",
-    kafkaOutputTopic: String = ""
+    kafkaOutputTopic: String = "",
+    watermarkIntervalSec: Int = 0
 )

@@ -48,8 +48,7 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
       .select(col("value") cast StringType as jsonColumn)
       .parseJsonColumn(jsonColumn, schema)
       .drop(jsonColumn)
-      //TODO Configurable watermark, explain in the article
-      .withWatermark(timestampColumn, "10 minutes")
+      .withWatermark(timestampColumn, s"${config.watermarkIntervalSec} seconds")
       .dropDuplicates(timestampColumn, siteIdColumn)
 
     val affectedStationCounts = events

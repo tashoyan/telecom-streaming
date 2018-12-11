@@ -77,6 +77,7 @@ Run Event Correlator:
    ```
    Note that Parquet files in the input HDFS directory should have distinct names,
    to let Spark Streaming distinguish them as separate files.
+   You can find more event samples in the `sampler/target/` directory.
 1. If you put event samples frequently enough,
    you will see alarms coming from the `alarms` topic to the Kafka console consumer:
    ```text

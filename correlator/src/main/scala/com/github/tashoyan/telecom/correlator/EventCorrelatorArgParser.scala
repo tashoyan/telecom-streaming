@@ -90,7 +90,7 @@ trait EventCorrelatorArgParser {
     opt[Int]("window-shift-sec")
       .required()
       .valueName("<number>")
-      .action((value, conf) => conf.copy(windowSizeSec = value))
+      .action((value, conf) => conf.copy(windowShiftSec = value))
       .validate { value =>
         if (value <= 0) failure("Window shift must be positive number")
         else success

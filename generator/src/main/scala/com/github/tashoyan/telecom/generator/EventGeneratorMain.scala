@@ -23,14 +23,9 @@ object EventGeneratorMain extends EventGeneratorArgParser {
     }
   }
 
-  //TODO Refactor and enable scalastyle
   //scalastyle:off
   private def doMain(config: EventGeneratorConfig): Unit = {
     println(config)
-    /*
-    TODO: Explain in the article: In production, schema inference is not recommended:
-    http://spark.apache.org/docs/latest/structured-streaming-programming-guide.html#schema-inference-and-partition-of-streaming-dataframesdatasets
-    */
     val schema = spark.read
       .parquet(config.schemaFile)
       .schema
@@ -52,20 +47,12 @@ object EventGeneratorMain extends EventGeneratorArgParser {
     val kafkaEvents = events
       .withJsonColumn(valueColumn)
       /*
-      TODO Explain in the article:
       Kafka producer partition assignment: records having the same key go to the same topic partition.
       We ensure that events from the same site go through the same partition and preserve their order.
       Note that each Spark executor may send records to each Kafka broker hosting a partition.
       */
       //TODO Exactly once delivery: Kafka transactions and https://issues.apache.org/jira/browse/SPARK-25005
       .withColumn(keyColumn, col(siteIdColumn) cast StringType)
-
-    /*
-    TODO Generator may produce duplicates.
-    Kafka semantics: at least once. The Kafka producer may send a duplicate before getting ack from the broker.
-    TODO - clarify in Kafka doc.
-    Therefore, Correlator must handle duplicates (for ex., de-duplicate in each window by event id).
-    */
 
     val query = kafkaEvents
       .writeStream

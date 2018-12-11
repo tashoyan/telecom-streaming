@@ -77,6 +77,33 @@ trait EventCorrelatorArgParser {
       }
       .text("Watermark interval in seconds, used for time window aggregation and for event deduplication")
 
+    opt[Int]("window-size-sec")
+      .required()
+      .valueName("<number>")
+      .action((value, conf) => conf.copy(windowSizeSec = value))
+      .validate { value =>
+        if (value <= 0) failure("Window size must be positive number")
+        else success
+      }
+      .text("Sliding window size in seconds, used for time window aggregation")
+
+    opt[Int]("window-shift-sec")
+      .required()
+      .valueName("<number>")
+      .action((value, conf) => conf.copy(windowSizeSec = value))
+      .validate { value =>
+        if (value <= 0) failure("Window shift must be positive number")
+        else success
+      }
+      .text("Sliding window shift in seconds, used for time window aggregation")
+
+    checkConfig { config =>
+      if (config.windowSizeSec < config.windowShiftSec)
+        failure("Window shift must be less or equal to window size")
+      else
+        success
+    }
+
     help("help")
     version("version")
   }

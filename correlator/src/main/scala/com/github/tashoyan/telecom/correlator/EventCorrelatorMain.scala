@@ -57,8 +57,10 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
       Possible optimization: broadcast join.
       */
       .join(topology, col(siteIdColumn) === col(stationColumn), "inner")
-      //TODO Configurable window
-      .groupBy(window(col(timestampColumn), "1 minute", "30 seconds"), col(controllerColumn))
+      .groupBy(
+        window(col(timestampColumn), s"${config.windowSizeSec} seconds", s"${config.windowShiftSec} seconds"),
+        col(controllerColumn)
+      )
       /*
       Workaround: countDistinct() is unsupported for streaming data sets (Spark 2.4.0)
       */

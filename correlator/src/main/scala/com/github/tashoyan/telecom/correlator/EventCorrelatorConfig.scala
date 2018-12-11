@@ -7,5 +7,7 @@ case class EventCorrelatorConfig(
     kafkaInputTopic: String = "",
     checkpointDir: String = "",
     kafkaOutputTopic: String = "",
-    watermarkIntervalSec: Int = 0
+    watermarkIntervalSec: Int = 0,
+    windowSizeSec: Int = 0,
+    windowShiftSec: Int = 0
 )

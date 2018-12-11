@@ -31,8 +31,6 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
 
     val topology = spark.read
       .parquet(config.topologyFile)
-      //TODO Redundant repartition - join will do repartition
-      .repartition(col(stationColumn))
     val totalStationCounts = topology
       .groupBy(controllerColumn)
       .agg(count(stationColumn) as "total_station_count")
@@ -53,8 +51,6 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
       //TODO Configurable whatermark, explain in the article
       .withWatermark(timestampColumn, "10 minutes")
       .dropDuplicates(timestampColumn, siteIdColumn)
-      //TODO Redundant repartition - join will do repartition
-      .repartition(col(siteIdColumn))
 
     val affectedStationCounts = events
       //TODO Inner join - drop events with unknown stations?

@@ -9,6 +9,7 @@ kafka_brokers="ossv147:9092"
 kafka_topic="events"
 checkpoint_dir="/stream/checkpoint-writer"
 output_dir="/stream/output"
+watermark_interval_sec=600
 
 jar_file="$(ls writer/target/writer-*.jar | grep -vi javadoc || true)"
 if test -z "$jar_file"
@@ -39,4 +40,5 @@ spark-submit \
 --kafka-brokers "$kafka_brokers" \
 --kafka-topic "$kafka_topic" \
 --checkpoint-dir "$checkpoint_dir" \
---output-dir "$output_dir"
+--output-dir "$output_dir" \
+--watermark-interval-sec "$watermark_interval_sec"

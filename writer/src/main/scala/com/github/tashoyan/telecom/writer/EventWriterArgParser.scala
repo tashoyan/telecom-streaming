@@ -57,6 +57,16 @@ trait EventWriterArgParser {
       }
       .text("Full path to the output directory where Parquet files with events will be written")
 
+    opt[Int]("watermark-interval-sec")
+      .required()
+      .valueName("<number>")
+      .action((value, conf) => conf.copy(watermarkIntervalSec = value))
+      .validate { value =>
+        if (value <= 0) failure("Watermark interval must be positive number")
+        else success
+      }
+      .text("Watermark interval in seconds, used for event deduplication")
+
     help("help")
     version("version")
   }

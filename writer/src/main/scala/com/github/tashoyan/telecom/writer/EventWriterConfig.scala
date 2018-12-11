@@ -5,5 +5,6 @@ case class EventWriterConfig(
     kafkaBrokers: String = "",
     kafkaTopic: String = "",
     checkpointDir: String = "",
-    outputDir: String = ""
+    outputDir: String = "",
+    watermarkIntervalSec: Int = 0
 )

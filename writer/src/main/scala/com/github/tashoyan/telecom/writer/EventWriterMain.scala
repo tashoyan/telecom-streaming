@@ -48,12 +48,11 @@ object EventWriterMain extends EventWriterArgParser {
       .select(col("value") cast StringType as jsonColumn)
       .parseJsonColumn(jsonColumn, schema)
       .drop(jsonColumn)
-      //TODO Configurable watermark
       /*
       We have a case when a station does not provide unique identifiers for events.
       An event is identified by a pair (timestamp, siteId)
       */
-      .withWatermark(timestampColumn, "10 minutes")
+      .withWatermark(timestampColumn, s"${config.watermarkIntervalSec} seconds")
       .dropDuplicates(timestampColumn, siteIdColumn)
       .repartition(col(siteIdColumn))
       .withColumn(yearMonthColumn, yearMonthUdf(col(timestampColumn)))

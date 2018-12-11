@@ -19,6 +19,29 @@ class SampleGeneratorTest extends FunSuite with SparkTestHarness {
     writeEvents(empty, "target/event_schema")
   }
 
+  test("controllers 2715, 2016 - all - 1 min - unique") {
+    val spark0 = spark
+    import spark0.implicits._
+
+    val topologyFile = this.getClass
+      .getResource("topology_controller_station.parquet")
+      .toString
+    val topology = spark.read.parquet(topologyFile)
+
+    val stations = topology.where(
+      col("controller") === 2715 or
+        col("controller") === 2716
+    )
+      .select("station")
+      .as[Int]
+      .collect()
+
+    val events = Sampler
+      .generateEvents(stations, TimeUnit.MINUTES.toMillis(1), 1)
+      .toDS()
+    writeEvents(events, "target/events_controllers_2715_2716_all_1min_uniq")
+  }
+
   test("controllers 2715, 2016 - all - 1 min - duplicates") {
     val spark0 = spark
     import spark0.implicits._

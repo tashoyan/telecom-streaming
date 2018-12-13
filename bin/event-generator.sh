@@ -24,8 +24,7 @@ hdfs dfs -mkdir -p "$input_dir"
 hdfs dfs -put "sampler/target/event_schema.parquet" "$event_schema_file"
 hdfs dfs -ls "$input_dir"/../
 
-#app_name="$(basename $0)"
-app_name="Text Labeling 1.1.1SNAPSHOT"
+app_name="$(basename $0)"
 spark-submit \
 --name "$app_name" \
 --master yarn \

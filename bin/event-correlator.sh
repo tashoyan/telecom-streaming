@@ -28,8 +28,7 @@ hdfs dfs -put "sampler/target/event_schema.parquet" "$event_schema_file"
 hdfs dfs -put "resources/topology_controller_station.parquet" "$topology_file"
 hdfs dfs -ls "$event_schema_file"/../
 
-#app_name="$(basename $0)"
-app_name="Pattern Regex Generator 1.1.1SNAPSHOT"
+app_name="$(basename $0)"
 spark-submit \
 --name "$app_name" \
 --master yarn \

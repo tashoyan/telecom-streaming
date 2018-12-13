@@ -6,7 +6,7 @@ set -o pipefail
 
 event_schema_file="/stream/event-schema-generator.parquet"
 input_dir="/stream/input"
-kafka_brokers="ossv147:9092"
+kafka_brokers="kafkabroker:9092"
 kafka_topic="events"
 checkpoint_dir="/stream/checkpoint-generator"
 

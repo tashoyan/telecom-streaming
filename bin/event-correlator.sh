@@ -6,7 +6,7 @@ set -o pipefail
 
 event_schema_file="/stream/event-schema-correlator.parquet"
 topology_file="/stream/topology-correlator.parquet"
-kafka_brokers="ossv147:9092"
+kafka_brokers="kafkabroker:9092"
 kafka_input_topic="events"
 kafka_output_topic="alarms"
 checkpoint_dir="/stream/checkpoint-correlator"

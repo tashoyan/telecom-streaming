@@ -5,7 +5,7 @@ set -o errexit
 set -o pipefail
 
 event_schema_file="/stream/event-schema-writer.parquet"
-kafka_brokers="ossv147:9092"
+kafka_brokers="kafkabroker:9092"
 kafka_topic="events"
 checkpoint_dir="/stream/checkpoint-writer"
 output_dir="/stream/output"

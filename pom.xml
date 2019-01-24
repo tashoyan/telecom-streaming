@@ -49,8 +49,8 @@
         <scopt.version>3.7.0</scopt.version>
         <scalaj-http.version>2.4.1</scalaj-http.version>
         <scala-parser-combinators.version>1.0.4</scala-parser-combinators.version>
-        <scalatest.version>3.0.4</scalatest.version>
-        <scalactic.version>3.0.4</scalactic.version>
+        <scalatest.version>3.0.5</scalatest.version>
+        <scalactic.version>3.0.5</scalactic.version>
         <guava.version>16.0.1</guava.version>
         <commons-collections.version>3.2.2</commons-collections.version>
         <commons-lang.version>2.6</commons-lang.version>

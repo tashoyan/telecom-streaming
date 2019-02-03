@@ -5,7 +5,7 @@ import scopt.OptionParser
 trait EventCorrelatorArgParser {
 
   val parser: OptionParser[EventCorrelatorConfig] = new OptionParser[EventCorrelatorConfig]("event-correlator") {
-    head("Event Writer")
+    head("Event Correlator")
 
     opt[String]("schema-file")
       .required()

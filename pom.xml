@@ -16,6 +16,7 @@
         <module>generator</module>
         <module>writer</module>
         <module>correlator</module>
+        <module>predictor-spark</module>
         <module>yarn-killer</module>
         <!--<module>topology</module>-->
     </modules>

@@ -17,6 +17,9 @@ class SparkPredictorMain extends SparkPredictorArgParser {
 
   private def doMain(config: SparkPredictorConfig): Unit = {
     println(config)
+    val schema = spark.read
+      .parquet(config.schemaFile)
+      .schema
 
     //TODO Complete
   }

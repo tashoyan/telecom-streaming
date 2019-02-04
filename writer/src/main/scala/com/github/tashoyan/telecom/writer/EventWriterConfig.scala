@@ -1,7 +1,6 @@
 package com.github.tashoyan.telecom.writer
 
 case class EventWriterConfig(
-    schemaFile: String = "",
     kafkaBrokers: String = "",
     kafkaTopic: String = "",
     checkpointDir: String = "",

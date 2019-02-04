@@ -4,7 +4,6 @@ set -o nounset
 set -o errexit
 set -o pipefail
 
-event_schema_file="/stream/event-schema-correlator.parquet"
 topology_file="/stream/topology-correlator.parquet"
 kafka_brokers="kafkabroker:9092"
 kafka_input_topic="events"
@@ -22,11 +21,9 @@ then
 fi
 
 hdfs dfs -test -e "$checkpoint_dir" && hdfs dfs -rm -r -skipTrash "$checkpoint_dir"
-hdfs dfs -test -e "$event_schema_file" && hdfs dfs -rm -r -skipTrash "$event_schema_file"
 hdfs dfs -test -e "$topology_file" && hdfs dfs -rm -r -skipTrash "$topology_file"
-hdfs dfs -put "sampler/target/event_schema.parquet" "$event_schema_file"
 hdfs dfs -put "resources/topology_controller_station.parquet" "$topology_file"
-hdfs dfs -ls "$event_schema_file"/../
+hdfs dfs -ls "$topology_file"/../
 
 app_name="$(basename $0)"
 spark-submit \
@@ -38,7 +35,6 @@ spark-submit \
 --conf spark.sql.shuffle.partitions=5 \
 --class com.github.tashoyan.telecom.correlator.EventCorrelatorMain \
 "$jar_file" \
---schema-file "$event_schema_file" \
 --topology-file "$topology_file" \
 --kafka-brokers "$kafka_brokers" \
 --kafka-input-topic "$kafka_input_topic" \

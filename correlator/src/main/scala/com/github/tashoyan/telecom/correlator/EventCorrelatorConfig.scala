@@ -1,7 +1,6 @@
 package com.github.tashoyan.telecom.correlator
 
 case class EventCorrelatorConfig(
-    schemaFile: String = "",
     topologyFile: String = "",
     kafkaBrokers: String = "",
     kafkaInputTopic: String = "",

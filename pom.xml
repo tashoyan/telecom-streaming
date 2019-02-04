@@ -46,7 +46,8 @@
         <scalatest-maven-plugin.version>2.0.0</scalatest-maven-plugin.version>
 
         <spark.version>2.4.0</spark.version>
-        <graphframes.version>0.6.0-spark2.2-s_${compiler.scala.compat.version}</graphframes.version>
+        <spark.compat.version>2.4</spark.compat.version>
+        <graphframes.version>0.7.0-spark${spark.compat.version}-s_${compiler.scala.compat.version}</graphframes.version>
         <scopt.version>3.7.0</scopt.version>
         <scalaj-http.version>2.4.1</scalaj-http.version>
         <scala-parser-combinators.version>1.0.4</scala-parser-combinators.version>

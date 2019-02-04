@@ -14,6 +14,12 @@ object Event {
   val siteIdColumn = "siteId"
   val severityColumn = "severity"
   val infoColumn = "info"
+  val columns: Set[String] = Set(
+    timestampColumn,
+    siteIdColumn,
+    severityColumn,
+    infoColumn
+  )
 
   val keyColumn = "key"
   val valueColumn = "value"

@@ -3,7 +3,9 @@ package com.github.tashoyan.telecom.event
 import java.nio.file.Files
 import java.sql.Timestamp
 
+import com.github.tashoyan.telecom.event.KafkaEventStream._
 import com.github.tashoyan.telecom.test.SparkTestHarness
+import com.github.tashoyan.telecom.util.Timestamps.RichTimestamp
 import net.manub.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
 import org.apache.spark.sql.streaming.OutputMode
 import org.apache.spark.sql.{Dataset, SaveMode}
@@ -11,7 +13,7 @@ import org.scalatest.FunSuite
 
 import scala.util.Random
 
-class KafkaEventLoaderTest extends FunSuite with EmbeddedKafka with SparkTestHarness {
+class KafkaEventStreamTest extends FunSuite with EmbeddedKafka with SparkTestHarness {
 
   test("integration - writeEvents + loadEvents") {
     val spark0 = spark
@@ -30,9 +32,8 @@ class KafkaEventLoaderTest extends FunSuite with EmbeddedKafka with SparkTestHar
     val kafkaConfig = EmbeddedKafkaConfig(kafkaPort = 0, zooKeeperPort = 0)
     //TODO Set up / tear down once for faster tests run
     withRunningKafkaOnFoundPort(kafkaConfig) { implicit actualConfig =>
-      println(actualConfig)
       val kafkaBrokers = s"localhost:${actualConfig.kafkaPort}"
-      val pollTimeoutMs = 500L
+      val pollTimeoutMs = defaultPollTimeoutMs
       val eventStream = new KafkaEventStream(
         kafkaBrokers,
         kafkaTopic = eventTopic(),
@@ -69,10 +70,10 @@ class KafkaEventLoaderTest extends FunSuite with EmbeddedKafka with SparkTestHar
 
     val resultEvents = spark.read
       .parquet(eventOutputDir)
-    resultEvents.show(false)
+      .as[Event]
     val result = resultEvents.collect()
     assert(result.length === sample.length)
-    //TODO Other checks
+    assert(result.sortBy(_.timestamp) === sample.sortBy(_.timestamp))
   }
 
   private def createCheckpointDir(): String =

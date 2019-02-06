@@ -1,4 +1,5 @@
 package com.github.tashoyan.telecom.event
+
 import com.github.tashoyan.telecom.event.KafkaEventStream._
 import com.github.tashoyan.telecom.spark.DataFrames.RichDataFrame
 import org.apache.spark.sql.functions._
@@ -7,16 +8,17 @@ import org.apache.spark.sql.{Dataset, SparkSession}
 
 /**
   * Loads events in JSON format from a Kafka stream.
-  * Parses events from the `value` column of the streaming data set.
   *
-  * @param kafkaBrokers Kafka brokers to connect to.
-  * @param kafkaTopic Kafka topic to consume from.
+  * @param kafkaBrokers  Kafka brokers to connect to.
+  * @param kafkaTopic    Kafka topic to consume from.
+  * @param pollTimeoutMs The timeout in milliseconds to poll data from Kafka topic.
   */
 class KafkaEventLoader(
-    kafkaBrokers: String,
-    kafkaTopic: String,
-    pollTimeoutMs: Long = defaultPollTimeoutMs
-)(implicit spark: SparkSession) extends EventLoader {
+                        kafkaBrokers: String,
+                        kafkaTopic: String,
+                        pollTimeoutMs: Long = defaultPollTimeoutMs
+                      )(implicit spark: SparkSession) extends EventLoader {
+
   import spark.implicits._
 
   private val eventSchema = spark.emptyDataset[Event].schema

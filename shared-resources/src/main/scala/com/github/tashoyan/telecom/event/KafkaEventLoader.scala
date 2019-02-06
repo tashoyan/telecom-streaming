@@ -1,4 +1,5 @@
 package com.github.tashoyan.telecom.event
+import com.github.tashoyan.telecom.event.KafkaEventStream._
 import com.github.tashoyan.telecom.spark.DataFrames.RichDataFrame
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.StringType
@@ -13,7 +14,8 @@ import org.apache.spark.sql.{Dataset, SparkSession}
   */
 class KafkaEventLoader(
     kafkaBrokers: String,
-    kafkaTopic: String
+    kafkaTopic: String,
+    pollTimeoutMs: Long = defaultPollTimeoutMs
 )(implicit spark: SparkSession) extends EventLoader {
   import spark.implicits._
 
@@ -28,13 +30,14 @@ class KafkaEventLoader(
       .format("kafka")
       .option("kafka.bootstrap.servers", kafkaBrokers)
       .option("subscribe", kafkaTopic)
+      .option("kafkaConsumer.pollTimeoutMs", pollTimeoutMs)
       .option("startingOffsets", "latest")
       .option("failOnDataLoss", "false")
       .load()
 
     val jsonColumn = "json_value"
     val events = kafkaEvents
-      .select(col("value") cast StringType as jsonColumn)
+      .select(col(valueColumn) cast StringType as jsonColumn)
       .parseJsonColumn(jsonColumn, eventSchema)
       .select(Event.columns.map(col).toSeq: _*)
       .as[Event]

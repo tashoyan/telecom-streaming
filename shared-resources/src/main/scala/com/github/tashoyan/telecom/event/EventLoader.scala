@@ -3,16 +3,15 @@ package com.github.tashoyan.telecom.event
 import org.apache.spark.sql.Dataset
 
 /**
-  * Event loader.
-  * Loads events from a batch or a streaming data set.
+  * Streaming event loader.
   */
 trait EventLoader {
 
   /**
-    * Loads a data set of events.
+    * Loads a data set of events from a stream.
     * Implementation may produce side effects.
     *
-    * @return Data set of events. Implementation maybe batch or streaming.
+    * @return Streaming data set of events.
     */
   def loadEvents(): Dataset[Event]
 

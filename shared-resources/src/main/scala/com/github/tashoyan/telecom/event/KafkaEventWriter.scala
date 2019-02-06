@@ -16,11 +16,11 @@ import org.apache.spark.sql.types.StringType
   * @param checkpointDir   Checkpoint directory used by Spark Kafka source.
   */
 class KafkaEventWriter(
-                        kafkaBrokers: String,
-                        kafkaTopic: String,
-                        partitionColumn: String,
-                        checkpointDir: String
-                      ) extends EventWriter {
+    kafkaBrokers: String,
+    kafkaTopic: String,
+    partitionColumn: String,
+    checkpointDir: String
+) extends EventWriter {
 
   override def writeEvents(events: Dataset[Event]): StreamingQuery = {
     val kafkaEvents = events

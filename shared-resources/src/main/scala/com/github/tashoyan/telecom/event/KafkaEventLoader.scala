@@ -14,10 +14,10 @@ import org.apache.spark.sql.{Dataset, SparkSession}
   * @param pollTimeoutMs The timeout in milliseconds to poll data from Kafka topic.
   */
 class KafkaEventLoader(
-                        kafkaBrokers: String,
-                        kafkaTopic: String,
-                        pollTimeoutMs: Long = defaultPollTimeoutMs
-                      )(implicit spark: SparkSession) extends EventLoader {
+    kafkaBrokers: String,
+    kafkaTopic: String,
+    pollTimeoutMs: Long = defaultPollTimeoutMs
+)(implicit spark: SparkSession) extends EventLoader {
 
   import spark.implicits._
 

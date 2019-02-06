@@ -44,6 +44,14 @@
         <appender-ref ref="file" />
     </logger>
 
+    <logger name="kafka.server.BrokerMetadataCheckpoint" additivity="false">
+        <level value="ERROR"/>
+    </logger>
+
+    <logger name="org.apache.kafka.clients.NetworkClient" additivity="false">
+        <level value="ERROR"/>
+    </logger>
+
     <root>
         <level value="TRACE" />
         <appender-ref ref="file" />

@@ -1,6 +1,6 @@
 package com.github.tashoyan.telecom.event
 
-import java.io.File
+import java.nio.file.Files
 import java.sql.Timestamp
 
 import com.github.tashoyan.telecom.test.SparkTestHarness
@@ -8,6 +8,8 @@ import net.manub.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
 import org.apache.spark.sql.streaming.OutputMode
 import org.apache.spark.sql.{Dataset, SaveMode}
 import org.scalatest.FunSuite
+
+import scala.util.Random
 
 class KafkaEventLoaderTest extends FunSuite with EmbeddedKafka with SparkTestHarness {
 
@@ -22,29 +24,21 @@ class KafkaEventLoaderTest extends FunSuite with EmbeddedKafka with SparkTestHar
     )
     val eventSample: Dataset[Event] = sample.toDS()
 
-    //TODO Inject "target" via Maven property
-    //TODO Temporary file to avoid tests interference
-    val eventInputDir = "target/event-input"
-    val eventOutputDir = "target/event-output"
-    new File(eventInputDir).mkdirs()
+    val eventInputDir = createInputDir()
+    val eventOutputDir = createOutputDir()
 
     val kafkaConfig = EmbeddedKafkaConfig(kafkaPort = 0, zooKeeperPort = 0)
     //TODO Set up / tear down once for faster tests run
     withRunningKafkaOnFoundPort(kafkaConfig) { implicit actualConfig =>
       println(actualConfig)
       val kafkaBrokers = s"localhost:${actualConfig.kafkaPort}"
-      //TODO Random topic to avoid tests interference
-      val kafkaTopic = "events"
-      //TODO Inject "target" via Maven property
-      //TODO Temporary file to avoid tests interference
-      val checkpointDir = "target/checkpoint"
       val pollTimeoutMs = 500L
       val eventStream = new KafkaEventStream(
         kafkaBrokers,
-        kafkaTopic,
-        Event.siteIdColumn,
-        checkpointDir,
-        pollTimeoutMs
+        kafkaTopic = eventTopic(),
+        partitionColumn = Event.siteIdColumn,
+        checkpointDir = createCheckpointDir(),
+        pollTimeoutMs = pollTimeoutMs
       )
 
       val eventsFromKafka = eventStream.loadEvents()
@@ -52,9 +46,7 @@ class KafkaEventLoaderTest extends FunSuite with EmbeddedKafka with SparkTestHar
         .outputMode(OutputMode.Append())
         .format("parquet")
         .option("path", eventOutputDir)
-        //TODO Inject "target" via Maven property
-        //TODO Temporary file to avoid tests interference
-        .option("checkpointLocation", "target/checkpoint1")
+        .option("checkpointLocation", createCheckpointDir())
         .start()
 
       val eventsToKafka = spark.readStream
@@ -69,7 +61,6 @@ class KafkaEventLoaderTest extends FunSuite with EmbeddedKafka with SparkTestHar
         .repartition(1)
         .write
         .mode(SaveMode.Overwrite)
-        //TODO Temporary file to avoid tests interference
         .parquet(eventInputDir)
 
       eventsToKafkaQuery.processAllAvailable()
@@ -84,14 +75,24 @@ class KafkaEventLoaderTest extends FunSuite with EmbeddedKafka with SparkTestHar
     //TODO Other checks
   }
 
-  //TODO Remove
-  ignore("dummy") {
-    val kafkaConfig = EmbeddedKafkaConfig(kafkaPort = 0, zooKeeperPort = 0)
-    withRunningKafkaOnFoundPort(kafkaConfig) { implicit actualConfig =>
-      publishStringMessageToKafka("topic", "msg")
-      val msg = consumeFirstStringMessageFrom("topic")
-      println(msg)
-    }
+  private def createCheckpointDir(): String =
+    createTempDir("checkpoint-")
+
+  private def createInputDir(): String =
+    createTempDir("event-input-")
+
+  private def createOutputDir(): String =
+    createTempDir("event-output-")
+
+  private def createTempDir(prefix: String): String = {
+    Files.createTempDirectory(prefix)
+      .toAbsolutePath
+      .toString
   }
+
+  private def eventTopic(): String =
+    s"events-${topicRandom.nextInt()}"
+
+  private val topicRandom = new Random()
 
 }

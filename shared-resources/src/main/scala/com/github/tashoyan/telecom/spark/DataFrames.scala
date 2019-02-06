@@ -1,6 +1,6 @@
 package com.github.tashoyan.telecom.spark
 
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{DataFrame, Dataset}
 import org.apache.spark.sql.functions.{col, from_json, struct, to_json}
 import org.apache.spark.sql.types.StructType
 
@@ -28,6 +28,15 @@ object DataFrames {
       val outputColumns = df.columns.map(col) ++ parsedColumns
       df.withColumn(parsedJsonColumn, from_json(col(jsonColumn), schema))
         .select(outputColumns: _*)
+    }
+
+  }
+
+  implicit class RichDataset[T](val ds: Dataset[T]) extends AnyVal {
+
+    @inline def withJsonColumn(jsonColumn: String): DataFrame = {
+      ds.toDF()
+        .withJsonColumn(jsonColumn)
     }
 
   }

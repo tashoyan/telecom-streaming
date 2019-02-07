@@ -3,7 +3,7 @@ package com.github.tashoyan.telecom.event
 import java.nio.file.Files
 import java.sql.Timestamp
 
-import com.github.tashoyan.telecom.event.KafkaEventStream._
+import com.github.tashoyan.telecom.spark.KafkaStream._
 import com.github.tashoyan.telecom.test.SparkTestHarness
 import com.github.tashoyan.telecom.util.Timestamps.RichTimestamp
 import net.manub.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
@@ -13,7 +13,7 @@ import org.scalatest.FunSuite
 
 import scala.util.Random
 
-class KafkaEventStreamTest extends FunSuite with EmbeddedKafka with SparkTestHarness {
+class KafkaEventSenderReceiverTest extends FunSuite with EmbeddedKafka with SparkTestHarness {
 
   test("integration - writeEvents + loadEvents") {
     val spark0 = spark

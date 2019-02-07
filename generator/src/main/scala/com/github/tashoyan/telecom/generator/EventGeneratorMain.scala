@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit
 
 import com.github.tashoyan.telecom.event.Event._
 import com.github.tashoyan.telecom.spark.DataFrames.RichDataFrame
+import com.github.tashoyan.telecom.spark.KafkaStream._
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.streaming.OutputMode

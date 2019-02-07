@@ -1,7 +1,7 @@
 package com.github.tashoyan.telecom.event
 
-import com.github.tashoyan.telecom.event.KafkaEventStream._
 import com.github.tashoyan.telecom.spark.DataFrames.RichDataset
+import com.github.tashoyan.telecom.spark.KafkaStream._
 import org.apache.spark.sql.Dataset
 import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.streaming.{OutputMode, StreamingQuery}

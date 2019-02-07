@@ -1,6 +1,6 @@
-package com.github.tashoyan.telecom.event
+package com.github.tashoyan.telecom.spark
 
-object KafkaEventStream {
+object KafkaStream {
 
   /**
     * Data set column used for keys when reading/writing data from/to Kafka topics.

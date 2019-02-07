@@ -21,6 +21,4 @@ object Event {
     infoColumn
   )
 
-  val keyColumn = "key"
-  val valueColumn = "value"
 }

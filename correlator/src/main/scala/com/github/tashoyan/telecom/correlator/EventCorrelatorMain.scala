@@ -3,6 +3,7 @@ package com.github.tashoyan.telecom.correlator
 import com.github.tashoyan.telecom.event.Event._
 import com.github.tashoyan.telecom.event.{DefaultEventDeduplicator, KafkaEventReceiver}
 import com.github.tashoyan.telecom.spark.DataFrames.RichDataFrame
+import com.github.tashoyan.telecom.spark.KafkaStream._
 import com.github.tashoyan.telecom.topology.Topology._
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.streaming.{OutputMode, StreamingQuery}

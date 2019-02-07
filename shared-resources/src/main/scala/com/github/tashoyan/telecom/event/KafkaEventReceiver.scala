@@ -1,5 +1,6 @@
 package com.github.tashoyan.telecom.event
 
+import com.github.tashoyan.telecom.event.SparkEventAdapter.EventDataFrame
 import com.github.tashoyan.telecom.spark.DataFrames.RichDataFrame
 import com.github.tashoyan.telecom.spark.KafkaStream._
 import org.apache.spark.sql.functions._
@@ -38,11 +39,10 @@ class KafkaEventReceiver(
       .load()
 
     val jsonColumn = "json_value"
-    val events = kafkaEvents
+    val events: Dataset[Event] = kafkaEvents
       .select(col(valueColumn) cast StringType as jsonColumn)
       .parseJsonColumn(jsonColumn, eventSchema)
-      .select(Event.columns.map(col).toSeq: _*)
-      .as[Event]
+      .asEvents
     events
   }
 

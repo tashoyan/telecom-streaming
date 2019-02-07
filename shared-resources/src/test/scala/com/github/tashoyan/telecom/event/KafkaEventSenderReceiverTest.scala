@@ -15,7 +15,7 @@ import scala.util.Random
 
 class KafkaEventSenderReceiverTest extends FunSuite with EmbeddedKafka with SparkTestHarness {
 
-  test("integration - writeEvents + loadEvents") {
+  test("integration - send + receive events") {
     val spark0 = spark
     import spark0.implicits._
 

@@ -8,21 +8,21 @@ import org.apache.spark.sql.streaming.{OutputMode, StreamingQuery}
 import org.apache.spark.sql.types.StringType
 
 /**
-  * Writes events in JSON format to a Kafka stream.
+  * Sends events in JSON format to a Kafka stream.
   *
   * @param kafkaBrokers    Kafka brokers to connect to.
   * @param kafkaTopic      Kafka topic to consume from.
   * @param partitionColumn Partition events on this column in the data set when writing them to the Kafka topic.
   * @param checkpointDir   Checkpoint directory used by Spark Kafka source.
   */
-class KafkaEventWriter(
+class KafkaEventSender(
     kafkaBrokers: String,
     kafkaTopic: String,
     partitionColumn: String,
     checkpointDir: String
-) extends EventWriter {
+) extends EventSender {
 
-  override def writeEvents(events: Dataset[Event]): StreamingQuery = {
+  override def sendEvents(events: Dataset[Event]): StreamingQuery = {
     val kafkaEvents = events
       .withJsonColumn(valueColumn)
       /*

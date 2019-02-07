@@ -4,16 +4,16 @@ import org.apache.spark.sql.Dataset
 import org.apache.spark.sql.streaming.StreamingQuery
 
 /**
-  * Streaming event writer.
+  * Streaming event sender.
   */
-trait EventWriter {
+trait EventSender {
 
   /**
-    * Creates a streaming query to write events to a stream.
+    * Creates a streaming query to send events to a stream.
     *
     * @param events Streaming data set of events.
     * @return Handler to the streaming query.
     */
-  def writeEvents(events: Dataset[Event]): StreamingQuery
+  def sendEvents(events: Dataset[Event]): StreamingQuery
 
 }

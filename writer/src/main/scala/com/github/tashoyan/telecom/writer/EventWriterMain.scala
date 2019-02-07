@@ -25,9 +25,9 @@ object EventWriterMain extends EventWriterArgParser {
   private def doMain(config: EventWriterConfig): Unit = {
     println(config)
 
-    val eventLoader = new KafkaEventLoader(config.kafkaBrokers, config.kafkaTopic)
+    val eventReceiver = new KafkaEventReceiver(config.kafkaBrokers, config.kafkaTopic)
     val eventDeduplicator = new DefaultEventDeduplicator(config.watermarkIntervalSec)
-    val kafkaEvents = eventLoader.loadEvents()
+    val kafkaEvents = eventReceiver.receiveEvents()
     val events = eventDeduplicator.deduplicateEvents(kafkaEvents)
 
     val yearMonthColumn = "year_month"

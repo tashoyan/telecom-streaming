@@ -7,23 +7,23 @@ import org.apache.spark.sql.types.StringType
 import org.apache.spark.sql.{Dataset, SparkSession}
 
 /**
-  * Loads events in JSON format from a Kafka stream.
+  * Receives events in JSON format from a Kafka stream.
   *
   * @param kafkaBrokers  Kafka brokers to connect to.
   * @param kafkaTopic    Kafka topic to consume from.
   * @param pollTimeoutMs The timeout in milliseconds to poll data from Kafka topic.
   */
-class KafkaEventLoader(
+class KafkaEventReceiver(
     kafkaBrokers: String,
     kafkaTopic: String,
     pollTimeoutMs: Long = defaultPollTimeoutMs
-)(implicit spark: SparkSession) extends EventLoader {
+)(implicit spark: SparkSession) extends EventReceiver {
 
   import spark.implicits._
 
   private val eventSchema = spark.emptyDataset[Event].schema
 
-  override def loadEvents(): Dataset[Event] = {
+  override def receiveEvents(): Dataset[Event] = {
     /*
     TODO Why only one Kafka consumer?
     https://stackoverflow.com/questions/53605061/spark-structured-streaming-kafka-source-how-many-consumers

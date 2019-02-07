@@ -35,19 +35,19 @@ class KafkaEventStreamTest extends FunSuite with EmbeddedKafka with SparkTestHar
       val kafkaBrokers = s"localhost:${actualConfig.kafkaPort}"
       val kafkaTopic = eventTopic()
       val pollTimeoutMs = defaultPollTimeoutMs
-      val eventLoader = new KafkaEventLoader(
+      val eventReceiver = new KafkaEventReceiver(
         kafkaBrokers,
         kafkaTopic,
         pollTimeoutMs
       )
-      val eventWriter = new KafkaEventWriter(
+      val eventSender = new KafkaEventSender(
         kafkaBrokers,
         kafkaTopic,
         partitionColumn = Event.siteIdColumn,
         checkpointDir = createCheckpointDir()
       )
 
-      val eventsFromKafka = eventLoader.loadEvents()
+      val eventsFromKafka = eventReceiver.receiveEvents()
       val eventsFromKafkaQuery = eventsFromKafka.writeStream
         .outputMode(OutputMode.Append())
         .format("parquet")
@@ -59,7 +59,7 @@ class KafkaEventStreamTest extends FunSuite with EmbeddedKafka with SparkTestHar
         .schema(eventSample.schema)
         .parquet(eventInputDir)
         .as[Event]
-      val eventsToKafkaQuery = eventWriter.writeEvents(eventsToKafka)
+      val eventsToKafkaQuery = eventSender.sendEvents(eventsToKafka)
 
       /*Make sure the consumer gets the second batch from Kafka*/
       Thread.sleep(pollTimeoutMs)

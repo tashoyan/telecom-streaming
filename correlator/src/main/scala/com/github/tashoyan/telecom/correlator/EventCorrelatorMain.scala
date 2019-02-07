@@ -1,7 +1,7 @@
 package com.github.tashoyan.telecom.correlator
 
 import com.github.tashoyan.telecom.event.Event._
-import com.github.tashoyan.telecom.event.{DefaultEventDeduplicator, KafkaEventLoader}
+import com.github.tashoyan.telecom.event.{DefaultEventDeduplicator, KafkaEventReceiver}
 import com.github.tashoyan.telecom.spark.DataFrames.RichDataFrame
 import com.github.tashoyan.telecom.topology.Topology._
 import org.apache.spark.sql.functions._
@@ -31,9 +31,9 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
       .groupBy(controllerColumn)
       .agg(count(stationColumn) as "total_station_count")
 
-    val eventLoader = new KafkaEventLoader(config.kafkaBrokers, config.kafkaInputTopic)
+    val eventReceiver = new KafkaEventReceiver(config.kafkaBrokers, config.kafkaInputTopic)
     val eventDeduplicator = new DefaultEventDeduplicator(config.watermarkIntervalSec)
-    val kafkaEvents = eventLoader.loadEvents()
+    val kafkaEvents = eventReceiver.receiveEvents()
     val events = eventDeduplicator.deduplicateEvents(kafkaEvents)
 
     val affectedStationCounts = events

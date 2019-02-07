@@ -4,15 +4,13 @@ import java.sql.Timestamp
 import java.util.concurrent.TimeUnit
 
 import com.github.tashoyan.telecom.event.Event._
-import com.github.tashoyan.telecom.spark.DataFrames.RichDataFrame
-import com.github.tashoyan.telecom.spark.KafkaStream._
+import com.github.tashoyan.telecom.event.KafkaEventSender
+import com.github.tashoyan.telecom.event.SparkEventAdapter.EventDataFrame
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.streaming.OutputMode
-import org.apache.spark.sql.types.StringType
 
 object EventGeneratorMain extends EventGeneratorArgParser {
-  private val spark = SparkSession.builder()
+  private implicit val spark: SparkSession = SparkSession.builder()
     .getOrCreate()
   spark.sparkContext
     .setLogLevel("WARN")
@@ -43,26 +41,15 @@ object EventGeneratorMain extends EventGeneratorArgParser {
       .withColumn(currentTimeSecColumn, unix_timestamp())
       .withColumn(timestampColumn, eventTimestampUdf(col(currentTimeSecColumn), col(timestampColumn)))
       .drop(currentTimeSecColumn)
+      .asEvents
 
-    val kafkaEvents = events
-      .withJsonColumn(valueColumn)
-      /*
-      Kafka producer partition assignment: records having the same key go to the same topic partition.
-      We ensure that events from the same site go through the same partition and preserve their order.
-      Note that each Spark executor may send records to each Kafka broker hosting a partition.
-      */
-      //TODO Exactly once delivery: Kafka transactions and https://issues.apache.org/jira/browse/SPARK-25005
-      .withColumn(keyColumn, col(siteIdColumn) cast StringType)
-
-    val query = kafkaEvents
-      .writeStream
-      .outputMode(OutputMode.Append())
-      .queryName(getClass.getSimpleName)
-      .format("kafka")
-      .option("kafka.bootstrap.servers", config.kafkaBrokers)
-      .option("topic", config.kafkaTopic)
-      .option("checkpointLocation", config.checkpointDir)
-      .start()
+    val eventSender = new KafkaEventSender(
+      config.kafkaBrokers,
+      config.kafkaTopic,
+      siteIdColumn,
+      config.checkpointDir
+    )
+    val query = eventSender.sendEvents(events)
     query.awaitTermination()
   }
 

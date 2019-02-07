@@ -15,7 +15,7 @@ trait SparkTestHarness extends Suite with BeforeAndAfter {
       .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
       .config("spark.kryo.unsafe", "true")
       .config("spark.ui.enabled", "false")
-      .config("spark.sql.warehouse.dir", "target/spark-warehouse")
+      .config("spark.sql.warehouse.dir", s"${sys.props("java.io.tmpdir")}/spark-warehouse")
       .getOrCreate()
   }
 

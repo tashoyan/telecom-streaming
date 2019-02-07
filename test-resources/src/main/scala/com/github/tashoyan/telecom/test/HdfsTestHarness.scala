@@ -15,7 +15,7 @@ import scala.io.Source
 import scala.language.implicitConversions
 
 abstract class HdfsTestHarness extends FunSuite with BeforeAndAfterAll with BeforeAndAfterEach {
-  protected val hdfsBaseDir: File = Paths.get(sys.props("user.dir"), "target", "hdfs").toFile
+  protected val hdfsBaseDir: File = Paths.get(sys.props("java.io.tmpdir"), "hdfs").toFile
   protected var hdfsCluster: MiniDFSCluster = _
   protected var hdfsUri: URI = _
   protected def fs: FileSystem = hdfsCluster.getFileSystem

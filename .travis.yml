@@ -1,0 +1,6 @@
+language: scala
+script: mvn clean install
+jdk:
+  - oraclejdk8
+notifications:
+  email: false

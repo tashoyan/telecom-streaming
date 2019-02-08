@@ -1,5 +1,7 @@
 # Telecom use cases implemented with Spark Streaming
 
+[![Build Status](https://travis-ci.com/tashoyan/telecom-streaming.svg?branch=master)](https://travis-ci.com/tashoyan/telecom-streaming)
+
 ## Building the code
 
 Run the command:

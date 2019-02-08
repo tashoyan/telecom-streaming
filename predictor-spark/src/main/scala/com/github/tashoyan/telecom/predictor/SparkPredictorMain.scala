@@ -1,9 +1,10 @@
 package com.github.tashoyan.telecom.predictor
 
+import com.github.tashoyan.telecom.event.{DefaultEventDeduplicator, KafkaEventReceiver}
 import org.apache.spark.sql.SparkSession
 
 class SparkPredictorMain extends SparkPredictorArgParser {
-  private val spark = SparkSession.builder()
+  private implicit val spark: SparkSession = SparkSession.builder()
     .getOrCreate()
   spark.sparkContext
     .setLogLevel("WARN")
@@ -18,6 +19,11 @@ class SparkPredictorMain extends SparkPredictorArgParser {
   private def doMain(config: SparkPredictorConfig): Unit = {
     println(config)
 
+    val eventReceiver = new KafkaEventReceiver(config.kafkaBrokers, config.kafkaInputTopic)
+    val eventDeduplicator = new DefaultEventDeduplicator(config.watermarkIntervalSec)
+    val kafkaEvents = eventReceiver.receiveEvents()
+    val events = eventDeduplicator.deduplicateEvents(kafkaEvents)
+    events.show()
     //TODO Complete
   }
 

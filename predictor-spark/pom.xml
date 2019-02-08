@@ -13,11 +13,11 @@
     <name>Predictor - Spark</name>
 
     <dependencies>
-        <!--<dependency>-->
-            <!--<groupId>${project.groupId}</groupId>-->
-            <!--<artifactId>shared-resources</artifactId>-->
-            <!--<version>${project.version}</version>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>shared-resources</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.github.scopt</groupId>
             <artifactId>scopt_${compiler.scala.compat.version}</artifactId>
@@ -36,11 +36,6 @@
             <artifactId>spark-sql_${compiler.scala.compat.version}</artifactId>
             <scope>provided</scope>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.apache.spark</groupId>-->
-            <!--<artifactId>spark-catalyst_${compiler.scala.compat.version}</artifactId>-->
-            <!--<scope>provided</scope>-->
-        <!--</dependency>-->
     </dependencies>
 
     <build>

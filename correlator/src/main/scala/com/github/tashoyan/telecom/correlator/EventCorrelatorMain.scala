@@ -62,6 +62,7 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
     query.awaitTermination()
   }
 
+  //TODO Makes sense to extract alarm stream to a separate class
   private def createAndStartAlarmQuery(config: EventCorrelatorConfig, alarms: DataFrame): StreamingQuery = {
     val kafkaAlarms = alarms
       .withJsonColumn(valueColumn)

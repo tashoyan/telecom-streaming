@@ -2,11 +2,12 @@ package com.github.tashoyan.telecom.event
 
 import java.nio.file.Files
 import java.sql.Timestamp
+import java.util.concurrent.TimeoutException
 
 import com.github.tashoyan.telecom.spark.KafkaStream._
 import com.github.tashoyan.telecom.test.{KafkaTestHarness, SparkTestHarness}
 import com.github.tashoyan.telecom.util.Timestamps.RichTimestamp
-import org.apache.spark.sql.streaming.OutputMode
+import org.apache.spark.sql.streaming.{OutputMode, StreamingQuery}
 import org.apache.spark.sql.{Dataset, SaveMode}
 import org.scalatest.FunSuite
 
@@ -49,14 +50,15 @@ class KafkaEventSenderReceiverTest extends FunSuite with KafkaTestHarness with S
       .option("checkpointLocation", createCheckpointDir())
       .start()
 
+    /*Make sure the consumer will get the second batch from Kafka*/
+    skipOneTrigger(eventsFromKafkaQuery)
+
     val eventsToKafka = spark.readStream
       .schema(eventSample.schema)
       .parquet(eventInputDir)
       .as[Event]
     val eventsToKafkaQuery = eventSender.sendEvents(eventsToKafka)
 
-    /*Make sure the consumer gets the second batch from Kafka*/
-    Thread.sleep(pollTimeoutMs)
     eventSample
       .repartition(1)
       .write
@@ -87,6 +89,40 @@ class KafkaEventSenderReceiverTest extends FunSuite with KafkaTestHarness with S
     Files.createTempDirectory(s"$prefix-")
       .toAbsolutePath
       .toString
+  }
+
+  private def skipOneTrigger(streamingQuery: StreamingQuery): Unit = {
+    val recheckTimeoutMs = 500L
+    val awaitTimeoutMs = 5000L
+    waitFor(
+      awaitTimeoutMs,
+      recheckTimeoutMs,
+      () => streamingQuery.status.isTriggerActive,
+      () => streamingQuery.status.toString()
+    )
+    waitFor(
+      awaitTimeoutMs,
+      recheckTimeoutMs,
+      () => !streamingQuery.status.isTriggerActive,
+      () => streamingQuery.status.toString()
+    )
+  }
+
+  //TODO Extract this generic function to test-resources
+  private def waitFor(
+      awaitTimeoutMs: Long,
+      recheckTimeoutMs: Long,
+      condition: () => Boolean,
+      timeoutStatus: () => String
+  ): Unit = {
+    val t0 = System.currentTimeMillis()
+    while (!condition()) {
+      val t = System.currentTimeMillis()
+      if (t - t0 > awaitTimeoutMs) {
+        throw new TimeoutException(s"Timed out $awaitTimeoutMs ms; status: ${timeoutStatus()}")
+      }
+      Thread.sleep(recheckTimeoutMs)
+    }
   }
 
 }

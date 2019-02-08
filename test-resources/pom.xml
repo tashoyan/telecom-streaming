@@ -29,6 +29,10 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>io.github.embeddedkafka</groupId>
+            <artifactId>embedded-kafka_${compiler.scala.compat.version}</artifactId>
+        </dependency>
+        <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
         </dependency>

@@ -4,16 +4,13 @@ import java.nio.file.Files
 import java.sql.Timestamp
 
 import com.github.tashoyan.telecom.spark.KafkaStream._
-import com.github.tashoyan.telecom.test.SparkTestHarness
+import com.github.tashoyan.telecom.test.{KafkaTestHarness, SparkTestHarness}
 import com.github.tashoyan.telecom.util.Timestamps.RichTimestamp
-import net.manub.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
 import org.apache.spark.sql.streaming.OutputMode
 import org.apache.spark.sql.{Dataset, SaveMode}
 import org.scalatest.FunSuite
 
-import scala.util.Random
-
-class KafkaEventSenderReceiverTest extends FunSuite with EmbeddedKafka with SparkTestHarness {
+class KafkaEventSenderReceiverTest extends FunSuite with KafkaTestHarness with SparkTestHarness {
 
   test("integration - send + receive events") {
     val spark0 = spark
@@ -29,49 +26,45 @@ class KafkaEventSenderReceiverTest extends FunSuite with EmbeddedKafka with Spar
     val eventInputDir = createInputDir()
     val eventOutputDir = createOutputDir()
 
-    val kafkaConfig = EmbeddedKafkaConfig(kafkaPort = 0, zooKeeperPort = 0)
-    //TODO Set up / tear down once for faster tests run
-    withRunningKafkaOnFoundPort(kafkaConfig) { implicit actualConfig =>
-      val kafkaBrokers = s"localhost:${actualConfig.kafkaPort}"
-      val kafkaTopic = eventTopic()
-      val pollTimeoutMs = defaultPollTimeoutMs
-      val eventReceiver = new KafkaEventReceiver(
-        kafkaBrokers,
-        kafkaTopic,
-        pollTimeoutMs
-      )
-      val eventSender = new KafkaEventSender(
-        kafkaBrokers,
-        kafkaTopic,
-        partitionColumn = Event.siteIdColumn,
-        checkpointDir = createCheckpointDir()
-      )
+    val kafkaBrokers = s"localhost:${embeddedKafkaConfig.kafkaPort}"
+    val kafkaTopic = randomTopic("event")
+    val pollTimeoutMs = defaultPollTimeoutMs
+    val eventReceiver = new KafkaEventReceiver(
+      kafkaBrokers,
+      kafkaTopic,
+      pollTimeoutMs
+    )
+    val eventSender = new KafkaEventSender(
+      kafkaBrokers,
+      kafkaTopic,
+      partitionColumn = Event.siteIdColumn,
+      checkpointDir = createCheckpointDir()
+    )
 
-      val eventsFromKafka = eventReceiver.receiveEvents()
-      val eventsFromKafkaQuery = eventsFromKafka.writeStream
-        .outputMode(OutputMode.Append())
-        .format("parquet")
-        .option("path", eventOutputDir)
-        .option("checkpointLocation", createCheckpointDir())
-        .start()
+    val eventsFromKafka = eventReceiver.receiveEvents()
+    val eventsFromKafkaQuery = eventsFromKafka.writeStream
+      .outputMode(OutputMode.Append())
+      .format("parquet")
+      .option("path", eventOutputDir)
+      .option("checkpointLocation", createCheckpointDir())
+      .start()
 
-      val eventsToKafka = spark.readStream
-        .schema(eventSample.schema)
-        .parquet(eventInputDir)
-        .as[Event]
-      val eventsToKafkaQuery = eventSender.sendEvents(eventsToKafka)
+    val eventsToKafka = spark.readStream
+      .schema(eventSample.schema)
+      .parquet(eventInputDir)
+      .as[Event]
+    val eventsToKafkaQuery = eventSender.sendEvents(eventsToKafka)
 
-      /*Make sure the consumer gets the second batch from Kafka*/
-      Thread.sleep(pollTimeoutMs)
-      eventSample
-        .repartition(1)
-        .write
-        .mode(SaveMode.Overwrite)
-        .parquet(eventInputDir)
+    /*Make sure the consumer gets the second batch from Kafka*/
+    Thread.sleep(pollTimeoutMs)
+    eventSample
+      .repartition(1)
+      .write
+      .mode(SaveMode.Overwrite)
+      .parquet(eventInputDir)
 
-      eventsToKafkaQuery.processAllAvailable()
-      eventsFromKafkaQuery.processAllAvailable()
-    }
+    eventsToKafkaQuery.processAllAvailable()
+    eventsFromKafkaQuery.processAllAvailable()
 
     val resultEvents = spark.read
       .parquet(eventOutputDir)
@@ -82,23 +75,18 @@ class KafkaEventSenderReceiverTest extends FunSuite with EmbeddedKafka with Spar
   }
 
   private def createCheckpointDir(): String =
-    createTempDir("checkpoint-")
+    createTempDir("checkpoint")
 
   private def createInputDir(): String =
-    createTempDir("event-input-")
+    createTempDir("event-input")
 
   private def createOutputDir(): String =
-    createTempDir("event-output-")
+    createTempDir("event-output")
 
   private def createTempDir(prefix: String): String = {
-    Files.createTempDirectory(prefix)
+    Files.createTempDirectory(s"$prefix-")
       .toAbsolutePath
       .toString
   }
-
-  private def eventTopic(): String =
-    s"events-${topicRandom.nextInt()}"
-
-  private val topicRandom = new Random()
 
 }

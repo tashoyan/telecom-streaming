@@ -12,12 +12,10 @@ import org.apache.spark.sql.{Dataset, SparkSession}
   *
   * @param kafkaBrokers  Kafka brokers to connect to.
   * @param kafkaTopic    Kafka topic to consume from.
-  * @param pollTimeoutMs The timeout in milliseconds to poll data from Kafka topic.
   */
 class KafkaEventReceiver(
     kafkaBrokers: String,
-    kafkaTopic: String,
-    pollTimeoutMs: Long = defaultPollTimeoutMs
+    kafkaTopic: String
 )(implicit spark: SparkSession) extends EventReceiver {
 
   import spark.implicits._
@@ -33,7 +31,6 @@ class KafkaEventReceiver(
       .format("kafka")
       .option("kafka.bootstrap.servers", kafkaBrokers)
       .option("subscribe", kafkaTopic)
-      .option("kafkaConsumer.pollTimeoutMs", pollTimeoutMs)
       .option("startingOffsets", "latest")
       .option("failOnDataLoss", "false")
       .load()

@@ -14,10 +14,4 @@ object KafkaStream {
     */
   val valueColumn = "value"
 
-  /**
-    * Default value of the timeout to poll data from Kafka topics.
-    * This value is specified in the Structured Streaming + Kafka Integration Guide.
-    */
-  val defaultPollTimeoutMs: Long = 512
-
 }

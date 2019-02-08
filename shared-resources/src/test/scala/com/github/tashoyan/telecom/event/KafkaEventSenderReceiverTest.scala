@@ -4,7 +4,6 @@ import java.nio.file.Files
 import java.sql.Timestamp
 import java.util.concurrent.TimeoutException
 
-import com.github.tashoyan.telecom.spark.KafkaStream._
 import com.github.tashoyan.telecom.test.{KafkaTestHarness, SparkTestHarness}
 import com.github.tashoyan.telecom.util.Timestamps.RichTimestamp
 import org.apache.spark.sql.streaming.{OutputMode, StreamingQuery}
@@ -29,11 +28,9 @@ class KafkaEventSenderReceiverTest extends FunSuite with KafkaTestHarness with S
 
     val kafkaBrokers = s"localhost:${embeddedKafkaConfig.kafkaPort}"
     val kafkaTopic = randomTopic("event")
-    val pollTimeoutMs = defaultPollTimeoutMs
     val eventReceiver = new KafkaEventReceiver(
       kafkaBrokers,
-      kafkaTopic,
-      pollTimeoutMs
+      kafkaTopic
     )
     val eventSender = new KafkaEventSender(
       kafkaBrokers,

@@ -4,7 +4,7 @@ set -o nounset
 set -o errexit
 set -o pipefail
 
-kafka_brokers="kafkabroker:9092"
+kafka_brokers="$(hostname):9092"
 kafka_topic="events"
 checkpoint_dir="/stream/checkpoint-writer"
 output_dir="/stream/output"

@@ -5,7 +5,7 @@ set -o errexit
 set -o pipefail
 
 topology_file="/stream/topology-correlator.parquet"
-kafka_brokers="kafkabroker:9092"
+kafka_brokers="$(hostname):9092"
 kafka_input_topic="events"
 kafka_output_topic="alarms"
 checkpoint_dir="/stream/checkpoint-correlator"

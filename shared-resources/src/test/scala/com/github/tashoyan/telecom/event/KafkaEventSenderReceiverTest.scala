@@ -89,8 +89,8 @@ class KafkaEventSenderReceiverTest extends FunSuite with KafkaTestHarness with S
   }
 
   private def skipOneTrigger(streamingQuery: StreamingQuery): Unit = {
-    val recheckTimeoutMs = 500L
-    val awaitTimeoutMs = 5000L
+    val recheckTimeoutMs = 1000L
+    val awaitTimeoutMs = 10000L
     waitFor(
       awaitTimeoutMs,
       recheckTimeoutMs,

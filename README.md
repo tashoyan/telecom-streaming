@@ -13,6 +13,7 @@ Note that event samples are generated as a part of the build.
 ## Runtime dependencies
 
 Spark 2.4.0 built with Scala 2.12
+Hadoop cluster with HDFS and YARN
 Kafka 2.1.0
 
 ## Preparing Kafka

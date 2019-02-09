@@ -11,10 +11,6 @@ import org.apache.spark.sql.types.StringType
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 object EventCorrelatorMain extends EventCorrelatorArgParser {
-  private implicit val spark: SparkSession = SparkSession.builder()
-    .getOrCreate()
-  spark.sparkContext
-    .setLogLevel("WARN")
 
   def main(args: Array[String]): Unit = {
     parser.parse(args, EventCorrelatorConfig()) match {
@@ -25,6 +21,11 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
 
   private def doMain(config: EventCorrelatorConfig): Unit = {
     println(config)
+
+    implicit val spark: SparkSession = SparkSession.builder()
+      .getOrCreate()
+    spark.sparkContext
+      .setLogLevel("WARN")
 
     val topology = spark.read
       .parquet(config.topologyFile)

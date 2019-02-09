@@ -10,10 +10,6 @@ import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
 
 object EventGeneratorMain extends EventGeneratorArgParser {
-  private implicit val spark: SparkSession = SparkSession.builder()
-    .getOrCreate()
-  spark.sparkContext
-    .setLogLevel("WARN")
 
   def main(args: Array[String]): Unit = {
     parser.parse(args, EventGeneratorConfig()) match {
@@ -24,6 +20,12 @@ object EventGeneratorMain extends EventGeneratorArgParser {
 
   private def doMain(config: EventGeneratorConfig): Unit = {
     println(config)
+
+    implicit val spark: SparkSession = SparkSession.builder()
+      .getOrCreate()
+    spark.sparkContext
+      .setLogLevel("WARN")
+
     val schema = spark.read
       .parquet(config.schemaFile)
       .schema

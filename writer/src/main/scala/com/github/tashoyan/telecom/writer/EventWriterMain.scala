@@ -10,10 +10,6 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.streaming.OutputMode
 
 object EventWriterMain extends EventWriterArgParser {
-  private implicit val spark: SparkSession = SparkSession.builder()
-    .getOrCreate()
-  spark.sparkContext
-    .setLogLevel("WARN")
 
   def main(args: Array[String]): Unit = {
     parser.parse(args, EventWriterConfig()) match {
@@ -24,6 +20,11 @@ object EventWriterMain extends EventWriterArgParser {
 
   private def doMain(config: EventWriterConfig): Unit = {
     println(config)
+
+    implicit val spark: SparkSession = SparkSession.builder()
+      .getOrCreate()
+    spark.sparkContext
+      .setLogLevel("WARN")
 
     val eventReceiver = new KafkaEventReceiver(config.kafkaBrokers, config.kafkaTopic)
     val eventDeduplicator = new DefaultEventDeduplicator(config.watermarkIntervalSec)

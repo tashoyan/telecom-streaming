@@ -10,6 +10,11 @@ mvn clean install
 ```
 Note that event samples are generated as a part of the build.
 
+## Runtime dependencies
+
+Spark 2.4.0 built with Scala 2.12
+Kafka 2.1.0
+
 ## Preparing Kafka
 
 1. Make sure that Zookeeper and Kafka are running.

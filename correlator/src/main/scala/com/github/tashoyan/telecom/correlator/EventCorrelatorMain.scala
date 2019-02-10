@@ -33,7 +33,7 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
       .groupBy(controllerColumn)
       .agg(count(stationColumn) as "total_station_count")
 
-    val eventReceiver = new KafkaEventReceiver(config.kafkaBrokers, config.kafkaInputTopic)
+    val eventReceiver = new KafkaEventReceiver(config.kafkaBrokers, config.kafkaEventTopic)
     val eventDeduplicator = new DefaultEventDeduplicator(config.watermarkIntervalSec)
     val kafkaEvents = eventReceiver.receiveEvents()
     val events = eventDeduplicator.deduplicateEvents(kafkaEvents)
@@ -75,7 +75,7 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
       .queryName(getClass.getSimpleName)
       .format("kafka")
       .option("kafka.bootstrap.servers", config.kafkaBrokers)
-      .option("topic", config.kafkaOutputTopic)
+      .option("topic", config.kafkaAlarmTopic)
       .option("checkpointLocation", config.checkpointDir)
       .start()
     query

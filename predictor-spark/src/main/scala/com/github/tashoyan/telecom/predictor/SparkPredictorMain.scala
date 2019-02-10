@@ -20,7 +20,7 @@ class SparkPredictorMain extends SparkPredictorArgParser {
     spark.sparkContext
       .setLogLevel("WARN")
 
-    val eventReceiver = new KafkaEventReceiver(config.kafkaBrokers, config.kafkaInputTopic)
+    val eventReceiver = new KafkaEventReceiver(config.kafkaBrokers, config.kafkaEventTopic)
     val eventDeduplicator = new DefaultEventDeduplicator(config.watermarkIntervalSec)
     val kafkaEvents = eventReceiver.receiveEvents()
     val events = eventDeduplicator.deduplicateEvents(kafkaEvents)

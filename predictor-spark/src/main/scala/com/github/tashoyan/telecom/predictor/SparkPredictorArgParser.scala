@@ -18,10 +18,10 @@ trait SparkPredictorArgParser {
       }
       .text("List of comma-separated Kafka brokers")
 
-    opt[String]("kafka-input-topic")
+    opt[String]("kafka-event-topic")
       .required()
       .valueName("<topic>")
-      .action((value, conf) => conf.copy(kafkaInputTopic = value))
+      .action((value, conf) => conf.copy(kafkaEventTopic = value))
       .validate { value =>
         if (value.isEmpty) failure("Kafka topic must not be empty string")
         else success
@@ -38,10 +38,10 @@ trait SparkPredictorArgParser {
       }
       .text(s"Checkpoint directory on HDFS.")
 
-    opt[String]("kafka-output-topic")
+    opt[String]("kafka-alarm-topic")
       .required()
       .valueName("<topic>")
-      .action((value, conf) => conf.copy(kafkaOutputTopic = value))
+      .action((value, conf) => conf.copy(kafkaAlarmTopic = value))
       .validate { value =>
         if (value.isEmpty) failure("Kafka topic must not be empty string")
         else success

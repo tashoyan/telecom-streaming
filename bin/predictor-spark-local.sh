@@ -16,5 +16,5 @@ spark-submit \
 --name "$app_name" \
 --master "local[*]" \
 --deploy-mode client \
---class com.github.tashoyan.telecom.predictor.SparkPredictorLocal \
+--class com.github.tashoyan.telecom.predictor.SparkPredictorLocal1 \
 "$jar_file"

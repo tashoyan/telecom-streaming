@@ -99,8 +99,8 @@ class SampleGeneratorTest extends FunSuite with SparkTestHarness {
 
     val siteId = 1L
     val events = Seq(
-      Event(new Timestamp(0L), siteId, "MINOR", s"Smoke on site $siteId"),
-      Event(new Timestamp(15000L), siteId, "MAJOR", s"Heat on site $siteId")
+      Event(new Timestamp(0L), siteId, "MAJOR", s"Smoke on site $siteId"),
+      Event(new Timestamp(15000L), siteId, "MINOR", s"Heat on site $siteId")
     )
       .toDS()
     writeEvents(events, "target/events_site_1_heat_and_smoke_15sec")

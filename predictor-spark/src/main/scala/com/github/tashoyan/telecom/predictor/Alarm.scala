@@ -4,11 +4,11 @@ import java.sql.Timestamp
 
 //TODO Generic - move to shared-resources
 case class Alarm(
-                  timestamp: Timestamp,
-                  siteId: Long,
-                  severity: String,
-                  info: String
-                )
+    timestamp: Timestamp,
+    siteId: Long,
+    severity: String,
+    info: String
+)
 
 object Alarm {
   val timestampColumn = "timestamp"

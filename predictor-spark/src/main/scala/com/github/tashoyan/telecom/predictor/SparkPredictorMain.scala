@@ -1,5 +1,7 @@
 package com.github.tashoyan.telecom.predictor
 
+import java.util.concurrent.TimeUnit
+
 import com.github.tashoyan.telecom.event.Event._
 import com.github.tashoyan.telecom.event.{DefaultEventDeduplicator, KafkaEventReceiver}
 import com.github.tashoyan.telecom.spark.DataFrames.RichDataset
@@ -18,8 +20,6 @@ object SparkPredictorMain extends SparkPredictorArgParser {
     }
   }
 
-  //TODO Refactor and enale scalastyle back
-  //scalastyle:off
   private def doMain(config: SparkPredictorConfig): Unit = {
     println(config)
 
@@ -34,8 +34,7 @@ object SparkPredictorMain extends SparkPredictorArgParser {
     val kafkaEvents = eventReceiver.receiveEvents()
     val events = eventDeduplicator.deduplicateEvents(kafkaEvents)
 
-    //TODO Configurable
-    val alarmStateFunction = new FireAlarmStateFunction(10000L)
+    val alarmStateFunction = new FireAlarmStateFunction(TimeUnit.SECONDS.toMillis(config.alarmTriggerIntervalSec.toLong))
     val alarms = events
       //TODO Maybe remove - deduplicator already set this watermark
       .withWatermark(timestampColumn, s"${config.watermarkIntervalSec} seconds")

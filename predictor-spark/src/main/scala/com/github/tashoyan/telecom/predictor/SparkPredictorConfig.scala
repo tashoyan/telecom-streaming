@@ -5,5 +5,6 @@ case class SparkPredictorConfig(
     kafkaEventTopic: String = "",
     checkpointDir: String = "",
     kafkaAlarmTopic: String = "",
-    watermarkIntervalSec: Int = 0
+    watermarkIntervalSec: Int = 0,
+    alarmTriggerIntervalSec: Int = 0
 )

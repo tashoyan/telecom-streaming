@@ -1,17 +1,15 @@
 package com.github.tashoyan.telecom.predictor
 
-import java.sql.Timestamp
-
-import com.github.tashoyan.telecom.event.{DefaultEventDeduplicator, Event, KafkaEventReceiver}
+import com.github.tashoyan.telecom.event.Event._
+import com.github.tashoyan.telecom.event.{DefaultEventDeduplicator, KafkaEventReceiver}
 import com.github.tashoyan.telecom.spark.DataFrames.RichDataset
 import com.github.tashoyan.telecom.spark.KafkaStream.{keyColumn, valueColumn}
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions.col
-import org.apache.spark.sql.streaming.{GroupState, GroupStateTimeout, OutputMode}
+import org.apache.spark.sql.streaming.{GroupStateTimeout, OutputMode}
 import org.apache.spark.sql.types.StringType
 
 object SparkPredictorMain extends SparkPredictorArgParser {
-  private val fireTriggerTimeout = 20000L
 
   def main(args: Array[String]): Unit = {
     parser.parse(args, SparkPredictorConfig()) match {
@@ -35,74 +33,18 @@ object SparkPredictorMain extends SparkPredictorArgParser {
     val eventDeduplicator = new DefaultEventDeduplicator(config.watermarkIntervalSec)
     val kafkaEvents = eventReceiver.receiveEvents()
     val events = eventDeduplicator.deduplicateEvents(kafkaEvents)
-    events.writeStream
-      .outputMode(OutputMode.Append())
-      .format("console")
-      .option("truncate", value = false)
-      .start()
 
-    def alarmFunction: (Long, Iterator[Event], GroupState[ProblemState]) => Iterator[Alarm] = {
-      (siteId, events, state) =>
-        if (state.hasTimedOut) {
-          println(s"TIMED OUT STATE; events: $events")
-          state.remove()
-          Iterator.empty
-        } else if (state.exists) {
-          println(s"EXISTING STATE; events: $events")
-          val heatTimestamp = state.get.heatTimestamp
-          val smokeEvent = events
-            .filter(e => e.info != null && e.info.toLowerCase.contains("smoke"))
-            .toStream
-            .headOption
-          //TODO Additional 'heat'
-          //TODO More than one 'smoke'
-          val smokeTimestamp = smokeEvent.map(_.timestamp)
-          if (smokeTimestamp.isDefined) {
-            println(s"smoke: $smokeTimestamp")
-            println(s"heat: $heatTimestamp")
-            if (smokeTimestamp.get.getTime - heatTimestamp.getTime > 0 && smokeTimestamp.get.getTime - heatTimestamp.getTime <= fireTriggerTimeout) {
-              val alarm = Alarm(siteId, heatTimestamp, smokeTimestamp.get, s"Fire alarm on $siteId")
-              state.remove()
-              Iterator(alarm)
-            } else {
-              state.update(state.get)
-              state.setTimeoutDuration(20000)
-              Iterator.empty
-            }
-          } else {
-            state.update(state.get)
-            state.setTimeoutDuration(20000)
-            Iterator.empty
-          }
-        } else {
-          println(s"NO STATE; events: $events")
-          val heatEvent = events
-            .filter(e => e.info != null && e.info.toLowerCase.contains("heat"))
-            .toStream
-            .headOption
-          println(s"heat event: $heatEvent")
-          //TODO What if 'smoke' comes in the same batch as 'heat'?
-          //TODO What if there are more than one 'heat'?
-          val newProblemState = heatEvent.map(e => ProblemState(siteId, e.timestamp))
-          if (newProblemState.isDefined) {
-            state.update(newProblemState.get)
-            state.setTimeoutDuration(20000)
-          }
-          Iterator.empty
-        }
-    }
-
+    //TODO Configurable
+    val alarmStateFunction = new FireAlarmStateFunction(10000L)
     val alarms = events
+      //TODO Maybe remove - deduplicator already set this watermark
+      .withWatermark(timestampColumn, s"${config.watermarkIntervalSec} seconds")
       .groupByKey(_.siteId)
-      //TODO EventTimeTimeout
-      .flatMapGroupsWithState[ProblemState, Alarm](OutputMode.Update(), GroupStateTimeout.ProcessingTimeTimeout())(alarmFunction)
+      .flatMapGroupsWithState(OutputMode.Update(), GroupStateTimeout.EventTimeTimeout())(alarmStateFunction.updateAlarmState)
 
-    //TODO Complete
-
-    //TODO Alarm columns
     val kafkaAlarms = alarms
       .withJsonColumn(valueColumn)
-      .withColumn(keyColumn, col("siteId") cast StringType)
+      .withColumn(keyColumn, col(Alarm.siteIdColumn) cast StringType)
 
     val query = kafkaAlarms
       .writeStream
@@ -117,7 +59,3 @@ object SparkPredictorMain extends SparkPredictorArgParser {
   }
 
 }
-
-case class ProblemState(siteId: Long, heatTimestamp: Timestamp)
-
-case class Alarm(siteId: Long, heatTimestamp: Timestamp, smokeTimestamp: Timestamp, info: String)

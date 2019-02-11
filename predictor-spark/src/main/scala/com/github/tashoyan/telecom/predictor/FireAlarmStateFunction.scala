@@ -18,9 +18,9 @@ class FireAlarmStateFunction(problemTimeoutMillis: Long) extends AlarmStateFunct
       //TODO More than one smoke from the same site
       println(s"EXISTING STATE on $siteId")
       /* already observed heat; checking now for smoke */
-      val heatTimestamp = state.get.heatTimestamp
-      println(s" -- heatTimestamp: $heatTimestamp")
-      val timeoutTimestamp = heatTimestamp.getTime + problemTimeoutMillis
+      val heatTs = state.get.heatTimestamp
+      println(s" -- heatTimestamp: $heatTs")
+      val timeoutTimestamp = heatTs.getTime + problemTimeoutMillis
       println(s" -- timeoutTimestamp: ${new Timestamp(timeoutTimestamp)}")
       state.setTimeoutTimestamp(timeoutTimestamp)
 
@@ -30,8 +30,7 @@ class FireAlarmStateFunction(problemTimeoutMillis: Long) extends AlarmStateFunct
       println(s" -- smokeTimestamp: $smokeTimestamp")
       if (smokeTimestamp.isDefined) {
         val smokeTs = smokeTimestamp.get
-        if (smokeTs.getTime - heatTimestamp.getTime > 0 &&
-          smokeTs.getTime - heatTimestamp.getTime <= problemTimeoutMillis) {
+        if (isInTriggerInterval(heatTs, smokeTs)) {
           /* smoke is soon after heat - fire alarm */
           val alarm = Alarm(smokeTs, siteId, "MAJOR", s"Fire on site $siteId")
           state.remove()
@@ -49,21 +48,40 @@ class FireAlarmStateFunction(problemTimeoutMillis: Long) extends AlarmStateFunct
       }
     } else {
       /* no heat yet; check for heat now */
-      //TODO Missing fire alarm when smoke comes in the same batch with heat
       //TODO More than one heat from the same site
       println(s"NEW STATE on $siteId")
       val heatTimestamp = siteEvents.toStream
         .find(isHeatEvent)
         .map(_.timestamp)
-      println(s" -- heatTimestamp: $heatTimestamp")
-      heatTimestamp.foreach { heatTs =>
-        val newState = ProblemState(siteId, heatTs)
-        state.update(newState)
-        val timeoutTimestamp = heatTs.getTime + problemTimeoutMillis
-        println(s" -- timeoutTimestamp: ${new Timestamp(timeoutTimestamp)}")
-        state.setTimeoutTimestamp(timeoutTimestamp)
+      val smokeTimestamp = siteEvents.toStream
+        .find(isSmokeEvent)
+        .map(_.timestamp)
+      println(s" -- heatTimestamp: $heatTimestamp, smokeTimestamp: $smokeTimestamp")
+      //TODO smoke in the same batch as heat - is it really a realistic scenario?
+      if (heatTimestamp.isDefined) {
+        val heatTs = heatTimestamp.get
+        if (smokeTimestamp.isDefined) {
+          val smokeTs = smokeTimestamp.get
+          if (isInTriggerInterval(heatTs, smokeTs)) {
+            /* smoke is soon after heat - fire alarm */
+            val alarm = Alarm(smokeTs, siteId, "MAJOR", s"Fire on site $siteId")
+            Iterator(alarm)
+          } else {
+            /* smoke is too late */
+            println(s" -- smoke is too late")
+            Iterator.empty
+          }
+        } else {
+          val newState = ProblemState(siteId, heatTs)
+          state.update(newState)
+          val timeoutTimestamp = heatTs.getTime + problemTimeoutMillis
+          println(s" -- timeoutTimestamp: ${new Timestamp(timeoutTimestamp)}")
+          state.setTimeoutTimestamp(timeoutTimestamp)
+          Iterator.empty
+        }
+      } else {
+        Iterator.empty
       }
-      Iterator.empty
     }
   }
 
@@ -74,5 +92,9 @@ class FireAlarmStateFunction(problemTimeoutMillis: Long) extends AlarmStateFunct
   def isSmokeEvent(event: Event): Boolean =
     event.info != null &&
       event.info.toLowerCase.contains("smoke")
+
+  def isInTriggerInterval(heatTimestamp: Timestamp, smokeTimestamp: Timestamp): Boolean =
+    smokeTimestamp.getTime - heatTimestamp.getTime > 0 &&
+      smokeTimestamp.getTime - heatTimestamp.getTime <= problemTimeoutMillis
 
 }

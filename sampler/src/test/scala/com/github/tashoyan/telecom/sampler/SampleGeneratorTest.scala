@@ -1,5 +1,6 @@
 package com.github.tashoyan.telecom.sampler
 
+import java.sql.Timestamp
 import java.util.concurrent.TimeUnit
 
 import com.github.tashoyan.telecom.event.Event
@@ -36,8 +37,7 @@ class SampleGeneratorTest extends FunSuite with SparkTestHarness {
       .as[Int]
       .collect()
 
-    val events = Sampler
-      .generateEvents(stations, TimeUnit.MINUTES.toMillis(1), 1)
+    val events = generateEvents(stations, TimeUnit.MINUTES.toMillis(1), 1)
       .toDS()
     writeEvents(events, "target/events_controllers_2715_2716_all_1min_uniq")
   }
@@ -59,8 +59,7 @@ class SampleGeneratorTest extends FunSuite with SparkTestHarness {
       .as[Int]
       .collect()
 
-    val events = Sampler
-      .generateEvents(stations, TimeUnit.MINUTES.toMillis(1), 2)
+    val events = generateEvents(stations, TimeUnit.MINUTES.toMillis(1), 2)
       .toDS()
     writeEvents(events, "target/events_controllers_2715_2716_all_1min_dup")
   }
@@ -88,11 +87,22 @@ class SampleGeneratorTest extends FunSuite with SparkTestHarness {
         .select("station")
         .as[Int]
         .collect()
-      val events = Sampler
-        .generateEvents(stations, TimeUnit.MINUTES.toMillis(1), 2)
+      val events = generateEvents(stations, TimeUnit.MINUTES.toMillis(1), 2)
         .toDS()
       writeEvents(events, s"target/events_controllers_2715_2716_half${half}_1min_dup")
     }
+  }
+
+  test("site 1 - heat and smoke - 15 sec interval") {
+    val spark0 = spark
+    import spark0.implicits._
+
+    val events = Seq(
+      Event(new Timestamp(0L), 1L, "MINOR", "Smoke on site 1"),
+      Event(new Timestamp(15L), 1L, "MAJOR", "Heat on site 1")
+    )
+      .toDS()
+    writeEvents(events, "target/events_site_1_heat_and_smoke_15sec")
   }
 
 }

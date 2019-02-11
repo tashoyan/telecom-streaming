@@ -42,6 +42,7 @@ object EventGeneratorMain extends EventGeneratorArgParser {
     val events = inputEvents
       .withColumn(currentTimeSecColumn, unix_timestamp())
       .withColumn(timestampColumn, eventTimestampUdf(col(currentTimeSecColumn), col(timestampColumn)))
+      //TODO Do not need this drop() - remove. asEvents() selects all needed columns.
       .drop(currentTimeSecColumn)
       .asEvents
 

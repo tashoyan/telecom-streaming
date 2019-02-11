@@ -15,7 +15,7 @@ import org.apache.spark.sql.types.LongType
 object SparkPredictorLocal1 {
   private val port: Long = 9999
   private val watermarkIntervalSec = 20L
-  private val problemTimeoutSec = 10L
+  private val problemTimeoutMillis = TimeUnit.SECONDS.toMillis(10L)
 
   def main(args: Array[String]): Unit = {
     implicit val spark: SparkSession = SparkSession.builder()
@@ -54,11 +54,11 @@ object SparkPredictorLocal1 {
       event.info != null &&
         event.info.toLowerCase.contains("smoke")
 
-    def dummyFunction: (Long, Iterator[Event], GroupState[DummyState1]) => Iterator[DummyAlarm1] = {
+    def dummyAlarmFunction: (Long, Iterator[Event], GroupState[DummyState1]) => Iterator[DummyAlarm1] = {
       (siteId, events, state) =>
         if (state.hasTimedOut) {
           println(s"TIMED OUT STATE on $siteId")
-          val heatTimestamp = state.get.heatTimestamp
+          val heatTimestamp = state.getOption.map(_.heatTimestamp)
           println(s" -- heatTimestamp: $heatTimestamp")
           println(s" -- now: ${new Timestamp(System.currentTimeMillis())}")
           state.remove()
@@ -70,14 +70,22 @@ object SparkPredictorLocal1 {
           val smokeTimestamp = events.toStream
             .find(isSmoke)
             .map(_.timestamp)
-          val timeoutTimestamp = heatTimestamp.getTime + TimeUnit.SECONDS.toMillis(problemTimeoutSec)
+          val timeoutTimestamp = heatTimestamp.getTime + problemTimeoutMillis
           state.setTimeoutTimestamp(timeoutTimestamp)
 
           if (smokeTimestamp.isDefined) {
             println(s" -- smokeTimestamp: $smokeTimestamp")
-            val alarm = DummyAlarm1(siteId, heatTimestamp, smokeTimestamp.get, s"Fire on $siteId")
-            state.remove()
-            Iterator(alarm)
+            val smokeTs = smokeTimestamp.get
+            if (smokeTs.getTime - heatTimestamp.getTime > 0 &&
+              smokeTs.getTime - heatTimestamp.getTime <= problemTimeoutMillis) {
+              val alarm = DummyAlarm1(siteId, heatTimestamp, smokeTs, s"Fire on $siteId")
+              state.remove()
+              Iterator(alarm)
+            } else {
+              println(" -- smoke is too late")
+              state.remove()
+              Iterator.empty
+            }
           } else {
             println(" -- no smoke yet")
             Iterator.empty
@@ -91,7 +99,7 @@ object SparkPredictorLocal1 {
             println(s" -- heatTimestamp: $heatTs")
             val newState = DummyState1(siteId, heatTs)
             state.update(newState)
-            val timeoutTimestamp = heatTs.getTime + TimeUnit.SECONDS.toMillis(problemTimeoutSec)
+            val timeoutTimestamp = heatTs.getTime + problemTimeoutMillis
             state.setTimeoutTimestamp(timeoutTimestamp)
             println(s" -- timeoutTimestamp: ${new Timestamp(timeoutTimestamp)}")
             println(s" -- watermark timeout timestamp: ${new Timestamp(timeoutTimestamp + TimeUnit.SECONDS.toMillis(watermarkIntervalSec))}")
@@ -103,7 +111,7 @@ object SparkPredictorLocal1 {
     val alarms = events
       .withWatermark(timestampColumn, s"$watermarkIntervalSec seconds")
       .groupByKey(_.siteId)
-      .flatMapGroupsWithState(OutputMode.Update(), GroupStateTimeout.EventTimeTimeout())(dummyFunction)
+      .flatMapGroupsWithState(OutputMode.Update(), GroupStateTimeout.EventTimeTimeout())(dummyAlarmFunction)
 
     val query = alarms.writeStream
       .outputMode(OutputMode.Update())

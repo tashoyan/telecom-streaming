@@ -15,6 +15,7 @@ class FireAlarmStateFunction(problemTimeoutMillis: Long) extends AlarmStateFunct
       state.remove()
       Iterator.empty
     } else if (state.exists) {
+      //TODO More than one smoke from the same site
       println(s"EXISTING STATE on $siteId")
       /* already observed heat; checking now for smoke */
       val heatTimestamp = state.get.heatTimestamp
@@ -49,6 +50,7 @@ class FireAlarmStateFunction(problemTimeoutMillis: Long) extends AlarmStateFunct
     } else {
       /* no heat yet; check for heat now */
       //TODO Missing fire alarm when smoke comes in the same batch with heat
+      //TODO More than one heat from the same site
       println(s"NEW STATE on $siteId")
       val heatTimestamp = siteEvents.toStream
         .find(isHeatEvent)

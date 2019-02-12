@@ -94,7 +94,7 @@ class FireAlarmStateFunction(problemTimeoutMillis: Long) extends AlarmStateFunct
       event.info.toLowerCase.contains("smoke")
 
   def isInTriggerInterval(heatTimestamp: Timestamp, smokeTimestamp: Timestamp): Boolean =
-    smokeTimestamp.getTime - heatTimestamp.getTime > 0 &&
+    smokeTimestamp.getTime - heatTimestamp.getTime >= 0 &&
       smokeTimestamp.getTime - heatTimestamp.getTime <= problemTimeoutMillis
 
 }

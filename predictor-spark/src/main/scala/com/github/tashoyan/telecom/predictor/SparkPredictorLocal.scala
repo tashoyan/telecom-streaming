@@ -8,6 +8,8 @@ import com.github.tashoyan.telecom.event.SparkEventAdapter.EventDataFrame
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.streaming.{GroupStateTimeout, OutputMode}
 
+//TODO Enable scalastyle back
+//scalastyle:off
 object SparkPredictorLocal {
   private val port: Long = 9999
   private val watermarkIntervalSec = 20L

@@ -1,17 +1,13 @@
 package com.github.tashoyan.telecom.event
 
 import com.github.tashoyan.telecom.event.Event._
-import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{Column, DataFrame, Dataset, SparkSession}
+import org.apache.spark.sql.{DataFrame, Dataset, SparkSession}
 
 object SparkEventAdapter {
 
-  private def sqlColumns: Seq[Column] =
-    columns.map(col)
-
   private def dataFrameAsEventDataset(df: DataFrame)(implicit spark: SparkSession): Dataset[Event] = {
     import spark.implicits._
-    df.select(sqlColumns: _*)
+    df.select(columns.head, columns.tail:_*)
       .as[Event]
   }
 

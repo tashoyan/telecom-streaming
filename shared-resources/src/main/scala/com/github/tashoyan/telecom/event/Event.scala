@@ -15,7 +15,7 @@ object Event {
   val severityColumn = "severity"
   val infoColumn = "info"
 
-  val columns: Set[String] = Set(
+  val columns: Seq[String] = Seq(
     timestampColumn,
     siteIdColumn,
     severityColumn,

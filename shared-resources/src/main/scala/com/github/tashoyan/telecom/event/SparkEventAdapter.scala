@@ -8,7 +8,6 @@ object SparkEventAdapter {
 
   private def sqlColumns: Seq[Column] =
     columns.map(col)
-      .toSeq
 
   private def dataFrameAsEventDataset(df: DataFrame)(implicit spark: SparkSession): Dataset[Event] = {
     import spark.implicits._

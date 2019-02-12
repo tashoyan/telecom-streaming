@@ -28,6 +28,8 @@ object SparkPredictorLocal {
       .option("port", port)
       .option("includeTimestamp", value = true)
       .load()
+    println("Input schema:")
+    input.printSchema()
 
     def parseInputString(inputStr: String): Seq[(Long, String)] = {
       inputStr
@@ -41,12 +43,13 @@ object SparkPredictorLocal {
     }
 
     def generateEventInfo(token: String): String =
-      if (token.contains("2")) "Smoke on site"
+      if (token.contains("s")) "Smoke on site"
       else "Heat on site"
 
     val events = input
-      .as[(Timestamp, String)]
-      .flatMap { case (timestamp, inputStr) =>
+      .select("value", "timestamp")
+      .as[(String, Timestamp)]
+      .flatMap { case (inputStr, timestamp) =>
         val siteEvents: Seq[(Long, String)] = parseInputString(inputStr)
         siteEvents.map { case (siteId, token) =>
           (timestamp, siteId, "MAJOR", generateEventInfo(token))

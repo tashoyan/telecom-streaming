@@ -1,13 +1,12 @@
 package com.github.tashoyan.telecom.predictor
 
+import java.sql.Timestamp
 import java.util.concurrent.TimeUnit
 
 import com.github.tashoyan.telecom.event.Event._
 import com.github.tashoyan.telecom.event.SparkEventAdapter.EventDataFrame
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.functions._
 import org.apache.spark.sql.streaming.{GroupStateTimeout, OutputMode}
-import org.apache.spark.sql.types.LongType
 
 object SparkPredictorLocal {
   private val port: Long = 9999
@@ -28,19 +27,30 @@ object SparkPredictorLocal {
       .option("includeTimestamp", value = true)
       .load()
 
-    val infoCol = when(
-      col("input_words")(1).contains("2"),
-      concat_ws(" ", lit("Smoke on site"), col(siteIdColumn))
-    )
-      .otherwise(
-        concat_ws(" ", lit("Heat on site"), col(siteIdColumn))
-      )
+    def parseInputString(inputStr: String): Seq[(Long, String)] = {
+      inputStr
+        .split("\\s+")
+        .grouped(2)
+        .flatMap {
+          case Array(num, token) => Iterator((num.toLong, token))
+          case _ => Iterator.empty
+        }
+        .toSeq
+    }
+
+    def generateEventInfo(token: String): String =
+      if (token.contains("2")) "Smoke on site"
+      else "Heat on site"
 
     val events = input
-      .withColumn("input_words", split(col("value"), "\\s+"))
-      .withColumn(siteIdColumn, col("input_words")(0) cast LongType)
-      .withColumn(severityColumn, lit("MAJOR"))
-      .withColumn(infoColumn, infoCol)
+      .as[(Timestamp, String)]
+      .flatMap { case (timestamp, inputStr) =>
+        val siteEvents: Seq[(Long, String)] = parseInputString(inputStr)
+        siteEvents.map { case (siteId, token) =>
+          (timestamp, siteId, "MAJOR", generateEventInfo(token))
+        }
+      }
+      .toDF(columns:_*)
       .asEvents
 
     val alarmStateFunction = new FireAlarmStateFunction(TimeUnit.SECONDS.toMillis(problemTimeoutSec))

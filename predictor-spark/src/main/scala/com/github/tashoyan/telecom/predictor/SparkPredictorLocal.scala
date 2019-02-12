@@ -1,6 +1,5 @@
 package com.github.tashoyan.telecom.predictor
 
-import java.sql.Timestamp
 import java.util.concurrent.TimeUnit
 
 import com.github.tashoyan.telecom.event.Event._
@@ -59,7 +58,3 @@ object SparkPredictorLocal {
   }
 
 }
-
-case class DummyState1(siteId: Long, heatTimestamp: Timestamp)
-
-case class DummyAlarm1(siteId: Long, heatTimestamp: Timestamp, smokeTimestamp: Timestamp, info: String)

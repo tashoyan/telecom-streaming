@@ -50,7 +50,7 @@ object SparkPredictorLocal {
           (timestamp, siteId, "MAJOR", generateEventInfo(token))
         }
       }
-      .toDF(columns:_*)
+      .toDF(columns: _*)
       .asEvents
 
     val alarmStateFunction = new FireAlarmStateFunction(TimeUnit.SECONDS.toMillis(problemTimeoutSec))

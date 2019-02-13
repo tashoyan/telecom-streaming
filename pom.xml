@@ -52,6 +52,7 @@
         <scalaj-http.version>2.4.1</scalaj-http.version>
         <scala-parser-combinators.version>1.0.4</scala-parser-combinators.version>
         <scalatest.version>3.0.5</scalatest.version>
+        <scalamock.version>4.1.0</scalamock.version>
         <scalactic.version>3.0.5</scalactic.version>
         <kafka.version>2.1.0</kafka.version>
         <embedded-kafka.version>2.1.0</embedded-kafka.version>
@@ -244,6 +245,11 @@
                 <groupId>org.scalatest</groupId>
                 <artifactId>scalatest_${compiler.scala.compat.version}</artifactId>
                 <version>${scalatest.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.scalamock</groupId>
+                <artifactId>scalamock_${compiler.scala.compat.version}</artifactId>
+                <version>${scalamock.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.scalactic</groupId>

@@ -7,7 +7,7 @@ object SparkEventAdapter {
 
   private def dataFrameAsEventDataset(df: DataFrame)(implicit spark: SparkSession): Dataset[Event] = {
     import spark.implicits._
-    df.select(columns.head, columns.tail:_*)
+    df.select(columns.head, columns.tail: _*)
       .as[Event]
   }
 

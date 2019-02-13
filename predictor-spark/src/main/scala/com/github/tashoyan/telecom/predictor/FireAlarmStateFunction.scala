@@ -36,6 +36,7 @@ class FireAlarmStateFunction(problemTimeoutMillis: Long) extends AlarmStateFunct
             Iterator.empty
           }
         } else {
+          //+ state exists [N] / state timed out [-] / heat [Y] / smoke [N] / smoke-heat timeout [-]
           val newState = ProblemState(siteId, heatTs)
           state.update(newState)
           val timeoutTimestamp = heatTs.getTime + problemTimeoutMillis
@@ -44,6 +45,7 @@ class FireAlarmStateFunction(problemTimeoutMillis: Long) extends AlarmStateFunct
           Iterator.empty
         }
       } else {
+        //+ state exists [N] / state timed out [-] / heat [N] / smoke [N] / smoke-heat timeout [-]
         Iterator.empty
       }
     } else if (state.exists && !state.hasTimedOut) {

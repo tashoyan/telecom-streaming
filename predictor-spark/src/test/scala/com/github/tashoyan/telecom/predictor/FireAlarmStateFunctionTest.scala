@@ -17,24 +17,52 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
   private val heatInfo = "Heat on site"
   private val smokeInfo = "Smoke on site"
 
-  def heatEvent(timestampMillis: Long): Event =
-    Event(new Timestamp(timestampMillis), siteId, severity, heatInfo)
+  def heatEvent(timestamp: Timestamp): Event =
+    Event(timestamp, siteId, severity, heatInfo)
 
-  def smokeEvent(timestampMillis: Long): Event =
-    Event(new Timestamp(timestampMillis), siteId, severity, smokeInfo)
+  def smokeEvent(timestamp: Timestamp): Event =
+    Event(timestamp, siteId, severity, smokeInfo)
 
   test("state exists [N] / state timed out [-] / heat [N] / smoke [N] / smoke-heat timeout [-]") {
-    val groupState: GroupState[ProblemState] = mock[GroupState[ProblemState]]
-    (groupState.exists _)
+    val state: GroupState[ProblemState] = mock[GroupState[ProblemState]]
+    (state.exists _)
       .expects()
       .atLeastOnce()
       .returns(false)
 
+    val events = Iterator.empty
+
     val alarmStateFunction = new FireAlarmStateFunction(problemTimeoutMillis)
 
-    val result = alarmStateFunction.updateAlarmState(siteId, Iterator.empty, groupState)
+    val result = alarmStateFunction.updateAlarmState(siteId, events, state)
     assert(result.isEmpty, "Expected none alarms")
+  }
 
+  test("state exists [N] / state timed out [-] / heat [Y] / smoke [N] / smoke-heat timeout [-]") {
+    val heatTimestamp = new Timestamp(1000L)
+
+    val state: GroupState[ProblemState] = mock[GroupState[ProblemState]]
+    inSequence {
+      (state.exists _)
+        .expects()
+        .atLeastOnce()
+        .returns(false)
+      inAnyOrder {
+        (state.update _)
+          .expects(ProblemState(siteId, heatTimestamp))
+          .once()
+        (state.setTimeoutTimestamp(_: Long))
+          .expects(heatTimestamp.getTime + problemTimeoutMillis)
+          .once()
+      }
+    }
+
+    val events = Iterator(heatEvent(heatTimestamp))
+
+    val alarmStateFunction = new FireAlarmStateFunction(problemTimeoutMillis)
+
+    val result = alarmStateFunction.updateAlarmState(siteId, events, state)
+    assert(result.isEmpty, "Expected none alarms")
   }
 
 }

@@ -10,43 +10,7 @@ import org.apache.spark.sql.streaming.GroupState
 class FireAlarmStateFunction(problemTimeoutMillis: Long) extends AlarmStateFunction {
 
   override def updateAlarmState(siteId: Long, siteEvents: Iterator[Event], state: GroupState[ProblemState]): Iterator[Alarm] = {
-    if (state.hasTimedOut) {
-      /* problem state timed out */
-      state.remove()
-      Iterator.empty
-    } else if (state.exists) {
-      //TODO More than one smoke from the same site
-      println(s"EXISTING STATE on $siteId")
-      /* already observed heat; checking now for smoke */
-      val heatTs = state.get.heatTimestamp
-      println(s" -- heatTimestamp: $heatTs")
-      val timeoutTimestamp = heatTs.getTime + problemTimeoutMillis
-      println(s" -- timeoutTimestamp: ${new Timestamp(timeoutTimestamp)}")
-      state.setTimeoutTimestamp(timeoutTimestamp)
-
-      val smokeTimestamp = siteEvents.toStream
-        .find(isSmokeEvent)
-        .map(_.timestamp)
-      println(s" -- smokeTimestamp: $smokeTimestamp")
-      if (smokeTimestamp.isDefined) {
-        val smokeTs = smokeTimestamp.get
-        if (isInTriggerInterval(heatTs, smokeTs)) {
-          /* smoke is soon after heat - fire alarm */
-          val alarm = Alarm(smokeTs, siteId, "MAJOR", s"Fire on site $siteId")
-          state.remove()
-          Iterator(alarm)
-        } else {
-          /* smoke is too late */
-          println(s" -- smoke is too late")
-          state.remove()
-          Iterator.empty
-        }
-      } else {
-        /* no smoke yet */
-        println(s" -- no smoke yet")
-        Iterator.empty
-      }
-    } else {
+    if (!state.exists) {
       /* no heat yet; check for heat now */
       //TODO More than one heat from the same site
       println(s"NEW STATE on $siteId")
@@ -82,6 +46,42 @@ class FireAlarmStateFunction(problemTimeoutMillis: Long) extends AlarmStateFunct
       } else {
         Iterator.empty
       }
+    } else if (state.exists && !state.hasTimedOut) {
+      //TODO More than one smoke from the same site
+      println(s"EXISTING STATE on $siteId")
+      /* already observed heat; checking now for smoke */
+      val heatTs = state.get.heatTimestamp
+      println(s" -- heatTimestamp: $heatTs")
+      val timeoutTimestamp = heatTs.getTime + problemTimeoutMillis
+      println(s" -- timeoutTimestamp: ${new Timestamp(timeoutTimestamp)}")
+      state.setTimeoutTimestamp(timeoutTimestamp)
+
+      val smokeTimestamp = siteEvents.toStream
+        .find(isSmokeEvent)
+        .map(_.timestamp)
+      println(s" -- smokeTimestamp: $smokeTimestamp")
+      if (smokeTimestamp.isDefined) {
+        val smokeTs = smokeTimestamp.get
+        if (isInTriggerInterval(heatTs, smokeTs)) {
+          /* smoke is soon after heat - fire alarm */
+          val alarm = Alarm(smokeTs, siteId, "MAJOR", s"Fire on site $siteId")
+          state.remove()
+          Iterator(alarm)
+        } else {
+          /* smoke is too late */
+          println(s" -- smoke is too late")
+          state.remove()
+          Iterator.empty
+        }
+      } else {
+        /* no smoke yet */
+        println(s" -- no smoke yet")
+        Iterator.empty
+      }
+    } else {
+      /* problem state timed out */
+      state.remove()
+      Iterator.empty
     }
   }
 

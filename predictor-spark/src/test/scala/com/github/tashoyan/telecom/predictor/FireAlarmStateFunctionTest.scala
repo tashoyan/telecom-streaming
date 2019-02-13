@@ -25,10 +25,6 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
 
   test("state exists [N] / state timed out [-] / heat [N] / smoke [N] / smoke-heat timeout [-]") {
     val groupState: GroupState[ProblemState] = mock[GroupState[ProblemState]]
-    (groupState.hasTimedOut _)
-      .expects()
-      .atLeastOnce()
-      .returns(false)
     (groupState.exists _)
       .expects()
       .atLeastOnce()

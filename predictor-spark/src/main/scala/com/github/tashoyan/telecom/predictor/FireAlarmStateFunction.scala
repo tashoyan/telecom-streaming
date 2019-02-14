@@ -91,6 +91,9 @@ class FireAlarmStateFunction(problemTimeoutMillis: Long) extends AlarmStateFunct
       }
     } else {
       //+ state exists [Y] / state timed out [Y] / heat [N] / smoke [N] / smoke-heat timeout [-]
+      //+ state exists [Y] / state timed out [Y] / heat [Y] / smoke [N] / smoke-heat timeout [-]
+      //+ state exists [Y] / state timed out [Y] / heat [N] / smoke [Y] / smoke-heat timeout [N|Y]
+      //+ state exists [Y] / state timed out [Y] / heat [Y] / smoke [Y] / smoke-heat timeout [N|Y]
       /* problem state timed out */
       state.remove()
       Iterator.empty

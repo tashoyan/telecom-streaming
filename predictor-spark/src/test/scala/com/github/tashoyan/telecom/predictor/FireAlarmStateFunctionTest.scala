@@ -367,4 +367,86 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
     assert(alarms.isEmpty, "Expected none alarms")
   }
 
+  test("state exists [Y] / state timed out [Y] / heat [Y] / smoke [N] / smoke-heat timeout [-]") {
+    val heatTimestamp = new Timestamp(1000L)
+    val events = Iterator(heatEvent(heatTimestamp))
+
+    val state: GroupState[ProblemState] = mock[GroupState[ProblemState]]
+    inSequence {
+      inAnyOrder {
+        (state.exists _)
+          .expects()
+          .atLeastOnce()
+          .returns(true)
+        (state.hasTimedOut _)
+          .expects()
+          .atLeastOnce()
+          .returns(true)
+      }
+      (state.remove _)
+        .expects()
+        .once()
+    }
+
+    val alarmStateFunction = new FireAlarmStateFunction(problemTimeoutMillis)
+
+    val alarms = alarmStateFunction.updateAlarmState(siteId, events, state)
+    assert(alarms.isEmpty, "Expected none alarms")
+  }
+
+  test("state exists [Y] / state timed out [Y] / heat [N] / smoke [Y] / smoke-heat timeout [N|Y]") {
+    val smokeTimestamp = new Timestamp(1000L)
+    val events = Iterator(smokeEvent(smokeTimestamp))
+
+    val state: GroupState[ProblemState] = mock[GroupState[ProblemState]]
+    inSequence {
+      inAnyOrder {
+        (state.exists _)
+          .expects()
+          .atLeastOnce()
+          .returns(true)
+        (state.hasTimedOut _)
+          .expects()
+          .atLeastOnce()
+          .returns(true)
+      }
+      (state.remove _)
+        .expects()
+        .once()
+    }
+
+    val alarmStateFunction = new FireAlarmStateFunction(problemTimeoutMillis)
+
+    val alarms = alarmStateFunction.updateAlarmState(siteId, events, state)
+    assert(alarms.isEmpty, "Expected none alarms")
+  }
+
+  test("state exists [Y] / state timed out [Y] / heat [Y] / smoke [Y] / smoke-heat timeout [N|Y]") {
+    val heatTimestamp = new Timestamp(1000L)
+    val smokeTimestamp = new Timestamp(2000L)
+    val events = Iterator(heatEvent(heatTimestamp), smokeEvent(smokeTimestamp))
+
+    val state: GroupState[ProblemState] = mock[GroupState[ProblemState]]
+    inSequence {
+      inAnyOrder {
+        (state.exists _)
+          .expects()
+          .atLeastOnce()
+          .returns(true)
+        (state.hasTimedOut _)
+          .expects()
+          .atLeastOnce()
+          .returns(true)
+      }
+      (state.remove _)
+        .expects()
+        .once()
+    }
+
+    val alarmStateFunction = new FireAlarmStateFunction(problemTimeoutMillis)
+
+    val alarms = alarmStateFunction.updateAlarmState(siteId, events, state)
+    assert(alarms.isEmpty, "Expected none alarms")
+  }
+
 }

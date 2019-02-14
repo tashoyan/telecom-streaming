@@ -27,10 +27,12 @@ class FireAlarmStateFunction(problemTimeoutMillis: Long) extends AlarmStateFunct
         if (smokeTimestamp.isDefined) {
           val smokeTs = smokeTimestamp.get
           if (isInTriggerInterval(heatTs, smokeTs)) {
+            //+ state exists [N] / state timed out [-] / heat [Y] / smoke [Y] / smoke-heat timeout [N]
             /* smoke is soon after heat - fire alarm */
             val alarm = Alarm(smokeTs, siteId, "MAJOR", s"Fire on site $siteId")
             Iterator(alarm)
           } else {
+            //+ state exists [N] / state timed out [-] / heat [Y] / smoke [Y] / smoke-heat timeout [Y]
             /* smoke is too late */
             println(s" -- smoke is too late")
             Iterator.empty
@@ -46,6 +48,7 @@ class FireAlarmStateFunction(problemTimeoutMillis: Long) extends AlarmStateFunct
         }
       } else {
         //+ state exists [N] / state timed out [-] / heat [N] / smoke [N] / smoke-heat timeout [-]
+        //+ state exists [N] / state timed out [-] / heat [N] / smoke [Y] / smoke-heat timeout [-]
         Iterator.empty
       }
     } else if (state.exists && !state.hasTimedOut) {

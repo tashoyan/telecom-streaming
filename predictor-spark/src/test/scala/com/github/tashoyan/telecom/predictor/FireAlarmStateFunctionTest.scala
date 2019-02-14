@@ -339,4 +339,32 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
     }
   }
 
+  /* Existing state, timed out */
+
+  test("state exists [Y] / state timed out [Y] / heat [N] / smoke [N] / smoke-heat timeout [-]") {
+    val events = Iterator.empty
+
+    val state: GroupState[ProblemState] = mock[GroupState[ProblemState]]
+    inSequence {
+      inAnyOrder {
+        (state.exists _)
+          .expects()
+          .atLeastOnce()
+          .returns(true)
+        (state.hasTimedOut _)
+          .expects()
+          .atLeastOnce()
+          .returns(true)
+      }
+      (state.remove _)
+        .expects()
+        .once()
+    }
+
+    val alarmStateFunction = new FireAlarmStateFunction(problemTimeoutMillis)
+
+    val alarms = alarmStateFunction.updateAlarmState(siteId, events, state)
+    assert(alarms.isEmpty, "Expected none alarms")
+  }
+
 }

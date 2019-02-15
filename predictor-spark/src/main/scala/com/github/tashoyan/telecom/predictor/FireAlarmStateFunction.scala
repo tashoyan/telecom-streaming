@@ -3,6 +3,8 @@ package com.github.tashoyan.telecom.predictor
 import java.sql.Timestamp
 
 import com.github.tashoyan.telecom.event.Event
+import com.github.tashoyan.telecom.util.Collections.RichIterable
+import com.github.tashoyan.telecom.util.Timestamps.RichTimestamp
 import org.apache.spark.sql.streaming.GroupState
 
 //TODO Enable scalastyle back
@@ -12,14 +14,18 @@ class FireAlarmStateFunction(problemTimeoutMillis: Long) extends AlarmStateFunct
   override def updateAlarmState(siteId: Long, siteEvents: Iterator[Event], state: GroupState[ProblemState]): Iterator[Alarm] = {
     if (!state.exists) {
       /* no heat yet; check for heat now */
-      //TODO More than one heat from the same site
       println(s"NEW STATE on $siteId")
-      val heatTimestamp = siteEvents.toStream
-        .find(isHeatEvent)
+      val importantEvents = siteEvents
+        .filter(e => isHeatEvent(e) || isSmokeEvent(e))
+        .toIterable
+      val heatTimestamp = importantEvents
+        .filter(isHeatEvent)
         .map(_.timestamp)
-      val smokeTimestamp = siteEvents.toStream
-        .find(isSmokeEvent)
+        .minOption
+      val smokeTimestamp = importantEvents
+        .filter(isSmokeEvent)
         .map(_.timestamp)
+        .minOption
       println(s" -- heatTimestamp: $heatTimestamp, smokeTimestamp: $smokeTimestamp")
       //TODO smoke in the same batch as heat - is it really a realistic scenario?
       if (heatTimestamp.isDefined) {

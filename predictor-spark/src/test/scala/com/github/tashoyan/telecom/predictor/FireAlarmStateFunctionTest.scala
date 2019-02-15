@@ -4,6 +4,7 @@ import java.sql.Timestamp
 import java.util.concurrent.TimeUnit
 
 import com.github.tashoyan.telecom.event.Event
+import com.github.tashoyan.telecom.util.Timestamps.RichTimestamp
 import org.apache.spark.sql.streaming.GroupState
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.FunSuite
@@ -447,6 +448,33 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
 
     val alarms = alarmStateFunction.updateAlarmState(siteId, events, state)
     assert(alarms.isEmpty, "Expected none alarms")
+  }
+
+  /* Multiple events in a batch */
+
+  test("state exists [N] / state timed out [-] / heat [Y] multiple / smoke [Y] multiple / smoke-heat timeout [N]") {
+    val heatTimestamps = Seq(3, 1, 5)
+      .map(i => i * problemTimeoutMillis / 10)
+      .map(millis => new Timestamp(millis))
+    val smokeTimestamps = Seq(6, 2, 4)
+      .map(i => i * problemTimeoutMillis / 10)
+      .map(millis => new Timestamp(millis))
+    val events = (heatTimestamps.map(heatEvent) ++ smokeTimestamps.map(smokeEvent))
+      .toIterator
+
+    val state: GroupState[ProblemState] = mock[GroupState[ProblemState]]
+    (state.exists _)
+      .expects()
+      .atLeastOnce()
+      .returns(false)
+    val alarmStateFunction = new FireAlarmStateFunction(problemTimeoutMillis)
+
+    val alarms = alarmStateFunction.updateAlarmState(siteId, events, state).toSeq
+    assert(alarms.length === 1, "Expected 1 alarm")
+    val alarm = alarms.head
+    assert(alarm.timestamp === smokeTimestamps.min)
+    assert(alarm.siteId === siteId)
+    assert(alarm.info.toLowerCase.contains("fire "))
   }
 
 }

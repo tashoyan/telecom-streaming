@@ -17,6 +17,16 @@ abstract class AbstractFireAlarmState(implicit problemTimeoutMillis: Long) exten
   protected implicit val eventOrdering: Ordering[Event] =
     Ordering.by(_.timestamp)
 
+  protected def findImportantSortedEvents(events: Iterator[Event]): (mutable.TreeSet[Event], mutable.TreeSet[Event]) = {
+    events.foldLeft((new mutable.TreeSet[Event](), new mutable.TreeSet[Event])) { case ((heats, smokes), event) =>
+      if (isHeatEvent(event)) {
+        (heats += event, smokes)
+      } else if (isSmokeEvent(event)) {
+        (heats, smokes += event)
+      } else (heats, smokes)
+    }
+  }
+
   protected def isHeatEvent(event: Event): Boolean =
     event.info != null &&
       event.info.toLowerCase.contains("heat")
@@ -34,19 +44,12 @@ abstract class AbstractFireAlarmState(implicit problemTimeoutMillis: Long) exten
 case class NoneState()(implicit problemTimeoutMillis: Long) extends AbstractFireAlarmState {
 
   override def transition(events: Iterator[Event]): FireAlarmState = {
-    val (heatEvents, smokeEvents) =
-      events.foldLeft((new mutable.TreeSet[Event](), new mutable.TreeSet[Event])) { case ((heats, smokes), event) =>
-        if (isHeatEvent(event)) {
-          (heats += event, smokes)
-        } else if (isSmokeEvent(event)) {
-          (heats, smokes += event)
-        } else (heats, smokes)
-      }
+    val (heatEvents, smokeEvents) = findImportantSortedEvents(events)
 
     if (heatEvents.isEmpty) {
-      NoneState()
+      this
     } else if (smokeEvents.isEmpty) {
-      HeatState(heatEvents.head)
+      HeatState(heatEvents.last)
     } else {
       val smokeEvent = smokeEvents.head
       heatEvents.find(heatEvent => isInTriggerInterval(heatEvent, smokeEvent))
@@ -60,23 +63,19 @@ case class NoneState()(implicit problemTimeoutMillis: Long) extends AbstractFire
 case class HeatState(heatEvent: Event)(implicit problemTimeoutMillis: Long) extends AbstractFireAlarmState {
 
   override def transition(events: Iterator[Event]): FireAlarmState = {
-    val smokeEvents = events.foldLeft(new mutable.TreeSet[Event]()) { case (smokes, event) =>
-      if (isSmokeEvent(event)) {
-        smokes += event
-      } else {
-        smokes
-      }
-    }
+    val (heatEvents, smokeEvents) = findImportantSortedEvents(events)
 
-    smokeEvents.headOption
-      .map { smokeEvent =>
-        if (isInTriggerInterval(heatEvent, smokeEvent)) {
-          HeatAndSmokeState(heatEvent, smokeEvent)
-        } else {
-          NoneState()
-        }
-      }
-      .getOrElse(this)
+    if (smokeEvents.nonEmpty) {
+      val smokeEvent = smokeEvents.head
+      val allHeatEvents = heatEvents + heatEvent
+      allHeatEvents.find(heat => isInTriggerInterval(heat, smokeEvent))
+        .map(heat => HeatAndSmokeState(heat, smokeEvent))
+        .getOrElse(NoneState())
+    } else {
+      heatEvents.lastOption
+        .map(heat => HeatState(heat))
+        .getOrElse(this)
+    }
   }
 
 }

@@ -144,9 +144,14 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
         .expects()
         .atLeastOnce()
         .returns(heatProblemState(heat0Timestamp))
-      (state.setTimeoutTimestamp(_: Long))
-        .expects(heat0Timestamp.getTime + problemTimeoutMillis)
-        .once()
+      inAnyOrder {
+        (state.update _)
+          .expects(heatProblemState(heat0Timestamp))
+          .once()
+        (state.setTimeoutTimestamp(_: Long))
+          .expects(heat0Timestamp.getTime + problemTimeoutMillis)
+          .once()
+      }
     }
 
     val alarmStateFunction = new FireAlarmStateFunction(problemTimeoutMillis)
@@ -176,9 +181,14 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
         .expects()
         .atLeastOnce()
         .returns(heatProblemState(heat0Timestamp))
-      (state.setTimeoutTimestamp(_: Long))
-        .expects(heat0Timestamp.getTime + problemTimeoutMillis)
-        .once()
+      inAnyOrder {
+        (state.update _)
+          .expects(heatProblemState(heatTimestamp))
+          .once()
+        (state.setTimeoutTimestamp(_: Long))
+          .expects(heatTimestamp.getTime + problemTimeoutMillis)
+          .once()
+      }
     }
 
     val alarmStateFunction = new FireAlarmStateFunction(problemTimeoutMillis)
@@ -208,9 +218,6 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
         .expects()
         .atLeastOnce()
         .returns(heatProblemState(heat0Timestamp))
-      (state.setTimeoutTimestamp(_: Long))
-        .expects(heat0Timestamp.getTime + problemTimeoutMillis)
-        .noMoreThanOnce()
       (state.remove _)
         .expects()
         .once()
@@ -247,9 +254,6 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
         .expects()
         .atLeastOnce()
         .returns(heatProblemState(heat0Timestamp))
-      (state.setTimeoutTimestamp(_: Long))
-        .expects(heat0Timestamp.getTime + problemTimeoutMillis)
-        .noMoreThanOnce()
       (state.remove _)
         .expects()
         .once()
@@ -283,9 +287,6 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
         .expects()
         .atLeastOnce()
         .returns(heatProblemState(heat0Timestamp))
-      (state.setTimeoutTimestamp(_: Long))
-        .expects(heat0Timestamp.getTime + problemTimeoutMillis)
-        .noMoreThanOnce()
       (state.remove _)
         .expects()
         .once()
@@ -303,7 +304,7 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
 
   test("state exists [Y] / state timed out [N] / heat [Y] / smoke [Y] / smoke-heat timeout [Y]") {
     val heat0Timestamp = new Timestamp(1000L)
-    val heatTimestamp = new Timestamp(heat0Timestamp.getTime + problemTimeoutMillis * 2)
+    val heatTimestamp = new Timestamp(heat0Timestamp.getTime + problemTimeoutMillis / 2)
     val smokeTimestamp = new Timestamp(heat0Timestamp.getTime + problemTimeoutMillis * 2)
     val events = Iterator(heatEvent(heatTimestamp), smokeEvent(smokeTimestamp))
 
@@ -323,9 +324,6 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
         .expects()
         .atLeastOnce()
         .returns(heatProblemState(heat0Timestamp))
-      (state.setTimeoutTimestamp(_: Long))
-        .expects(heat0Timestamp.getTime + problemTimeoutMillis)
-        .noMoreThanOnce()
       (state.remove _)
         .expects()
         .once()
@@ -497,7 +495,7 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
     assert(alarms.isEmpty, "Expected none alarms")
   }
 
-  ignore("state exists [Y] / state timed out [N] / heat [Y] multiple / smoke [Y] multiple / smoke-heat timeout [N]") {
+  test("state exists [Y] / state timed out [N] / heat [Y] multiple / smoke [Y] multiple / smoke-heat timeout [N]") {
     val heat0Timestamp = new Timestamp(1000L)
 
     val heatTimestamps = Seq(3, 1, 5)
@@ -538,7 +536,7 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
     val alarms = alarmStateFunction.updateAlarmState(siteId, events, state).toSeq
     assert(alarms.length === 1, "Expected 1 alarm")
     val alarm = alarms.head
-    assert(alarm.timestamp === smokeTimestamps.map(_.getTime).min)
+    assert(alarm.timestamp === smokeTimestamps.min)
     assert(alarm.siteId === siteId)
     assert(alarm.info.toLowerCase.contains("fire "))
   }

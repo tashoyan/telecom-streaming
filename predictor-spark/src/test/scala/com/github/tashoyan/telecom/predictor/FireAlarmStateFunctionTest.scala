@@ -453,8 +453,7 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
     val heatTimestamps = Seq(3, 1, 5)
       .map(i => i * problemTimeoutMillis / 10)
       .map(millis => new Timestamp(millis))
-    val smokeTimestamps = Seq(6, 2, 4)
-      //    TODO val smokeTimestamps = Seq(20, 14, 25)
+    val smokeTimestamps = Seq(20, 14, 25)
       .map(i => i * problemTimeoutMillis / 10)
       .map(millis => new Timestamp(millis))
     val events = (heatTimestamps.map(heatEvent) ++ smokeTimestamps.map(smokeEvent))
@@ -465,6 +464,7 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
       .expects()
       .atLeastOnce()
       .returns(false)
+
     val alarmStateFunction = new FireAlarmStateFunction(problemTimeoutMillis)
 
     val alarms = alarmStateFunction.updateAlarmState(siteId, events, state).toSeq
@@ -475,8 +475,26 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
     assert(alarm.info.toLowerCase.contains("fire "))
   }
 
-  ignore("state exists [N] / state timed out [-] / heat [Y] multiple / smoke [Y] multiple / smoke-heat timeout [Y]") {
-    //TODO Complete
+  test("state exists [N] / state timed out [-] / heat [Y] multiple / smoke [Y] multiple / smoke-heat timeout [Y]") {
+    val heatTimestamps = Seq(3, 1, 5)
+      .map(i => i * problemTimeoutMillis / 10)
+      .map(millis => new Timestamp(millis))
+    val smokeTimestamps = Seq(20, 16, 25)
+      .map(i => i * problemTimeoutMillis / 10)
+      .map(millis => new Timestamp(millis))
+    val events = (heatTimestamps.map(heatEvent) ++ smokeTimestamps.map(smokeEvent))
+      .toIterator
+
+    val state: GroupState[ProblemState] = mock[GroupState[ProblemState]]
+    (state.exists _)
+      .expects()
+      .atLeastOnce()
+      .returns(false)
+
+    val alarmStateFunction = new FireAlarmStateFunction(problemTimeoutMillis)
+
+    val alarms = alarmStateFunction.updateAlarmState(siteId, events, state)
+    assert(alarms.isEmpty, "Expected none alarms")
   }
 
 }

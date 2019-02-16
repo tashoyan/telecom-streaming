@@ -1,6 +1,6 @@
 package com.github.tashoyan.telecom.predictor
 
-import java.sql.Timestamp
+import com.github.tashoyan.telecom.event.Event
 
-//TODO Make generic and move to shared-resources: heatTimestamp -> triggerTimestamp
-case class ProblemState(siteId: Long, heatTimestamp: Timestamp)
+//TODO Make generic and move to shared-resources
+case class ProblemState(triggerEvent: Event)

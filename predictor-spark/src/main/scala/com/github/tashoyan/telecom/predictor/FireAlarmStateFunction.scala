@@ -20,6 +20,7 @@ class FireAlarmStateFunction(problemTimeoutMillis: Long) extends AlarmStateFunct
           //+ state exists [N] / state timed out [-] / heat [N] / smoke [Y] / smoke-heat timeout [-]
           /* smoke is too late */
           //+ state exists [N] / state timed out [-] / heat [Y] / smoke [Y] / smoke-heat timeout [Y]
+          //+ state exists [N] / state timed out [-] / heat [Y] multiple / smoke [Y] multiple / smoke-heat timeout [Y]
           Iterator.empty
         case HeatState(heatEvent) =>
           //+ state exists [N] / state timed out [-] / heat [Y] / smoke [N] / smoke-heat timeout [-]
@@ -31,6 +32,7 @@ class FireAlarmStateFunction(problemTimeoutMillis: Long) extends AlarmStateFunct
         case HeatAndSmokeState(_, smokeEvent) =>
           /* smoke is soon after heat - fire alarm */
           //+ state exists [N] / state timed out [-] / heat [Y] / smoke [Y] / smoke-heat timeout [N]
+          //+ state exists [N] / state timed out [-] / heat [Y] multiple / smoke [Y] multiple / smoke-heat timeout [N]
           val smokeTs = smokeEvent.timestamp
           val alarm = Alarm(smokeTs, siteId, "MAJOR", s"Fire on site $siteId")
           Iterator(alarm)

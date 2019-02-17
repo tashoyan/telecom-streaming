@@ -19,21 +19,13 @@ abstract class AbstractFireAlarmState(implicit problemTimeoutMillis: Long) exten
 
   protected def findImportantSortedEvents(events: Iterator[Event]): (mutable.TreeSet[Event], mutable.TreeSet[Event]) = {
     events.foldLeft((new mutable.TreeSet[Event](), new mutable.TreeSet[Event])) { case ((heats, smokes), event) =>
-      if (isHeatEvent(event)) {
+      if (event.isHeat) {
         (heats += event, smokes)
-      } else if (isSmokeEvent(event)) {
+      } else if (event.isSmoke) {
         (heats, smokes += event)
       } else (heats, smokes)
     }
   }
-
-  protected def isHeatEvent(event: Event): Boolean =
-    event.info != null &&
-      event.info.toLowerCase.contains("heat")
-
-  protected def isSmokeEvent(event: Event): Boolean =
-    event.info != null &&
-      event.info.toLowerCase.contains("smoke")
 
   protected def isInTriggerInterval(heat: Event, smoke: Event): Boolean =
     smoke.timestamp.getTime - heat.timestamp.getTime >= 0 &&

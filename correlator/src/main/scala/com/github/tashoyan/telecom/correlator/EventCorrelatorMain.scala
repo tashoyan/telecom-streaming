@@ -36,6 +36,7 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
     val eventReceiver = new KafkaEventReceiver(config.kafkaBrokers, config.kafkaEventTopic)
     val eventDeduplicator = new DefaultEventDeduplicator(config.watermarkIntervalSec)
     val kafkaEvents = eventReceiver.receiveEvents()
+      .filter(_.isCommunication)
     val events = eventDeduplicator.deduplicateEvents(kafkaEvents)
 
     val affectedStationCounts = events

@@ -24,7 +24,13 @@ object Sampler {
     *         Event Generator is expected to substitute real timestamps:
     *         real_timestamp = current_time - offset
     */
-  def generateEvents(stations: Seq[Int], timeRangeMillis: Long, perStationMultiplier: Int): Seq[Event] = {
+  def generateEvents(
+      stations: Seq[Int],
+      timeRangeMillis: Long,
+      perStationMultiplier: Int,
+      severity: String,
+      info: String
+  ): Seq[Event] = {
     require(stations.nonEmpty, "stations set must be non empty")
     require(timeRangeMillis > 0, "timeRangeMillis must be > 0")
     require(perStationMultiplier > 0, "perStationMultiplier must be > 0")
@@ -39,7 +45,7 @@ object Sampler {
       }
       .flatMap(Seq.fill(perStationMultiplier)(_))
       .map { case (siteId, timestamp: Timestamp) =>
-        Event(timestamp, siteId, "MAJOR", s"Communication failure at site $siteId")
+        Event(timestamp, siteId, severity, info)
       }
   }
 

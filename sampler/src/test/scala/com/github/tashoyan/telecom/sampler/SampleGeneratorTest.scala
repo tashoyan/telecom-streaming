@@ -20,7 +20,7 @@ class SampleGeneratorTest extends FunSuite with SparkTestHarness {
     writeEvents(empty, "target/event_schema")
   }
 
-  test("controllers 2715, 2016 - all - 1 min - unique") {
+  test("communication_events-controllers_2715_2716_all-1min-uniq") {
     val spark0 = spark
     import spark0.implicits._
 
@@ -37,12 +37,18 @@ class SampleGeneratorTest extends FunSuite with SparkTestHarness {
       .as[Int]
       .collect()
 
-    val events = generateEvents(stations, TimeUnit.MINUTES.toMillis(1), 1)
+    val events = generateEvents(
+      stations = stations,
+      timeRangeMillis = TimeUnit.MINUTES.toMillis(1),
+      perStationMultiplier = 1,
+      severity = "MAJOR",
+      info = "Communication failure"
+    )
       .toDS()
-    writeEvents(events, "target/events_controllers_2715_2716_all_1min_uniq")
+    writeEvents(events, "target/communication_events-controllers_2715_2716_all-1min-uniq")
   }
 
-  test("controllers 2715, 2016 - all - 1 min - duplicates") {
+  test("communication_events-controllers_2715_2716_all-1min-dup") {
     val spark0 = spark
     import spark0.implicits._
 
@@ -59,12 +65,18 @@ class SampleGeneratorTest extends FunSuite with SparkTestHarness {
       .as[Int]
       .collect()
 
-    val events = generateEvents(stations, TimeUnit.MINUTES.toMillis(1), 2)
+    val events = generateEvents(
+      stations = stations,
+      timeRangeMillis = TimeUnit.MINUTES.toMillis(1),
+      perStationMultiplier = 2,
+      severity = "MAJOR",
+      info = "Communication failure"
+    )
       .toDS()
-    writeEvents(events, "target/events_controllers_2715_2716_all_1min_dup")
+    writeEvents(events, "target/communication_events-controllers_2715_2716_all-1min-dup")
   }
 
-  test("controllers 2715, 2016 - half 1, 2 - 1 min - duplicates") {
+  test("communication_events-controllers_2715_2716_half1/2-1min-dup") {
     val spark0 = spark
     import spark0.implicits._
 
@@ -87,13 +99,19 @@ class SampleGeneratorTest extends FunSuite with SparkTestHarness {
         .select("station")
         .as[Int]
         .collect()
-      val events = generateEvents(stations, TimeUnit.MINUTES.toMillis(1), 2)
+      val events = generateEvents(
+        stations = stations,
+        timeRangeMillis = TimeUnit.MINUTES.toMillis(1),
+        perStationMultiplier = 2,
+        severity = "MAJOR",
+        info = "Communication failure"
+      )
         .toDS()
-      writeEvents(events, s"target/events_controllers_2715_2716_half${half}_1min_dup")
+      writeEvents(events, s"target/communication_events-controllers_2715_2716_half$half-1min-dup")
     }
   }
 
-  test("site 1 - heat and smoke - 15 sec interval") {
+  test("heat_smoke_events-site_1-15sec") {
     val spark0 = spark
     import spark0.implicits._
 
@@ -103,7 +121,7 @@ class SampleGeneratorTest extends FunSuite with SparkTestHarness {
       Event(new Timestamp(15000L), siteId, "MINOR", s"Heat on site $siteId")
     )
       .toDS()
-    writeEvents(events, "target/events_site_1_heat_and_smoke_15sec")
+    writeEvents(events, "target/heat_smoke_events-site_1-15sec")
   }
 
 }

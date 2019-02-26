@@ -2,8 +2,7 @@ package com.github.tashoyan.telecom.predictor
 
 import java.util.concurrent.TimeUnit
 
-import com.github.tashoyan.telecom.event.Event._
-import com.github.tashoyan.telecom.event.{DefaultEventDeduplicator, KafkaEventReceiver}
+import com.github.tashoyan.telecom.event.{Alarm, DefaultEventDeduplicator, Event, KafkaEventReceiver}
 import com.github.tashoyan.telecom.spark.DataFrames.RichDataset
 import com.github.tashoyan.telecom.spark.KafkaStream.{keyColumn, valueColumn}
 import org.apache.spark.sql.SparkSession
@@ -37,7 +36,7 @@ object SparkPredictorMain extends SparkPredictorArgParser {
     val alarmStateFunction = new FireAlarmStateFunction(TimeUnit.SECONDS.toMillis(config.alarmTriggerIntervalSec.toLong))
     val alarms = events
       //TODO Maybe remove - deduplicator already set this watermark
-      .withWatermark(timestampColumn, s"${config.watermarkIntervalSec} seconds")
+      .withWatermark(Event.timestampColumn, s"${config.watermarkIntervalSec} seconds")
       .groupByKey(_.siteId)
       .flatMapGroupsWithState(OutputMode.Update(), GroupStateTimeout.EventTimeTimeout())(alarmStateFunction.updateAlarmState)
 

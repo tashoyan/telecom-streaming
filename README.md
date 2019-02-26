@@ -78,9 +78,9 @@ Run Event Correlator:
    ```
 1. Put some event samples to the input HDFS directory of Event Generator:
    ```bash
-   hdfs dfs -put sampler/target/events_controllers_2715_2716_all_1min_uniq.parquet /stream/input/events1.parquet
-   hdfs dfs -put sampler/target/events_controllers_2715_2716_all_1min_uniq.parquet /stream/input/events2.parquet
-   hdfs dfs -put sampler/target/events_controllers_2715_2716_all_1min_uniq.parquet /stream/input/events3.parquet
+   hdfs dfs -put sampler/target/communication_events-controllers_2715_2716_all-1min-uniq.parquet /stream/input/events1.parquet
+   hdfs dfs -put sampler/target/communication_events-controllers_2715_2716_all-1min-uniq.parquet /stream/input/events2.parquet
+   hdfs dfs -put sampler/target/communication_events-controllers_2715_2716_all-1min-uniq.parquet /stream/input/events3.parquet
    ...
    ```
    Note that Parquet files in the input HDFS directory should have distinct names,

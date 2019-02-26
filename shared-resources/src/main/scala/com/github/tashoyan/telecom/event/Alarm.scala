@@ -1,8 +1,7 @@
-package com.github.tashoyan.telecom.predictor
+package com.github.tashoyan.telecom.event
 
 import java.sql.Timestamp
 
-//TODO Generic - move to shared-resources
 case class Alarm(
     timestamp: Timestamp,
     siteId: Long,

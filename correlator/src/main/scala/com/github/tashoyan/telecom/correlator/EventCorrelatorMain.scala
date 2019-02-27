@@ -71,7 +71,7 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
   private def createAndStartAlarmQuery(config: EventCorrelatorConfig, alarms: Dataset[Alarm]): StreamingQuery = {
     val kafkaAlarms = alarms
       .withJsonColumn(valueColumn)
-      .withColumn(keyColumn, col(controllerColumn) cast StringType)
+      .withColumn(keyColumn, col(Alarm.objectIdColumn) cast StringType)
 
     val query = kafkaAlarms
       .writeStream

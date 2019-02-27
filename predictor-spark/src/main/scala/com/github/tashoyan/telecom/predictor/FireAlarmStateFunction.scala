@@ -43,7 +43,7 @@ class FireAlarmStateFunction(problemTimeoutMillis: Long) extends AlarmStateFunct
         //+ state exists [N] / state timed out [-] / heat [Y] / smoke [Y] / smoke-heat timeout [N]
         //+ state exists [N] / state timed out [-] / heat [Y] multiple / smoke [Y] multiple / smoke-heat timeout [N]
         val smokeTs = smokeEvent.timestamp
-        val alarm = Alarm(smokeTs, siteId, "MAJOR", s"Fire on site $siteId")
+        val alarm = Alarm(smokeTs, siteId, "CRITICAL", s"Fire on site $siteId")
         Some(alarm)
     }
   }

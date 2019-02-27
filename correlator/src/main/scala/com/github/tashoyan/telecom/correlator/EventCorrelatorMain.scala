@@ -1,13 +1,10 @@
 package com.github.tashoyan.telecom.correlator
 
 import com.github.tashoyan.telecom.event.Event._
-import com.github.tashoyan.telecom.event.{Alarm, DefaultEventDeduplicator, KafkaEventReceiver}
-import com.github.tashoyan.telecom.spark.DataFrames.RichDataset
-import com.github.tashoyan.telecom.spark.KafkaStream._
+import com.github.tashoyan.telecom.event._
 import com.github.tashoyan.telecom.topology.Topology._
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.streaming.{OutputMode, StreamingQuery}
-import org.apache.spark.sql.types.StringType
+import org.apache.spark.sql.streaming.OutputMode
 import org.apache.spark.sql.{Dataset, SparkSession}
 
 object EventCorrelatorMain extends EventCorrelatorArgParser {
@@ -26,6 +23,27 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
       .getOrCreate()
     spark.sparkContext
       .setLogLevel("WARN")
+
+    val eventReceiver = new KafkaEventReceiver(config.kafkaBrokers, config.kafkaEventTopic)
+    val eventDeduplicator = new DefaultEventDeduplicator(config.watermarkIntervalSec)
+    val kafkaEvents = eventReceiver.receiveEvents()
+      .filter(_.isCommunication)
+    val events = eventDeduplicator.deduplicateEvents(kafkaEvents)
+
+    val controllerAlarms = correlateEvents(events, config)
+
+    val alarmSender = new KafkaStreamingSender[Alarm](
+      config.kafkaBrokers,
+      config.kafkaAlarmTopic,
+      Alarm.objectIdColumn,
+      config.checkpointDir,
+      OutputMode.Update()
+    )
+    val query = alarmSender.sendingQuery(controllerAlarms)
+    query.awaitTermination()
+  }
+
+  private def correlateEvents(events: Dataset[Event], config: EventCorrelatorConfig)(implicit spark: SparkSession): Dataset[Alarm] = {
     import spark.implicits._
 
     val topology = spark.read
@@ -33,12 +51,6 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
     val totalStationCounts = topology
       .groupBy(controllerColumn)
       .agg(count(stationColumn) as "total_station_count")
-
-    val eventReceiver = new KafkaEventReceiver(config.kafkaBrokers, config.kafkaEventTopic)
-    val eventDeduplicator = new DefaultEventDeduplicator(config.watermarkIntervalSec)
-    val kafkaEvents = eventReceiver.receiveEvents()
-      .filter(_.isCommunication)
-    val events = eventDeduplicator.deduplicateEvents(kafkaEvents)
 
     val affectedStationCounts = events
       /* Inner join - dropping events with unknown stations. Possible optimization: broadcast join. */
@@ -62,27 +74,7 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
         lit("Communication lost with the controller") as Alarm.infoColumn
       )
       .as[Alarm]
-
-    val query = createAndStartAlarmQuery(config, controllerAlarms)
-    query.awaitTermination()
-  }
-
-  //TODO Makes sense to extract alarm stream to a separate class
-  private def createAndStartAlarmQuery(config: EventCorrelatorConfig, alarms: Dataset[Alarm]): StreamingQuery = {
-    val kafkaAlarms = alarms
-      .withJsonColumn(valueColumn)
-      .withColumn(keyColumn, col(Alarm.objectIdColumn) cast StringType)
-
-    val query = kafkaAlarms
-      .writeStream
-      .outputMode(OutputMode.Update())
-      .queryName(getClass.getSimpleName)
-      .format("kafka")
-      .option("kafka.bootstrap.servers", config.kafkaBrokers)
-      .option("topic", config.kafkaAlarmTopic)
-      .option("checkpointLocation", config.checkpointDir)
-      .start()
-    query
+    controllerAlarms
   }
 
 }

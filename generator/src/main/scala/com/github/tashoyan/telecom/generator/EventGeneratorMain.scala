@@ -8,6 +8,7 @@ import com.github.tashoyan.telecom.event.SparkEventAdapter.EventDataFrame
 import com.github.tashoyan.telecom.event.{Event, KafkaStreamingSender}
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.streaming.OutputMode
 
 object EventGeneratorMain extends EventGeneratorArgParser {
 
@@ -48,7 +49,8 @@ object EventGeneratorMain extends EventGeneratorArgParser {
       config.kafkaBrokers,
       config.kafkaTopic,
       siteIdColumn,
-      config.checkpointDir
+      config.checkpointDir,
+      OutputMode.Append()
     )
     val query = eventSender.sendingQuery(events)
     query.awaitTermination()

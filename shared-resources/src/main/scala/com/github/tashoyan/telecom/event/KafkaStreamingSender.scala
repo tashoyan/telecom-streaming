@@ -14,12 +14,14 @@ import org.apache.spark.sql.types.StringType
   * @param kafkaTopic      Kafka topic to consume from.
   * @param partitionColumn Partition the data on this column in the data set when writing to the Kafka topic.
   * @param checkpointDir   Checkpoint directory used by Spark Kafka source.
+  * @param outputMode      Output mode of the streaming query.
   */
 class KafkaStreamingSender[T <: Product](
     kafkaBrokers: String,
     kafkaTopic: String,
     partitionColumn: String,
-    checkpointDir: String
+    checkpointDir: String,
+    outputMode: OutputMode
 ) extends StreamingSender[T] {
 
   override def sendingQuery(data: Dataset[T]): StreamingQuery = {
@@ -35,7 +37,7 @@ class KafkaStreamingSender[T <: Product](
 
     val query = jsonData
       .writeStream
-      .outputMode(OutputMode.Append())
+      .outputMode(outputMode)
       .queryName(getClass.getSimpleName)
       .format("kafka")
       .option("kafka.bootstrap.servers", kafkaBrokers)

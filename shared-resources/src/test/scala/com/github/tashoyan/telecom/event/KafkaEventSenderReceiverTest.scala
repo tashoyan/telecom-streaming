@@ -36,7 +36,8 @@ class KafkaEventSenderReceiverTest extends FunSuite with KafkaTestHarness with S
       kafkaBrokers,
       kafkaTopic,
       partitionColumn = Event.siteIdColumn,
-      checkpointDir = createCheckpointDir()
+      checkpointDir = createCheckpointDir(),
+      OutputMode.Append()
     )
 
     val eventsFromKafka = eventReceiver.receiveEvents()

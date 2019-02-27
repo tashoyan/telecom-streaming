@@ -70,13 +70,23 @@ Run Event Correlator:
 ./bin/event-correlator.sh
 ```
 
+### Spark Predictor
+
+Spark Predictor consumes events from the `events` Kafka topic, and predicts failures based on the observed events.
+It creates alarms as a result of the prediction, and sends alarms to the `alarms` Kafka topic. 
+
+Run Spark Predictor:
+```bash
+./bin/spark-predictor.sh
+```
+
 ## Pushing events and getting alarms
 
 1. Run Kafka console consumer to get alarms on your terminal:
    ```bash
    kafka-console-consumer.sh --bootstrap-server localhost:9092 --group alarms --topic alarms
    ```
-1. Put some event samples to the input HDFS directory of Event Generator:
+1. Put some samples with communication events to the input HDFS directory of Event Generator:
    ```bash
    hdfs dfs -put sampler/target/communication_events-controllers_2715_2716_all-1min-uniq.parquet /stream/input/events1.parquet
    hdfs dfs -put sampler/target/communication_events-controllers_2715_2716_all-1min-uniq.parquet /stream/input/events2.parquet
@@ -86,14 +96,25 @@ Run Event Correlator:
    Note that Parquet files in the input HDFS directory should have distinct names,
    to let Spark Streaming distinguish them as separate files.
    You can find more event samples in the `sampler/target/` directory.
-1. If you put event samples frequently enough,
-   you will see alarms coming from the `alarms` topic to the Kafka console consumer:
+   If you put event samples frequently enough,
+   you will see `communication lost` alarms coming from the `alarms` topic to the Kafka console consumer:
    ```text
-   {"controller":2716,"window":{"start":"2018-12-11T12:05:00.000+01:00","end":"2018-12-11T12:06:00.000+01:00"},"affected_station_count":116,"total_station_count":116}
-   {"controller":2715,"window":{"start":"2018-12-11T12:05:00.000+01:00","end":"2018-12-11T12:06:00.000+01:00"},"affected_station_count":126,"total_station_count":126}
-   {"controller":2716,"window":{"start":"2018-12-11T12:05:00.000+01:00","end":"2018-12-11T12:06:00.000+01:00"},"affected_station_count":116,"total_station_count":116}
-   {"controller":2715,"window":{"start":"2018-12-11T12:05:00.000+01:00","end":"2018-12-11T12:06:00.000+01:00"},"affected_station_count":126,"total_station_count":126}
+   {"timestamp":"2019-02-27T09:55:00.000+01:00","objectId":2716,"severity":"CRITICAL","info":"Communication lost with the controller"}
+   {"timestamp":"2019-02-27T09:55:00.000+01:00","objectId":2715,"severity":"CRITICAL","info":"Communication lost with the controller"}
+   {"timestamp":"2019-02-27T09:55:00.000+01:00","objectId":2715,"severity":"CRITICAL","info":"Communication lost with the controller"}
+   {"timestamp":"2019-02-27T09:55:00.000+01:00","objectId":2716,"severity":"CRITICAL","info":"Communication lost with the controller"}
    ```
+   Event Correlator produces these alarms as a result of topology based event correlation.
+1. Put some samples with heat and smoke events to the input HDFS directory of Event Generator:
+   ```bash
+   hdfs dfs -put sampler/target/heat_events-site_1-1min-10_events.parquet /stream/input/events12.parquet
+   hdfs dfs -put sampler/target/smoke_events-site_1-1min-10_events.parquet /stream/input/events13.parquet
+   ```
+   You will see `fire alarms` alarms coming from the `alarms` topic to the Kafka console consumer:
+   ```text
+   {"timestamp":"2019-02-27T11:52:40.000+01:00","objectId":1,"severity":"CRITICAL","info":"Fire on site 1"}
+   ```
+   Spark Predictor produces these alarms as a result of prediction based on heat and smoke events.
 
 ## Killing Spark applications
 

@@ -4,6 +4,7 @@ import com.github.tashoyan.telecom.event.{Alarm, Event, ProblemState}
 import org.apache.spark.sql.streaming.GroupState
 
 class FireAlarmStateFunction(problemTimeoutMillis: Long) extends AlarmStateFunction {
+  private val alarmSeverity = "CRITICAL"
 
   override def updateAlarmState(siteId: Long, siteEvents: Iterator[Event], groupState: GroupState[ProblemState]): Iterator[Alarm] = {
     if (!groupState.exists) {
@@ -43,7 +44,7 @@ class FireAlarmStateFunction(problemTimeoutMillis: Long) extends AlarmStateFunct
         //+ state exists [N] / state timed out [-] / heat [Y] / smoke [Y] / smoke-heat timeout [N]
         //+ state exists [N] / state timed out [-] / heat [Y] multiple / smoke [Y] multiple / smoke-heat timeout [N]
         val smokeTs = smokeEvent.timestamp
-        val alarm = Alarm(smokeTs, siteId, "CRITICAL", s"Fire on site $siteId")
+        val alarm = Alarm(smokeTs, siteId, alarmSeverity, s"Fire on site $siteId")
         Some(alarm)
     }
   }
@@ -75,7 +76,7 @@ class FireAlarmStateFunction(problemTimeoutMillis: Long) extends AlarmStateFunct
         //+ state exists [Y] / state timed out [N] / heat [Y] / smoke [Y] / smoke-heat timeout [N]
         //+ state exists [Y] / state timed out [N] / heat [Y] multiple / smoke [Y] multiple / smoke-heat timeout [N]
         val smokeTs = smokeEvent.timestamp
-        val alarm = Alarm(smokeTs, siteId, "MAJOR", s"Fire on site $siteId")
+        val alarm = Alarm(smokeTs, siteId, alarmSeverity, s"Fire on site $siteId")
         groupState.remove()
         Some(alarm)
     }

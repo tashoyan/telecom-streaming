@@ -124,4 +124,36 @@ class SampleGeneratorTest extends FunSuite with SparkTestHarness {
     writeEvents(events, "target/heat_smoke_events-site_1-15sec")
   }
 
+  test("heat_events-site_1-1min-10_events") {
+    val spark0 = spark
+    import spark0.implicits._
+
+    val siteId = 1
+    val events = generateEvents(
+      stations = Seq(siteId),
+      timeRangeMillis = TimeUnit.MINUTES.toMillis(1),
+      perStationMultiplier = 10,
+      severity = "MAJOR",
+      info = s"Heat on site $siteId"
+    )
+      .toDS()
+    writeEvents(events, "target/heat_events-site_1-1min-10_events")
+  }
+
+  test("smoke_events-site_1-1min-10_events") {
+    val spark0 = spark
+    import spark0.implicits._
+
+    val siteId = 1
+    val events = generateEvents(
+      stations = Seq(siteId),
+      timeRangeMillis = TimeUnit.MINUTES.toMillis(1),
+      perStationMultiplier = 10,
+      severity = "MAJOR",
+      info = s"Smoke on site $siteId"
+    )
+      .toDS()
+    writeEvents(events, "target/smoke_events-site_1-1min-10_events")
+  }
+
 }

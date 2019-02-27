@@ -102,7 +102,7 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
     assert(alarms.length === 1, "Expected 1 alarm")
     val alarm = alarms.head
     assert(alarm.timestamp === smokeTimestamp)
-    assert(alarm.siteId === siteId)
+    assert(alarm.objectId === siteId)
     assert(alarm.info.toLowerCase.contains("fire "))
   }
 
@@ -229,7 +229,7 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
     assert(alarms.length === 1, "Expected 1 alarm")
     val alarm = alarms.head
     assert(alarm.timestamp === smokeTimestamp)
-    assert(alarm.siteId === siteId)
+    assert(alarm.objectId === siteId)
     assert(alarm.info.toLowerCase.contains("fire "))
   }
 
@@ -298,7 +298,7 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
     assert(alarms.length === 1, "Expected 1 alarm")
     val alarm = alarms.head
     assert(alarm.timestamp === smokeTimestamp)
-    assert(alarm.siteId === siteId)
+    assert(alarm.objectId === siteId)
     assert(alarm.info.toLowerCase.contains("fire "))
   }
 
@@ -469,7 +469,7 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
     assert(alarms.length === 1, "Expected 1 alarm")
     val alarm = alarms.head
     assert(alarm.timestamp === smokeTimestamps.min)
-    assert(alarm.siteId === siteId)
+    assert(alarm.objectId === siteId)
     assert(alarm.info.toLowerCase.contains("fire "))
   }
 
@@ -534,7 +534,7 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
     assert(alarms.length === 1, "Expected 1 alarm")
     val alarm = alarms.head
     assert(alarm.timestamp === smokeTimestamps.min)
-    assert(alarm.siteId === siteId)
+    assert(alarm.objectId === siteId)
     assert(alarm.info.toLowerCase.contains("fire "))
   }
 

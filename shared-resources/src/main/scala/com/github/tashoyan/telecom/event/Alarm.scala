@@ -4,20 +4,20 @@ import java.sql.Timestamp
 
 case class Alarm(
     timestamp: Timestamp,
-    siteId: Long,
+    objectId: Long,
     severity: String,
     info: String
 )
 
 object Alarm {
   val timestampColumn = "timestamp"
-  val siteIdColumn = "siteId"
+  val objectIdColumn = "objectId"
   val severityColumn = "severity"
   val infoColumn = "info"
 
   val columns: Set[String] = Set(
     timestampColumn,
-    siteIdColumn,
+    objectIdColumn,
     severityColumn,
     infoColumn
   )

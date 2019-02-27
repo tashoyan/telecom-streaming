@@ -42,7 +42,7 @@ object SparkPredictorMain extends SparkPredictorArgParser {
 
     val kafkaAlarms = alarms
       .withJsonColumn(valueColumn)
-      .withColumn(keyColumn, col(Alarm.siteIdColumn) cast StringType)
+      .withColumn(keyColumn, col(Alarm.objectIdColumn) cast StringType)
 
     val query = kafkaAlarms
       .writeStream

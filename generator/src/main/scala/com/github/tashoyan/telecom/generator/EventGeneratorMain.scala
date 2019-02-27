@@ -4,8 +4,8 @@ import java.sql.Timestamp
 import java.util.concurrent.TimeUnit
 
 import com.github.tashoyan.telecom.event.Event._
-import com.github.tashoyan.telecom.event.KafkaEventSender
 import com.github.tashoyan.telecom.event.SparkEventAdapter.EventDataFrame
+import com.github.tashoyan.telecom.event.{Event, KafkaStreamingSender}
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
 
@@ -44,13 +44,13 @@ object EventGeneratorMain extends EventGeneratorArgParser {
       .withColumn(timestampColumn, eventTimestampUdf(col(currentTimeSecColumn), col(timestampColumn)))
       .asEvents
 
-    val eventSender = new KafkaEventSender(
+    val eventSender = new KafkaStreamingSender[Event](
       config.kafkaBrokers,
       config.kafkaTopic,
       siteIdColumn,
       config.checkpointDir
     )
-    val query = eventSender.sendEvents(events)
+    val query = eventSender.sendingQuery(events)
     query.awaitTermination()
   }
 

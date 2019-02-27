@@ -32,7 +32,7 @@ class KafkaEventSenderReceiverTest extends FunSuite with KafkaTestHarness with S
       kafkaBrokers,
       kafkaTopic
     )
-    val eventSender = new KafkaEventSender(
+    val eventSender = new KafkaStreamingSender[Event](
       kafkaBrokers,
       kafkaTopic,
       partitionColumn = Event.siteIdColumn,
@@ -54,7 +54,7 @@ class KafkaEventSenderReceiverTest extends FunSuite with KafkaTestHarness with S
       .schema(eventSample.schema)
       .parquet(eventInputDir)
       .as[Event]
-    val eventsToKafkaQuery = eventSender.sendEvents(eventsToKafka)
+    val eventsToKafkaQuery = eventSender.sendingQuery(eventsToKafka)
 
     eventSample
       .repartition(1)

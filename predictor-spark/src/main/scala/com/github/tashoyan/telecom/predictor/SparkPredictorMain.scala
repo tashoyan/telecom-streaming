@@ -2,13 +2,9 @@ package com.github.tashoyan.telecom.predictor
 
 import java.util.concurrent.TimeUnit
 
-import com.github.tashoyan.telecom.event.{Alarm, DefaultEventDeduplicator, Event, KafkaEventReceiver}
-import com.github.tashoyan.telecom.spark.DataFrames.RichDataset
-import com.github.tashoyan.telecom.spark.KafkaStream.{keyColumn, valueColumn}
+import com.github.tashoyan.telecom.event._
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.streaming.{GroupStateTimeout, OutputMode}
-import org.apache.spark.sql.types.StringType
 
 object SparkPredictorMain extends SparkPredictorArgParser {
 
@@ -40,19 +36,14 @@ object SparkPredictorMain extends SparkPredictorArgParser {
       .groupByKey(_.siteId)
       .flatMapGroupsWithState(OutputMode.Update(), GroupStateTimeout.EventTimeTimeout())(alarmStateFunction.updateAlarmState)
 
-    val kafkaAlarms = alarms
-      .withJsonColumn(valueColumn)
-      .withColumn(keyColumn, col(Alarm.objectIdColumn) cast StringType)
-
-    val query = kafkaAlarms
-      .writeStream
-      .outputMode(OutputMode.Update())
-      .queryName(this.getClass.getSimpleName)
-      .format("kafka")
-      .option("kafka.bootstrap.servers", config.kafkaBrokers)
-      .option("topic", config.kafkaAlarmTopic)
-      .option("checkpointLocation", config.checkpointDir)
-      .start()
+    val alarmSender = new KafkaStreamingSender[Alarm](
+      config.kafkaBrokers,
+      config.kafkaAlarmTopic,
+      Alarm.objectIdColumn,
+      config.checkpointDir,
+      OutputMode.Update()
+    )
+    val query = alarmSender.sendingQuery(alarms)
     query.awaitTermination()
   }
 

@@ -17,6 +17,7 @@
         <module>writer</module>
         <module>correlator</module>
         <module>predictor-spark</module>
+        <module>predictor-flink</module>
         <module>yarn-killer</module>
         <!--<module>topology</module>-->
     </modules>
@@ -48,6 +49,7 @@
         <spark.version>2.4.0</spark.version>
         <spark.compat.version>2.4</spark.compat.version>
         <graphframes.version>0.7.0-spark${spark.compat.version}-s_${compiler.scala.compat.version}</graphframes.version>
+        <flink.version>1.7.1</flink.version>
         <scopt.version>3.7.1</scopt.version>
         <scalaj-http.version>2.4.1</scalaj-http.version>
         <scala-parser-combinators.version>1.0.4</scala-parser-combinators.version>
@@ -160,6 +162,16 @@
                 <groupId>graphframes</groupId>
                 <artifactId>graphframes</artifactId>
                 <version>${graphframes.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-scala_${compiler.scala.compat.version}</artifactId>
+                <version>${flink.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-streaming-scala_${compiler.scala.compat.version}</artifactId>
+                <version>${flink.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.hadoop</groupId>

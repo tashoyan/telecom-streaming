@@ -1,0 +1,50 @@
+package com.github.tashoyan.telecom.predictor
+
+import org.apache.flink.api.common.functions.AggregateFunction
+import org.apache.flink.api.scala._
+import org.apache.flink.streaming.api.functions.source.SourceFunction
+import org.apache.flink.streaming.api.scala.{DataStream, KeyedStream, StreamExecutionEnvironment}
+import org.apache.flink.streaming.api.windowing.time.Time
+import org.apache.flink.streaming.connectors.wikiedits.{WikipediaEditEvent, WikipediaEditsSource}
+
+/*
+https://ci.apache.org/projects/flink/flink-docs-release-1.7/tutorials/datastream_api.html#writing-a-flink-program
+https://ci.apache.org/projects/flink/flink-docs-release-1.7/tutorials/local_setup.html
+*/
+object WikipediaAnalysis {
+  private val windowSizeSec = 5L
+
+  def main(args: Array[String]): Unit = {
+    val env = StreamExecutionEnvironment.getExecutionEnvironment
+
+    //TODO By default sources have a parallelism of 1 - learn parallel source
+    val sourceFunction: SourceFunction[WikipediaEditEvent] = new WikipediaEditsSource()
+    val edits: DataStream[WikipediaEditEvent] = env.addSource(sourceFunction)
+    val keyedEdits: KeyedStream[WikipediaEditEvent, String] = edits.keyBy(_.getUser)
+
+    //TODO Better implementation: https://stackoverflow.com/questions/47123785/flink-how-to-convert-the-deprecated-fold-to-aggregrate
+    val aggregateFunction: AggregateFunction[WikipediaEditEvent, (String, Long), (String, Long)] =
+      new AggregateFunction[WikipediaEditEvent, (String, Long), (String, Long)] {
+        override def createAccumulator(): (String, Long) =
+          ("", 0L)
+
+        override def add(value: WikipediaEditEvent, accumulator: (String, Long)): (String, Long) =
+          (accumulator._1, accumulator._2 + value.getByteDiff)
+
+        override def getResult(accumulator: (String, Long)): (String, Long) =
+          accumulator
+
+        override def merge(a: (String, Long), b: (String, Long)): (String, Long) =
+          (a._1, a._2 + b._2)
+      }
+    val result: DataStream[(String, Long)] = keyedEdits
+      .timeWindow(Time.seconds(windowSizeSec))
+      .aggregate(aggregateFunction)
+    result.print()
+
+    env.execute(this.getClass.getSimpleName)
+    //TODO Track execution?
+    ()
+  }
+
+}

@@ -8,6 +8,12 @@ import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.connectors.wikiedits.{WikipediaEditEvent, WikipediaEditsSource}
 
 /*
+API to implement the Predictor:
+https://ci.apache.org/projects/flink/flink-docs-stable/dev/stream/operators/process_function.html
+https://ci.apache.org/projects/flink/flink-docs-release-1.7/dev/libs/cep.html
+DataStream? Table? SQL?
+
+Getting started:
 https://ci.apache.org/projects/flink/flink-docs-release-1.7/tutorials/datastream_api.html#writing-a-flink-program
 https://ci.apache.org/projects/flink/flink-docs-release-1.7/tutorials/local_setup.html
 */
@@ -28,8 +34,8 @@ object WikipediaAnalysis {
         override def createAccumulator(): (String, Long) =
           ("", 0L)
 
-        override def add(value: WikipediaEditEvent, accumulator: (String, Long)): (String, Long) =
-          (accumulator._1, accumulator._2 + value.getByteDiff)
+        override def add(event: WikipediaEditEvent, acc: (String, Long)): (String, Long) =
+          (event.getUser, acc._2 + event.getByteDiff)
 
         override def getResult(accumulator: (String, Long)): (String, Long) =
           accumulator

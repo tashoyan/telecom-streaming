@@ -24,6 +24,13 @@
             <!--<scope>provided</scope>-->
         </dependency>
         <dependency>
+            <!--TODO dependency management-->
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-java</artifactId>
+            <version>${flink.version}</version>
+            <!--<scope>provided</scope>-->
+        </dependency>
+        <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-streaming-scala_${compiler.scala.compat.version}</artifactId>
             <!--<scope>provided</scope>-->

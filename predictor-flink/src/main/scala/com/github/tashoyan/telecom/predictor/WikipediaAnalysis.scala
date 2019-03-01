@@ -1,10 +1,12 @@
 package com.github.tashoyan.telecom.predictor
 
 import org.apache.flink.api.common.functions.AggregateFunction
+import org.apache.flink.api.common.serialization.SimpleStringSchema
 import org.apache.flink.api.scala._
 import org.apache.flink.streaming.api.functions.source.SourceFunction
 import org.apache.flink.streaming.api.scala.{DataStream, KeyedStream, StreamExecutionEnvironment}
 import org.apache.flink.streaming.api.windowing.time.Time
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer
 import org.apache.flink.streaming.connectors.wikiedits.{WikipediaEditEvent, WikipediaEditsSource}
 
 /*
@@ -46,7 +48,11 @@ object WikipediaAnalysis {
     val result: DataStream[(String, Long)] = keyedEdits
       .timeWindow(Time.seconds(windowSizeSec))
       .aggregate(aggregateFunction)
-    result.print()
+
+    //    result.print()
+    result
+      .map(_.toString())
+      .addSink(new FlinkKafkaProducer[String]("ossv147.gre.hpecorp.net:9092", "events", new SimpleStringSchema()))
 
     env.execute(this.getClass.getSimpleName)
     //TODO Track execution?

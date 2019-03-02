@@ -2,6 +2,7 @@ package com.github.tashoyan.telecom.predictor
 
 import org.apache.flink.api.common.functions.AggregateFunction
 import org.apache.flink.api.common.serialization.SimpleStringSchema
+import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.scala.createTypeInformation
 import org.apache.flink.streaming.api.functions.source.SourceFunction
 import org.apache.flink.streaming.api.scala.{DataStream, KeyedStream, StreamExecutionEnvironment}
@@ -19,11 +20,16 @@ Getting started:
 https://ci.apache.org/projects/flink/flink-docs-release-1.7/tutorials/datastream_api.html#writing-a-flink-program
 https://ci.apache.org/projects/flink/flink-docs-release-1.7/tutorials/local_setup.html
 */
+//TODO triggers for lateness
+//TODO watermark extractors
+//TODO Fault tolerance - recover the state from a checkpoint
+//TODO Upgrade - from a savepoint
 object WikipediaAnalysis {
   private val windowSizeSec = 5L
 
   def main(args: Array[String]): Unit = {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
+    env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime)
 
     //TODO By default sources have a parallelism of 1 - learn parallel source
     val sourceFunction: SourceFunction[WikipediaEditEvent] = new WikipediaEditsSource()

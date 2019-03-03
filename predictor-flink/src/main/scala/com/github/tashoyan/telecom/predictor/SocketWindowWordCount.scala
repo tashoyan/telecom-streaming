@@ -3,10 +3,12 @@ package com.github.tashoyan.telecom.predictor
 import java.sql.Timestamp
 import java.util.concurrent.TimeUnit
 
+import org.apache.flink.api.common.functions.AggregateFunction
 import org.apache.flink.api.java.utils.ParameterTool
 import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor
 import org.apache.flink.streaming.api.scala.extensions._
+import org.apache.flink.streaming.api.scala.function.WindowFunction
 import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironment, createTypeInformation}
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.api.windowing.windows.{TimeWindow, Window}
@@ -16,6 +18,7 @@ import org.apache.flink.util.Collector
 $ nc -lk 9999
 $ mvn -pl :predictor-flink exec:java -Dexec.mainClass=com.github.tashoyan.telecom.predictor.SocketWindowWordCount -Dexec.args="--port 9999"
 */
+//scalastyle:off
 object SocketWindowWordCount {
   private val windowSizeSec = 5L
   private val windowSlideSec = 5L
@@ -54,16 +57,28 @@ object SocketWindowWordCount {
       override def extractTimestamp(element: (Timestamp, String)): Long = element._1.getTime
     }
 
-    val windowCounts: DataStream[WordCount] = tsWords
+    val preAggregator = new AggregateFunction[(Timestamp, String), (String, Long), (String, Long)] {
+      override def createAccumulator(): (String, Long) = ("", 0L)
+
+      override def add(value: (Timestamp, String), accumulator: (String, Long)): (String, Long) = (value._2, accumulator._2 + 1)
+
+      override def getResult(accumulator: (String, Long)): (String, Long) = accumulator
+
+      override def merge(a: (String, Long), b: (String, Long)): (String, Long) = (a._1, a._2 + b._2)
+    }
+
+    val windowFunction = new WindowFunction[(String, Long), WindowWordCount, String, TimeWindow] {
+      override def apply(key: String, window: TimeWindow, input: Iterable[(String, Long)], out: Collector[WindowWordCount]): Unit =
+        out.collect(WindowWordCount(new Timestamp(window.getStart), new Timestamp(window.getEnd), key, input.map(_._2).sum))
+    }
+
+    val windowCounts: DataStream[WindowWordCount] = tsWords
       .assignTimestampsAndWatermarks(wmAssigner)
-      .map(tsWord => WordCount(tsWord._2, new TimeWindow(0, 0), 1))
-      .keyBy(_.word)
+      .keyBy(_._2)
       .timeWindow(Time.seconds(windowSizeSec), Time.seconds(windowSlideSec))
-      .reduce[WordCount](
-        (c1: WordCount, c2: WordCount) =>
-          WordCount(c1.word, c1.window, c1.count + c2.count),
-        (key: String, window: Window, counts: Iterable[WordCount], collector: Collector[WordCount]) =>
-          collector.collect(WordCount(key, window, counts.map(_.count).sum))
+      .aggregate[(String, Long), (String, Long), WindowWordCount](
+        preAggregator,
+        windowFunction
       )
 
     windowCounts.print()
@@ -73,6 +88,6 @@ object SocketWindowWordCount {
     ()
   }
 
-  case class WordCount(word: String, window: Window, count: Long)
+  case class WindowWordCount(start: Timestamp, end: Timestamp, word: String, count: Long)
 
 }

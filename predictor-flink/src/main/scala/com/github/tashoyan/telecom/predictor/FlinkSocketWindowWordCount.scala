@@ -5,13 +5,13 @@ import java.time.format.DateTimeFormatterBuilder
 import java.time.temporal.ChronoField._
 import java.util.concurrent.TimeUnit
 
-import org.apache.flink.api.java.utils.ParameterTool
-import org.apache.flink.streaming.api.scala.extensions._
-import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironment, createTypeInformation}
-import org.apache.flink.streaming.api.scala.function.WindowFunction
 import org.apache.flink.api.common.functions.AggregateFunction
+import org.apache.flink.api.java.utils.ParameterTool
 import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor
+import org.apache.flink.streaming.api.scala.extensions._
+import org.apache.flink.streaming.api.scala.function.WindowFunction
+import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironment, createTypeInformation}
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow
 import org.apache.flink.util.Collector
@@ -40,19 +40,12 @@ object FlinkSocketWindowWordCount {
     env.setBufferTimeout(0L)
     env.getConfig.setAutoWatermarkInterval(TimeUnit.SECONDS.toMillis(watermarkCheckIntervalSec))
 
-    val text: DataStream[String] = env.socketTextStream("localhost", port, '\n')
-    val tsText: DataStream[(Timestamp, String)] = text
+    val timestampText: DataStream[(String, Timestamp)] = env.socketTextStream("localhost", port, '\n')
       .filter(_.nonEmpty)
-      .map { input =>
-        val inputSplit = input.split("\\s+", 2)
-        val (delayStr, words) = (inputSplit.head, inputSplit.tail.head)
-        val delaySec = delayStr.toLong
-        val timestamp = new Timestamp(System.currentTimeMillis() - TimeUnit.SECONDS.toMillis(delaySec))
-        (timestamp, words)
-      }
+      .map((_, new Timestamp(System.currentTimeMillis())))
 
-    val timestampWords: DataStream[TimestampWord] = tsText.flatMapWith { case (timestamp, words) =>
-      words
+    val timestampWords: DataStream[TimestampWord] = timestampText.flatMapWith { case (text, timestamp) =>
+      text
         .split("\\s+")
         .map(TimestampWord(timestamp, _))
     }
@@ -65,25 +58,25 @@ object FlinkSocketWindowWordCount {
       override def extractTimestamp(tsWord: TimestampWord): Long = tsWord.timestamp.getTime
     }
 
-    val preAggregator = new AggregateFunction[TimestampWord, (String, Long), (String, Long)] {
-      override def createAccumulator(): (String, Long) = ("", 0L)
+    val preAggregator = new AggregateFunction[TimestampWord, Long, Long] {
+      override def createAccumulator(): Long = 0L
 
-      override def add(tsWord: TimestampWord, acc: (String, Long)): (String, Long) = (tsWord.word, acc._2 + 1)
+      override def add(tsWord: TimestampWord, acc: Long): Long = acc + 1
 
-      override def getResult(acc: (String, Long)): (String, Long) = acc
+      override def merge(acc1: Long, acc2: Long): Long = acc1 + acc2
 
-      override def merge(acc1: (String, Long), acc2: (String, Long)): (String, Long) = (acc1._1, acc1._2 + acc2._2)
+      override def getResult(acc: Long): Long = acc
     }
 
-    val windowFunction = new WindowFunction[(String, Long), WindowWordCount, String, TimeWindow] {
-      override def apply(key: String, window: TimeWindow, input: Iterable[(String, Long)], out: Collector[WindowWordCount]): Unit =
+    val windowFunction = new WindowFunction[Long, WindowWordCount, String, TimeWindow] {
+      override def apply(key: String, window: TimeWindow, input: Iterable[Long], out: Collector[WindowWordCount]): Unit =
         out.collect(
           WindowWordCount(
             new Timestamp(window.getStart),
             new Timestamp(window.getEnd),
             new Timestamp(System.currentTimeMillis()),
             key,
-            input.map(_._2).sum
+            input.head
           )
         )
     }
@@ -92,7 +85,7 @@ object FlinkSocketWindowWordCount {
       .assignTimestampsAndWatermarks(wmAssigner)
       .keyBy(_.word)
       .timeWindow(Time.seconds(windowSizeSec), Time.seconds(windowSlideSec))
-      .aggregate[(String, Long), (String, Long), WindowWordCount](
+      .aggregate[Long, Long, WindowWordCount](
         preAggregator,
         windowFunction
       )

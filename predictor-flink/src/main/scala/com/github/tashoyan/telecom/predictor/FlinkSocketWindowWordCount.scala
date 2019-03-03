@@ -3,7 +3,6 @@ package com.github.tashoyan.telecom.predictor
 import java.sql.Timestamp
 import java.time.format.DateTimeFormatterBuilder
 import java.time.temporal.ChronoField._
-import java.util.concurrent.TimeUnit
 
 import org.apache.flink.api.common.functions.AggregateFunction
 import org.apache.flink.api.java.utils.ParameterTool
@@ -25,7 +24,7 @@ object FlinkSocketWindowWordCount {
   private val windowSizeSec = 5L
   private val windowSlideSec = 5L
   private val watermarkSec = 5L
-  private val watermarkCheckIntervalSec = 1L
+  private val watermarkCheckIntervalMillis = 1000L
 
   def main(args: Array[String]): Unit = {
     val port: Int = try {
@@ -37,8 +36,9 @@ object FlinkSocketWindowWordCount {
 
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
+    //TODO Buffer timeout 0 iz very aggressive - don't do this
     env.setBufferTimeout(0L)
-    env.getConfig.setAutoWatermarkInterval(TimeUnit.SECONDS.toMillis(watermarkCheckIntervalSec))
+    env.getConfig.setAutoWatermarkInterval(watermarkCheckIntervalMillis)
 
     val timestampText: DataStream[(String, Timestamp)] = env.socketTextStream("localhost", port, '\n')
       .filter(_.nonEmpty)
@@ -50,7 +50,6 @@ object FlinkSocketWindowWordCount {
         .map(TimestampWord(timestamp, _))
     }
     //TODO Why setParallelism() affects the parallelism only if invoked after print()?
-    //TODO Clarify: some data may delay (infinitely?) if no new data coming to the input
     timestampWords.print()
       .setParallelism(1)
 
@@ -81,6 +80,13 @@ object FlinkSocketWindowWordCount {
         )
     }
 
+    /*
+    TODO If the source does not send the data, then operations based on event time cannot progress.
+     https://ci.apache.org/projects/flink/flink-docs-release-1.7/dev/event_time.html#idling-sources
+     Kafka notes:
+     https://ci.apache.org/projects/flink/flink-docs-stable/dev/connectors/kafka.html#kafka-consumers-and-timestamp-extractionwatermark-emission
+     Workaround: send heartbeat messages (poor workaround, garbage on the wire)
+    */
     val windowCounts: DataStream[WindowWordCount] = timestampWords
       .assignTimestampsAndWatermarks(wmAssigner)
       .keyBy(_.word)

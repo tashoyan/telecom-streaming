@@ -10,7 +10,7 @@ import org.apache.flink.api.java.utils.ParameterTool
 import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor
 import org.apache.flink.streaming.api.scala.extensions._
-import org.apache.flink.streaming.api.scala.function.WindowFunction
+import org.apache.flink.streaming.api.scala.function.ProcessWindowFunction
 import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironment, createTypeInformation}
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow
@@ -68,15 +68,15 @@ object FlinkSocketWindowWordCount {
       override def getResult(acc: Long): Long = acc
     }
 
-    val windowFunction = new WindowFunction[Long, WindowWordCount, String, TimeWindow] {
-      override def apply(key: String, window: TimeWindow, input: Iterable[Long], out: Collector[WindowWordCount]): Unit =
+    val windowFunction: ProcessWindowFunction[Long, WindowWordCount, String, TimeWindow] = new ProcessWindowFunction[Long, WindowWordCount, String, TimeWindow] {
+      override def process(key: String, context: Context, elements: Iterable[Long], out: Collector[WindowWordCount]): Unit =
         out.collect(
           WindowWordCount(
-            new Timestamp(window.getStart),
-            new Timestamp(window.getEnd),
+            new Timestamp(context.window.getStart),
+            new Timestamp(context.window.getEnd),
             new Timestamp(System.currentTimeMillis()),
             key,
-            input.head
+            elements.head
           )
         )
     }

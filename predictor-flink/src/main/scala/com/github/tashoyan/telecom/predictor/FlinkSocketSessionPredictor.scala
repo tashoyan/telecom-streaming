@@ -16,6 +16,10 @@ import org.apache.flink.streaming.api.windowing.triggers.{EventTimeTrigger, Trig
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow
 import org.apache.flink.util.Collector
 
+/*
+$ nc -lk 9999
+$ mvn -DskipTests -Dskip -pl :predictor-flink install && mvn exec:java -pl :predictor-flink -Dexec.mainClass=com.github.tashoyan.telecom.predictor.FlinkSocketSessionPredictor -Dexec.args="--port 9999"
+*/
 //scalastyle:off
 object FlinkSocketSessionPredictor {
   private val sessionTimeoutSec = 5L

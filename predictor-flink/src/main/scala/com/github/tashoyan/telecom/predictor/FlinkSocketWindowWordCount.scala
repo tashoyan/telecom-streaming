@@ -16,6 +16,16 @@ import org.apache.flink.streaming.api.windowing.windows.TimeWindow
 import org.apache.flink.util.Collector
 
 /*
+Ways to implement the predictor:
+1. Session window:
+ https://ci.apache.org/projects/flink/flink-docs-stable/dev/stream/operators/windows.html#session-windows
+2. State - per-key, per-window:
+ https://ci.apache.org/projects/flink/flink-docs-release-1.7/dev/stream/state/state.html
+ State TTL - cleanup on timeout
+3. CEP:
+ https://ci.apache.org/projects/flink/flink-docs-release-1.7/dev/libs/cep.html
+*/
+/*
 $ nc -lk 9999
 $ mvn -pl :predictor-flink exec:java -Dexec.mainClass=com.github.tashoyan.telecom.predictor.FlinkSocketWindowWordCount -Dexec.args="--port 9999"
 */

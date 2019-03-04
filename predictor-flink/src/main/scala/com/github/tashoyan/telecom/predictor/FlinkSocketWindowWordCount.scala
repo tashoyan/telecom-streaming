@@ -53,6 +53,7 @@ object FlinkSocketWindowWordCount {
     timestampWords.print()
       .setParallelism(1)
 
+    //TODO What is the preferred way to assign watermarks?
     val wmAssigner = new BoundedOutOfOrdernessTimestampExtractor[TimestampWord](Time.seconds(watermarkSec)) {
       override def extractTimestamp(tsWord: TimestampWord): Long = tsWord.timestamp.getTime
     }

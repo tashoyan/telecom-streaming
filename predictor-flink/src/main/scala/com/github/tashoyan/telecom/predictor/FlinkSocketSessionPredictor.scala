@@ -16,11 +16,11 @@ import org.apache.flink.streaming.api.windowing.triggers.{EventTimeTrigger, Trig
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow
 import org.apache.flink.util.Collector
 
+//scalastyle:off
 /*
 $ nc -lk 9999
 $ mvn -DskipTests -Dskip -pl :predictor-flink install && mvn exec:java -pl :predictor-flink -Dexec.mainClass=com.github.tashoyan.telecom.predictor.FlinkSocketSessionPredictor -Dexec.args="--port 9999"
 */
-//scalastyle:off
 object FlinkSocketSessionPredictor {
   private val sessionTimeoutSec = 5L
   private val watermarkSec = 5L
@@ -93,7 +93,7 @@ object FlinkSocketSessionPredictor {
     ()
   }
 
-  case class Event(timestamp: Timestamp, eventType: String) {
+  private case class Event(timestamp: Timestamp, eventType: String) {
     def isHeat: Boolean = eventType == "h"
     def isSmoke: Boolean = eventType == "s"
 
@@ -101,12 +101,12 @@ object FlinkSocketSessionPredictor {
       s"${formatTime(timestamp)} | $eventType"
   }
 
-  case class Alarm(timestamp: Timestamp, info: String) {
+  private case class Alarm(timestamp: Timestamp, info: String) {
     override def toString: String =
       s"Alarm ${formatTime(timestamp)} | $info"
   }
 
-  class CustomTrigger extends Trigger[Event, TimeWindow] {
+  private class CustomTrigger extends Trigger[Event, TimeWindow] {
     private val delegate = EventTimeTrigger.create()
 
     override def onElement(element: Event, timestamp: Long, window: TimeWindow, ctx: Trigger.TriggerContext): TriggerResult =

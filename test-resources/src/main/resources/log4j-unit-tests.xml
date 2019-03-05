@@ -3,7 +3,7 @@
 <log4j:configuration debug="false">
 
     <appender name="console" class="org.apache.log4j.ConsoleAppender">
-        <param name="threshold" value="WARN" />
+        <param name="threshold" value="ERROR" />
         <param name="Target" value="System.out"/>
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern" value="%d{ISO8601} %-5p [%t] %c %x - %m%n" />
@@ -18,39 +18,6 @@
             <param name="ConversionPattern" value="%d{ISO8601} %-5p [%t] %c %x - %m%n" />
         </layout>
     </appender>
-
-    <logger name="org.apache.spark" additivity="false">
-        <level value="INFO" />
-        <appender-ref ref="file" />
-    </logger>
-
-    <logger name="org.spark_project.jetty.util.log" additivity="false">
-        <level value="INFO" />
-        <appender-ref ref="file" />
-    </logger>
-
-    <logger name="org.apache.parquet" additivity="false">
-        <level value="INFO" />
-        <appender-ref ref="file" />
-    </logger>
-
-    <logger name="org.apache.hadoop" additivity="false">
-        <level value="INFO" />
-        <appender-ref ref="file" />
-    </logger>
-
-    <logger name="com.github.fommil.netlib" additivity="false">
-        <level value="INFO" />
-        <appender-ref ref="file" />
-    </logger>
-
-    <logger name="kafka.server.BrokerMetadataCheckpoint" additivity="false">
-        <level value="ERROR"/>
-    </logger>
-
-    <logger name="org.apache.kafka.clients.NetworkClient" additivity="false">
-        <level value="ERROR"/>
-    </logger>
 
     <root>
         <level value="TRACE" />

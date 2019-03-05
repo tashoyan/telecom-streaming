@@ -4,11 +4,10 @@ import java.io.{File, IOException}
 import java.net.{URI, URL}
 import java.nio.file.Paths
 
-import HdfsTestHarness._
+import com.github.tashoyan.telecom.test.HdfsTestHarness._
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FileSystem, FileUtil, Path, RemoteIterator}
 import org.apache.hadoop.hdfs.MiniDFSCluster
-import org.apache.log4j.{Level, Logger}
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite}
 
 import scala.io.Source
@@ -21,7 +20,6 @@ abstract class HdfsTestHarness extends FunSuite with BeforeAndAfterAll with Befo
   protected def fs: FileSystem = hdfsCluster.getFileSystem
 
   override protected def beforeAll(): Unit = {
-    suppressHadoopInfoLogging()
     setupHdfs()
   }
 
@@ -32,12 +30,6 @@ abstract class HdfsTestHarness extends FunSuite with BeforeAndAfterAll with Befo
   override protected def beforeEach(): Unit = {
     if (!cleanup())
       throw new AssertionError("Failed to cleanup")
-  }
-
-  protected def suppressHadoopInfoLogging(): Unit = {
-    Logger.getLogger("org.apache.hadoop").setLevel(Level.WARN)
-    Logger.getLogger("BlockStateChange").setLevel(Level.WARN)
-    Logger.getLogger("org.mortbay").setLevel(Level.WARN)
   }
 
   protected def setupHdfs(): Unit = {

@@ -5,7 +5,7 @@ import org.scalatest.{BeforeAndAfter, Suite}
 
 trait SparkTestHarness extends Suite with BeforeAndAfter {
 
-  implicit var spark: SparkSession = _
+  protected implicit var spark: SparkSession = _
 
   before {
     spark = SparkSession

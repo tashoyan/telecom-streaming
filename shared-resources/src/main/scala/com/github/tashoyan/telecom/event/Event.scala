@@ -1,6 +1,7 @@
 package com.github.tashoyan.telecom.event
 
 import java.sql.Timestamp
+import com.github.tashoyan.telecom.util.Timestamps.RichTimestamp
 
 case class Event(
     timestamp: Timestamp,
@@ -35,5 +36,7 @@ object Event {
     severityColumn,
     infoColumn
   )
+
+  implicit val defaultEventOrdering: Ordering[Event] = Ordering.by(_.timestamp)
 
 }

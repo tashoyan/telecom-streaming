@@ -1,7 +1,6 @@
 package com.github.tashoyan.telecom.predictor
 
 import com.github.tashoyan.telecom.event.Event
-import com.github.tashoyan.telecom.util.Timestamps.RichTimestamp
 
 import scala.collection.mutable
 
@@ -14,10 +13,7 @@ trait FireAlarmState {
 
 abstract class AbstractFireAlarmState(implicit problemTimeoutMillis: Long) extends FireAlarmState {
 
-  protected implicit val eventOrdering: Ordering[Event] =
-    Ordering.by(_.timestamp)
-
-  protected def findImportantSortedEvents(events: Iterator[Event]): (mutable.TreeSet[Event], mutable.TreeSet[Event]) = {
+  protected def findImportantSortedEvents(events: Iterator[Event]): (mutable.SortedSet[Event], mutable.SortedSet[Event]) = {
     events.foldLeft((new mutable.TreeSet[Event](), new mutable.TreeSet[Event])) { case ((heats, smokes), event) =>
       if (event.isHeat) {
         (heats += event, smokes)

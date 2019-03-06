@@ -1,6 +1,7 @@
 package com.github.tashoyan.telecom.predictor
 
 import com.github.tashoyan.telecom.event.Event
+import com.github.tashoyan.telecom.event.Event._
 
 import scala.collection.mutable
 
@@ -11,7 +12,7 @@ trait FireAlarmState {
 
 }
 
-abstract class AbstractFireAlarmState(implicit problemTimeoutMillis: Long) extends FireAlarmState {
+abstract class AbstractFireAlarmState extends FireAlarmState {
 
   protected def findImportantSortedEvents(events: Iterator[Event]): (mutable.SortedSet[Event], mutable.SortedSet[Event]) = {
     events.foldLeft((new mutable.TreeSet[Event](), new mutable.TreeSet[Event])) { case ((heats, smokes), event) =>
@@ -22,10 +23,6 @@ abstract class AbstractFireAlarmState(implicit problemTimeoutMillis: Long) exten
       } else (heats, smokes)
     }
   }
-
-  protected def isInTriggerInterval(heat: Event, smoke: Event): Boolean =
-    smoke.timestamp.getTime - heat.timestamp.getTime >= 0 &&
-      smoke.timestamp.getTime - heat.timestamp.getTime <= problemTimeoutMillis
 
 }
 
@@ -40,7 +37,7 @@ case class NoneState()(implicit problemTimeoutMillis: Long) extends AbstractFire
       HeatState(heatEvents.last)
     } else {
       val smokeEvent = smokeEvents.head
-      heatEvents.find(heatEvent => isInTriggerInterval(heatEvent, smokeEvent))
+      heatEvents.find(heatEvent => isInCausalRelationship(heatEvent, smokeEvent, problemTimeoutMillis))
         .map(heatEvent => HeatAndSmokeState(heatEvent, smokeEvent))
         .getOrElse(this)
     }
@@ -56,7 +53,7 @@ case class HeatState(heatEvent: Event)(implicit problemTimeoutMillis: Long) exte
     if (smokeEvents.nonEmpty) {
       val smokeEvent = smokeEvents.head
       val allHeatEvents = heatEvents + heatEvent
-      allHeatEvents.find(heat => isInTriggerInterval(heat, smokeEvent))
+      allHeatEvents.find(heat => isInCausalRelationship(heat, smokeEvent, problemTimeoutMillis))
         .map(heat => HeatAndSmokeState(heat, smokeEvent))
         .getOrElse(NoneState())
     } else {

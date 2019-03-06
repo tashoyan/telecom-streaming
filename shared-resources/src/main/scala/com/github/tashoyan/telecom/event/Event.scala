@@ -39,4 +39,8 @@ object Event {
 
   implicit val defaultEventOrdering: Ordering[Event] = Ordering.by(_.timestamp)
 
+  def isInCausalRelationship(cause: Event, consequence: Event, maxIntervalMillis: Long, minIntervalMillis: Long = 0): Boolean =
+    consequence.timestamp.getTime - cause.timestamp.getTime >= minIntervalMillis &&
+      consequence.timestamp.getTime - cause.timestamp.getTime <= maxIntervalMillis
+
 }

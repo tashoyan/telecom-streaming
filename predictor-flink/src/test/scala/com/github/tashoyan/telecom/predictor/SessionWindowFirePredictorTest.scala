@@ -14,16 +14,21 @@ class SessionWindowFirePredictorTest extends AbstractTestBase with JUnitSuiteLik
   @Test def dummy(): Unit = {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
+
     val events = env.fromElements(
-      Event(timestamp = new Timestamp(1L), siteId = 1L, severity = "MAJOR", info = "event 1"),
-      Event(timestamp = new Timestamp(2L), siteId = 1L, severity = "MAJOR", info = "event 2")
+      Event(timestamp = new Timestamp(0L), siteId = 1L, severity = "MAJOR", info = "Heat 1"),
+      Event(timestamp = new Timestamp(500L), siteId = 1L, severity = "MAJOR", info = "Smoke 1")
     )
 
     val problemTimeoutMillis = 1000L
-    val firePredictor = new SessionWindowFirePredictor(problemTimeoutMillis)
+    val eventOutOfOrdernessMillis = 5000L
+    val firePredictor = new SessionWindowFirePredictor(problemTimeoutMillis, eventOutOfOrdernessMillis)
     val alarms = firePredictor.predictAlarms(events)
 
-    val result = new DataStreamUtils(alarms).collect()
+    val result = new DataStreamUtils(alarms)
+      .collect()
+      .toSeq
+    println(s"Alarms: ${result.size}")
     result.foreach(println)
   }
 

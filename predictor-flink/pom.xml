@@ -43,16 +43,10 @@
             <artifactId>flink-streaming-java_${compiler.scala.compat.version}</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <!--TODO Remove, don't forget -->
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-wikiedits_${compiler.scala.compat.version}</artifactId>
-            <version>${flink.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-kafka_${compiler.scala.compat.version}</artifactId>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.apache.flink</groupId>-->
+            <!--<artifactId>flink-connector-kafka_${compiler.scala.compat.version}</artifactId>-->
+        <!--</dependency>-->
         <!--<dependency>-->
         <!--<groupId>com.github.scopt</groupId>-->
         <!--<artifactId>scopt_${compiler.scala.compat.version}</artifactId>-->

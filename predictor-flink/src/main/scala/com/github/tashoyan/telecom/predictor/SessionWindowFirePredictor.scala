@@ -37,16 +37,19 @@ class SessionWindowFirePredictor(
     override def merge(acc1: SortedEvents, acc2: SortedEvents): SortedEvents = acc1 ++= acc2
 
     override def getResult(acc: SortedEvents): Alarm = {
+      println(s"getResult: ${acc.mkString(",")}")
       val smoke = acc.find(_.isSmoke)
         .getOrElse(
           throw new NoSuchElementException(s"No smoke event among ${acc.mkString(",")}." +
             " Incorrect implementation of the window trigger.")
         )
+      println(s"getResult: smoke: $smoke")
       val heat = acc.find(e => isInCausalRelationship(e, smoke, problemTimeoutMillis0) && e.isHeat)
         .getOrElse(
           throw new NoSuchElementException(s"No heat event within $problemTimeoutMillis0 milliseconds before $smoke among ${acc.mkString(",")}." +
             " Incorrect implementation of the session window.")
         )
+      println(s"getResult: heat: $heat")
       Alarm(
         smoke.timestamp,
         smoke.siteId,
@@ -64,27 +67,37 @@ class SessionWindowFirePredictor(
   private object OnSmokeTrigger extends Trigger[Event, TimeWindow] {
     private val delegate = EventTimeTrigger.create()
 
-    override def onElement(element: Event, timestamp: Long, window: TimeWindow, ctx: Trigger.TriggerContext): TriggerResult =
+    override def onElement(element: Event, timestamp: Long, window: TimeWindow, ctx: Trigger.TriggerContext): TriggerResult = {
+      println(s"onElement: $element, timestamp: $timestamp, window: $window")
       if (element.asInstanceOf[Event].isSmoke) {
         TriggerResult.FIRE
       } else
         delegate.onElement(element, timestamp, window, ctx)
+    }
 
-    override def onProcessingTime(time: Long, window: TimeWindow, ctx: Trigger.TriggerContext): TriggerResult =
+    override def onProcessingTime(time: Long, window: TimeWindow, ctx: Trigger.TriggerContext): TriggerResult = {
+      println(s"onProcessingTime: $time, window: $window")
       delegate.onProcessingTime(time, window, ctx)
+    }
 
-    override def onEventTime(time: Long, window: TimeWindow, ctx: Trigger.TriggerContext): TriggerResult =
+    override def onEventTime(time: Long, window: TimeWindow, ctx: Trigger.TriggerContext): TriggerResult = {
+      println(s"onEventTime: $time, window: $window")
       //TODO Or PURGE?
       TriggerResult.CONTINUE
+    }
 
-    override def clear(window: TimeWindow, ctx: Trigger.TriggerContext): Unit =
+    override def clear(window: TimeWindow, ctx: Trigger.TriggerContext): Unit = {
+      println(s"clear: $window")
       delegate.clear(window, ctx)
+    }
 
     override def canMerge: Boolean =
       delegate.canMerge
 
-    override def onMerge(window: TimeWindow, ctx: Trigger.OnMergeContext): Unit =
+    override def onMerge(window: TimeWindow, ctx: Trigger.OnMergeContext): Unit = {
+      println(s"onMerge: $window")
       delegate.onMerge(window, ctx)
+    }
   }
 
   override def predictAlarms(events: DataStream[Event]): DataStream[Alarm] = {

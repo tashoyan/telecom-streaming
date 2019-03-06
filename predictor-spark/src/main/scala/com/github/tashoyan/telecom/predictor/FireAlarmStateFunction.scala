@@ -39,12 +39,12 @@ class FireAlarmStateFunction(problemTimeoutMillis: Long) extends AlarmStateFunct
         val timeoutTimestamp = heatEvent.timestamp.getTime + problemTimeoutMillis
         groupState.setTimeoutTimestamp(timeoutTimestamp)
         None
-      case HeatAndSmokeState(_, smokeEvent) =>
+      case HeatAndSmokeState(heatEvent, smokeEvent) =>
         /* smoke is soon after heat - fire alarm */
         //+ state exists [N] / state timed out [-] / heat [Y] / smoke [Y] / smoke-heat timeout [N]
         //+ state exists [N] / state timed out [-] / heat [Y] multiple / smoke [Y] multiple / smoke-heat timeout [N]
         val smokeTs = smokeEvent.timestamp
-        val alarm = Alarm(smokeTs, siteId, alarmSeverity, s"Fire on site $siteId")
+        val alarm = Alarm(smokeTs, siteId, alarmSeverity, s"Fire on site $siteId. First heat at ${heatEvent.timestamp}.")
         Some(alarm)
     }
   }
@@ -70,13 +70,13 @@ class FireAlarmStateFunction(problemTimeoutMillis: Long) extends AlarmStateFunct
         val timeoutTimestamp = heatEvent.timestamp.getTime + problemTimeoutMillis
         groupState.setTimeoutTimestamp(timeoutTimestamp)
         None
-      case HeatAndSmokeState(_, smokeEvent) =>
+      case HeatAndSmokeState(heatEvent, smokeEvent) =>
         /* smoke is soon after heat - fire alarm */
         //+ state exists [Y] / state timed out [N] / heat [N] / smoke [Y] / smoke-heat timeout [N]
         //+ state exists [Y] / state timed out [N] / heat [Y] / smoke [Y] / smoke-heat timeout [N]
         //+ state exists [Y] / state timed out [N] / heat [Y] multiple / smoke [Y] multiple / smoke-heat timeout [N]
         val smokeTs = smokeEvent.timestamp
-        val alarm = Alarm(smokeTs, siteId, alarmSeverity, s"Fire on site $siteId")
+        val alarm = Alarm(smokeTs, siteId, alarmSeverity, s"Fire on site $siteId. First heat at ${heatEvent.timestamp}.")
         groupState.remove()
         Some(alarm)
     }

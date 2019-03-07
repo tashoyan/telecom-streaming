@@ -74,6 +74,7 @@ class SessionWindowFirePredictor(
       out.collect(alarms.head)
   }
 
+  //TODO It's just a wrapper over EventTimeTrigger - remove it and use the wrapped trigger
   private object FireTrigger extends Trigger[Event, TimeWindow] {
     private val delegate = EventTimeTrigger.create()
 

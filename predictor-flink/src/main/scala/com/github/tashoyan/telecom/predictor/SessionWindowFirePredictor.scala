@@ -7,7 +7,7 @@ import org.apache.flink.api.common.functions.AggregateFunction
 import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor
 import org.apache.flink.streaming.api.scala.function.ProcessWindowFunction
 import org.apache.flink.streaming.api.scala.{DataStream, _}
-import org.apache.flink.streaming.api.windowing.assigners.EventTimeSessionWindows
+import org.apache.flink.streaming.api.windowing.assigners.{EventTimeSessionWindows, SessionWindowTimeGapExtractor}
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.api.windowing.triggers.{EventTimeTrigger, Trigger, TriggerResult}
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow
@@ -23,6 +23,16 @@ class SessionWindowFirePredictor(
   private val timestampAssigner = new BoundedOutOfOrdernessTimestampExtractor[Event](Time.milliseconds(eventOutOfOrdernessMillis)) {
     override def extractTimestamp(event: Event): Long =
       event.timestamp.getTime
+  }
+
+  private object TimeGapExtractor extends SessionWindowTimeGapExtractor[Event] {
+    private val problemTimeoutMillis0 = problemTimeoutMillis
+
+    override def extract(event: Event): Long =
+      if (event.isHeat)
+        problemTimeoutMillis0
+      else
+        1L
   }
 
   private type SortedEvents = mutable.SortedSet[Event]
@@ -64,39 +74,38 @@ class SessionWindowFirePredictor(
       out.collect(alarms.head)
   }
 
-  private object OnSmokeTrigger extends Trigger[Event, TimeWindow] {
+  private object FireTrigger extends Trigger[Event, TimeWindow] {
     private val delegate = EventTimeTrigger.create()
 
     override def onElement(element: Event, timestamp: Long, window: TimeWindow, ctx: Trigger.TriggerContext): TriggerResult = {
-      println(s"onElement: $element, timestamp: $timestamp, window: $window")
-      if (element.asInstanceOf[Event].isSmoke) {
-        TriggerResult.FIRE
-      } else
-        delegate.onElement(element, timestamp, window, ctx)
+      val res = delegate.onElement(element, timestamp, window, ctx)
+      println(s"onElement: $element, timestamp: $timestamp, window: $window; $res")
+      res
     }
 
     override def onProcessingTime(time: Long, window: TimeWindow, ctx: Trigger.TriggerContext): TriggerResult = {
-      println(s"onProcessingTime: $time, window: $window")
-      delegate.onProcessingTime(time, window, ctx)
+      val res = delegate.onProcessingTime(time, window, ctx)
+      println(s"onProcessingTime: $time, window: $window; $res")
+      res
     }
 
     override def onEventTime(time: Long, window: TimeWindow, ctx: Trigger.TriggerContext): TriggerResult = {
-      println(s"onEventTime: $time, window: $window")
-      //TODO Or PURGE?
-      TriggerResult.CONTINUE
+      val res = delegate.onEventTime(time, window, ctx)
+      println(s"onEventTime: $time, window: $window; $res")
+      res
     }
 
     override def clear(window: TimeWindow, ctx: Trigger.TriggerContext): Unit = {
-      println(s"clear: $window")
       delegate.clear(window, ctx)
+      println(s"clear: $window")
     }
 
     override def canMerge: Boolean =
       delegate.canMerge
 
     override def onMerge(window: TimeWindow, ctx: Trigger.OnMergeContext): Unit = {
-      println(s"onMerge: $window")
       delegate.onMerge(window, ctx)
+      println(s"onMerge: $window")
     }
   }
 
@@ -105,8 +114,8 @@ class SessionWindowFirePredictor(
       .filter(e => isFireCandidate(e))
       .assignTimestampsAndWatermarks(timestampAssigner)
       .keyBy(_.siteId)
-      .window(EventTimeSessionWindows.withGap(Time.milliseconds(problemTimeoutMillis)))
-      .trigger(OnSmokeTrigger)
+      .window(EventTimeSessionWindows.withDynamicGap(TimeGapExtractor))
+      .trigger(FireTrigger)
       .aggregate(
         AlarmAggregator,
         windowFunction

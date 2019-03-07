@@ -31,6 +31,7 @@ class SessionWindowFirePredictorTest extends AbstractTestBase with JUnitSuiteLik
     val result = new DataStreamUtils(alarms)
       .collect()
       .toList
+    println(s"Alarms (${result.size}): $result")
     result should have length 1
     val alarm = result.head
     inside(alarm) { case Alarm(timestamp, objectId, severity, info) =>
@@ -41,7 +42,6 @@ class SessionWindowFirePredictorTest extends AbstractTestBase with JUnitSuiteLik
       info should include regex s"(?i)first\\s+heat\\s+at\\s+"
       info should include(new Timestamp(0L).toString)
     }
-    println(s"Alarms: ${result.size}")
     result.foreach(println)
   }
 

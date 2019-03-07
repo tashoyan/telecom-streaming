@@ -37,7 +37,7 @@ class SessionWindowFirePredictor(
 
   private type SortedEvents = mutable.SortedSet[Event]
 
-  private object AlarmAggregator extends AggregateFunction[Event, SortedEvents, Alarm] {
+  private object AlarmAggregator extends AggregateFunction[Event, SortedEvents, Option[Alarm]] {
     private val problemTimeoutMillis0 = problemTimeoutMillis
 
     override def createAccumulator(): SortedEvents = new mutable.TreeSet[Event]()
@@ -46,21 +46,12 @@ class SessionWindowFirePredictor(
 
     override def merge(acc1: SortedEvents, acc2: SortedEvents): SortedEvents = acc1 ++= acc2
 
-    override def getResult(acc: SortedEvents): Alarm = {
+    override def getResult(acc: SortedEvents): Option[Alarm] = {
       println(s"getResult: ${acc.mkString(",")}")
-      val smoke = acc.find(_.isSmoke)
-        .getOrElse(
-          throw new NoSuchElementException(s"No smoke event among ${acc.mkString(",")}." +
-            " Incorrect implementation of the window trigger.")
-        )
-      println(s"getResult: smoke: $smoke")
-      val heat = acc.find(e => isInCausalRelationship(e, smoke, problemTimeoutMillis0) && e.isHeat)
-        .getOrElse(
-          throw new NoSuchElementException(s"No heat event within $problemTimeoutMillis0 milliseconds before $smoke among ${acc.mkString(",")}." +
-            " Incorrect implementation of the session window.")
-        )
-      println(s"getResult: heat: $heat")
-      Alarm(
+      for {
+        smoke <- acc.find(_.isSmoke)
+        heat <- acc.find(e => isInCausalRelationship(e, smoke, problemTimeoutMillis0) && e.isHeat)
+      } yield Alarm(
         smoke.timestamp,
         smoke.siteId,
         alarmSeverity,
@@ -69,9 +60,9 @@ class SessionWindowFirePredictor(
     }
   }
 
-  private val windowFunction: ProcessWindowFunction[Alarm, Alarm, Long, TimeWindow] = new ProcessWindowFunction[Alarm, Alarm, Long, TimeWindow] {
-    override def process(siteId: Long, context: Context, alarms: Iterable[Alarm], out: Collector[Alarm]): Unit =
-      out.collect(alarms.head)
+  private object WindowFunction extends ProcessWindowFunction[Option[Alarm], Alarm, Long, TimeWindow] {
+    override def process(siteId: Long, context: Context, alarms: Iterable[Option[Alarm]], out: Collector[Alarm]): Unit =
+      alarms.head.foreach(out.collect)
   }
 
   //TODO It's just a wrapper over EventTimeTrigger - remove it and use the wrapped trigger
@@ -119,7 +110,7 @@ class SessionWindowFirePredictor(
       .trigger(FireTrigger)
       .aggregate(
         AlarmAggregator,
-        windowFunction
+        WindowFunction
       )
     alarms
   }

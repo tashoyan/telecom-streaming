@@ -25,7 +25,7 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
       .setLogLevel("WARN")
 
     val eventReceiver = new KafkaEventReceiver(config.kafkaBrokers, config.kafkaEventTopic)
-    val eventDeduplicator = new DefaultEventDeduplicator(config.watermarkIntervalSec)
+    val eventDeduplicator = new DefaultEventDeduplicator(config.watermarkIntervalMillis)
     val kafkaEvents = eventReceiver.receiveEvents()
       .filter(_.isCommunication)
     val events = eventDeduplicator.deduplicateEvents(kafkaEvents)

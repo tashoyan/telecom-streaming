@@ -9,7 +9,7 @@ kafka_brokers="$(hostname):9092"
 kafka_event_topic="events"
 kafka_alarm_topic="alarms"
 checkpoint_dir="/stream/checkpoint-correlator"
-watermark_interval_sec=600
+watermark_interval_millis=$((10 * 60 * 1000))
 window_size_sec=60
 window_shift_sec=30
 
@@ -40,6 +40,6 @@ spark-submit \
 --kafka-event-topic "$kafka_event_topic" \
 --kafka-alarm-topic "$kafka_alarm_topic" \
 --checkpoint-dir "$checkpoint_dir" \
---watermark-interval-sec "$watermark_interval_sec" \
+--watermark-interval-millis "$watermark_interval_millis" \
 --window-size-sec "$window_size_sec" \
 --window-shift-sec "$window_shift_sec"

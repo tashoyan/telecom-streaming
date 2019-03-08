@@ -1,7 +1,5 @@
 package com.github.tashoyan.telecom.predictor
 
-import java.util.concurrent.TimeUnit
-
 import com.github.tashoyan.telecom.event._
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.streaming.{GroupStateTimeout, OutputMode}
@@ -25,14 +23,14 @@ object SparkPredictorMain extends SparkPredictorArgParser {
     import spark.implicits._
 
     val eventReceiver = new KafkaEventReceiver(config.kafkaBrokers, config.kafkaEventTopic)
-    val eventDeduplicator = new DefaultEventDeduplicator(config.watermarkIntervalSec)
+    val eventDeduplicator = new DefaultEventDeduplicator(config.watermarkIntervalMillis)
     val kafkaEvents = eventReceiver.receiveEvents()
     val events = eventDeduplicator.deduplicateEvents(kafkaEvents)
 
     val alarmStateFunction = new FireAlarmStateFunction(config.problemTimeoutMillis)
     val alarms = events
       //TODO Maybe remove - deduplicator already set this watermark
-      .withWatermark(Event.timestampColumn, s"${config.watermarkIntervalSec} seconds")
+      .withWatermark(Event.timestampColumn, s"${config.watermarkIntervalMillis} milliseconds")
       .groupByKey(_.siteId)
       .flatMapGroupsWithState(OutputMode.Update(), GroupStateTimeout.EventTimeTimeout())(alarmStateFunction.updateAlarmState)
 

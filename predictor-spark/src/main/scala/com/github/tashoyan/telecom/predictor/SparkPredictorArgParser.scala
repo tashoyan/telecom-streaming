@@ -48,17 +48,17 @@ trait SparkPredictorArgParser {
       }
       .text("Kafka topic to send events to")
 
-    opt[Int]("watermark-interval-sec")
+    opt[Long]("watermark-interval-millis")
       .required()
       .valueName("<number>")
-      .action((value, conf) => conf.copy(watermarkIntervalSec = value))
+      .action((value, conf) => conf.copy(watermarkIntervalMillis = value))
       .validate { value =>
         if (value <= 0) failure("Watermark interval must be positive number")
         else success
       }
-      .text("Watermark interval in seconds, used for time window aggregation and for event deduplication")
+      .text("Watermark interval in milliseconds, used for time window aggregation and for event deduplication")
 
-    opt[Int]("problem-timeout-millis")
+    opt[Long]("problem-timeout-millis")
       .required()
       .valueName("<number>")
       .action((value, conf) => conf.copy(problemTimeoutMillis = value))

@@ -27,7 +27,7 @@ object EventWriterMain extends EventWriterArgParser {
       .setLogLevel("WARN")
 
     val eventReceiver = new KafkaEventReceiver(config.kafkaBrokers, config.kafkaTopic)
-    val eventDeduplicator = new DefaultEventDeduplicator(config.watermarkIntervalSec)
+    val eventDeduplicator = new DefaultEventDeduplicator(config.watermarkIntervalMillis)
     val kafkaEvents = eventReceiver.receiveEvents()
     val events = eventDeduplicator.deduplicateEvents(kafkaEvents)
 

@@ -2,7 +2,7 @@ package com.github.tashoyan.telecom.predictor
 
 import com.github.tashoyan.telecom.event._
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.streaming.{GroupStateTimeout, OutputMode}
+import org.apache.spark.sql.streaming.OutputMode
 
 object SparkPredictorMain extends SparkPredictorArgParser {
 
@@ -20,19 +20,14 @@ object SparkPredictorMain extends SparkPredictorArgParser {
       .getOrCreate()
     spark.sparkContext
       .setLogLevel("WARN")
-    import spark.implicits._
 
     val eventReceiver = new KafkaEventReceiver(config.kafkaBrokers, config.kafkaEventTopic)
     val eventDeduplicator = new DefaultEventDeduplicator(config.watermarkIntervalMillis)
     val kafkaEvents = eventReceiver.receiveEvents()
     val events = eventDeduplicator.deduplicateEvents(kafkaEvents)
 
-    val alarmStateFunction = new FireAlarmStateFunction(config.problemTimeoutMillis)
-    val alarms = events
-      //TODO Maybe remove - deduplicator already set this watermark
-      .withWatermark(Event.timestampColumn, s"${config.watermarkIntervalMillis} milliseconds")
-      .groupByKey(_.siteId)
-      .flatMapGroupsWithState(OutputMode.Update(), GroupStateTimeout.EventTimeTimeout())(alarmStateFunction.updateAlarmState)
+    val firePredictor = new GroupStateFirePredictor(config.problemTimeoutMillis, config.watermarkIntervalMillis)
+    val alarms = firePredictor.predictAlarms(events)
 
     val alarmSender = new KafkaStreamingSender[Alarm](
       config.kafkaBrokers,

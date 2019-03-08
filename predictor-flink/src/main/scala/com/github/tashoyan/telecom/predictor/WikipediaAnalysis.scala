@@ -24,6 +24,7 @@ https://ci.apache.org/projects/flink/flink-docs-release-1.7/tutorials/local_setu
 //TODO watermark extractors
 //TODO Fault tolerance - recover the state from a checkpoint
 //TODO Upgrade - from a savepoint
+@deprecated(message = "to remove", since = "now")
 object WikipediaAnalysis {
   private val windowSizeSec = 5L
 

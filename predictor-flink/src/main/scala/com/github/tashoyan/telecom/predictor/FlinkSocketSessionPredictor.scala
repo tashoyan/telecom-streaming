@@ -21,6 +21,7 @@ import org.apache.flink.util.Collector
 $ nc -lk 9999
 $ mvn -DskipTests -Dskip -pl :predictor-flink install && mvn exec:java -pl :predictor-flink -Dexec.mainClass=com.github.tashoyan.telecom.predictor.FlinkSocketSessionPredictor -Dexec.args="--port 9999"
 */
+@deprecated(message = "to remove", since = "now")
 object FlinkSocketSessionPredictor {
   private val sessionTimeoutSec = 5L
   private val watermarkSec = 5L

@@ -30,6 +30,7 @@ $ nc -lk 9999
 $ mvn -pl :predictor-flink exec:java -Dexec.mainClass=com.github.tashoyan.telecom.predictor.FlinkSocketWindowWordCount -Dexec.args="--port 9999"
 */
 //scalastyle:off
+@deprecated(message = "to remove", since = "now")
 object FlinkSocketWindowWordCount {
   private val windowSizeSec = 5L
   private val windowSlideSec = 5L

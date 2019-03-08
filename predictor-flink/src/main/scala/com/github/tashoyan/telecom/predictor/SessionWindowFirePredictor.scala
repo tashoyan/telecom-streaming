@@ -1,8 +1,8 @@
 package com.github.tashoyan.telecom.predictor
 
 import com.github.tashoyan.telecom.event.Event._
+import com.github.tashoyan.telecom.event.FireAlarmUtil._
 import com.github.tashoyan.telecom.event.{Alarm, Event}
-import com.github.tashoyan.telecom.predictor.FirePredictor._
 import org.apache.flink.api.common.functions.AggregateFunction
 import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor
 import org.apache.flink.streaming.api.scala.function.ProcessWindowFunction
@@ -18,7 +18,7 @@ import scala.collection.mutable
 class SessionWindowFirePredictor(
     override val problemTimeoutMillis: Long,
     eventOutOfOrdernessMillis: Long
-) extends FirePredictor {
+) extends FlinkFirePredictor {
 
   private val timestampAssigner = new BoundedOutOfOrdernessTimestampExtractor[Event](Time.milliseconds(eventOutOfOrdernessMillis)) {
     override def extractTimestamp(event: Event): Long =
@@ -53,7 +53,7 @@ class SessionWindowFirePredictor(
       } yield Alarm(
         smoke.timestamp,
         smoke.siteId,
-        alarmSeverity,
+        fireAlarmSeverity,
         s"Fire on site ${smoke.siteId}. First heat at ${heat.timestamp}."
       )
     }
@@ -65,6 +65,7 @@ class SessionWindowFirePredictor(
   }
 
   override def predictAlarms(events: DataStream[Event]): DataStream[Alarm] = {
+    //TODO Here we assume that events are already deduplicated. Add deduplicator to the main class.
     val alarms = events
       .filter(e => isFireCandidate(e))
       .assignTimestampsAndWatermarks(timestampAssigner)

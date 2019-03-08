@@ -1,4 +1,4 @@
-package com.github.tashoyan.telecom.event
+package com.github.tashoyan.telecom.spark
 
 import com.github.tashoyan.telecom.spark.DataFrames.RichDataset
 import com.github.tashoyan.telecom.spark.KafkaStream.{keyColumn, valueColumn}

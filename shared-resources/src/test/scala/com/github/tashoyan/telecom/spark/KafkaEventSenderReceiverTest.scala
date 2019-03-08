@@ -1,8 +1,9 @@
-package com.github.tashoyan.telecom.event
+package com.github.tashoyan.telecom.spark
 
 import java.nio.file.Files
 import java.util.concurrent.TimeoutException
 
+import com.github.tashoyan.telecom.event.Event
 import com.github.tashoyan.telecom.test.{KafkaTestHarness, SparkTestHarness}
 import org.apache.spark.sql.streaming.{OutputMode, StreamingQuery}
 import org.apache.spark.sql.{Dataset, SaveMode}

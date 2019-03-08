@@ -1,6 +1,6 @@
-package com.github.tashoyan.telecom.event
+package com.github.tashoyan.telecom.spark
 
-import com.github.tashoyan.telecom.event.SparkEvent._
+import com.github.tashoyan.telecom.spark.SparkEvent._
 import org.apache.spark.sql.Dataset
 
 class DefaultEventDeduplicator(watermarkIntervalMillis: Long) extends EventDeduplicator {

@@ -1,7 +1,8 @@
-package com.github.tashoyan.telecom.event
+package com.github.tashoyan.telecom.spark
 
 import java.sql.Timestamp
 
+import com.github.tashoyan.telecom.event.Event
 import org.apache.spark.sql.{DataFrame, Dataset, SparkSession}
 
 case class SparkEvent(

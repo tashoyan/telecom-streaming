@@ -1,6 +1,7 @@
 package com.github.tashoyan.telecom.predictor
 
 import com.github.tashoyan.telecom.event._
+import com.github.tashoyan.telecom.spark.{DefaultEventDeduplicator, KafkaEventReceiver, KafkaStreamingSender}
 import org.apache.spark.sql.streaming.OutputMode
 import org.apache.spark.sql.{Dataset, SparkSession}
 

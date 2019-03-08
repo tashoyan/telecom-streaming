@@ -3,7 +3,7 @@ package com.github.tashoyan.telecom.writer
 import java.sql.Timestamp
 
 import com.github.tashoyan.telecom.event.Event._
-import com.github.tashoyan.telecom.event._
+import com.github.tashoyan.telecom.spark.{DefaultEventDeduplicator, KafkaEventReceiver}
 import com.github.tashoyan.telecom.util.Timestamps._
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._

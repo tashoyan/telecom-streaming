@@ -1,4 +1,4 @@
-package com.github.tashoyan.telecom.event
+package com.github.tashoyan.telecom.spark
 
 import org.apache.spark.sql.Dataset
 

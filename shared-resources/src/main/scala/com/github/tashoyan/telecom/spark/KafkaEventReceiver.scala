@@ -1,8 +1,8 @@
-package com.github.tashoyan.telecom.event
+package com.github.tashoyan.telecom.spark
 
-import com.github.tashoyan.telecom.event.SparkEvent.SparkEventDataFrame
 import com.github.tashoyan.telecom.spark.DataFrames.RichDataFrame
 import com.github.tashoyan.telecom.spark.KafkaStream._
+import com.github.tashoyan.telecom.spark.SparkEvent._
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.StringType
 import org.apache.spark.sql.{Dataset, SparkSession}

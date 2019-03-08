@@ -3,8 +3,9 @@ package com.github.tashoyan.telecom.generator
 import java.sql.Timestamp
 import java.util.concurrent.TimeUnit
 
-import com.github.tashoyan.telecom.event.SparkEvent._
-import com.github.tashoyan.telecom.event.{Event, KafkaStreamingSender}
+import com.github.tashoyan.telecom.event.Event
+import com.github.tashoyan.telecom.spark.KafkaStreamingSender
+import com.github.tashoyan.telecom.spark.SparkEvent._
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.streaming.OutputMode
 import org.apache.spark.sql.{Dataset, SparkSession}

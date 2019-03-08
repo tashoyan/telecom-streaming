@@ -11,9 +11,9 @@ import org.apache.spark.sql.{Dataset, SparkSession}
 @deprecated(message = "to remove", since = "now")
 object SparkSocketWindowWordCount {
   private val port = 9998L
-  private val windowSizeSec = 5L
-  private val windowSlideSec = 5L
-  private val watermarkSec = 5L
+  private val windowSizeMillis = 5000L
+  private val windowSlideMillis = 5000L
+  private val watermarkMillis = 5000L
 
   def main(args: Array[String]): Unit = {
     val spark = SparkSession.builder()
@@ -39,10 +39,10 @@ object SparkSocketWindowWordCount {
       }
 
     val windowCounts = timestampWords
-      .withWatermark("timestamp", s"$watermarkSec seconds")
+      .withWatermark("timestamp", s"$watermarkMillis milliseconds")
       .groupBy(
         col("word"),
-        window(col("timestamp"), s"$windowSizeSec seconds", s"$windowSlideSec seconds")
+        window(col("timestamp"), s"$windowSizeMillis milliseconds", s"$windowSlideMillis milliseconds")
       )
       .count()
       .select(

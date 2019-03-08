@@ -23,8 +23,8 @@ $ mvn -DskipTests -Dskip -pl :predictor-flink install && mvn exec:java -pl :pred
 */
 @deprecated(message = "to remove", since = "now")
 object FlinkSocketSessionPredictor {
-  private val sessionTimeoutSec = 5L
-  private val watermarkSec = 5L
+  private val sessionTimeoutMillis = 5000L
+  private val eventOutOfOrdernessMillis = 5000L
   private val watermarkCheckIntervalMillis = 1000L
 
   def main(args: Array[String]): Unit = {
@@ -51,7 +51,7 @@ object FlinkSocketSessionPredictor {
     events.print()
       .setParallelism(1)
 
-    val wmAssigner = new BoundedOutOfOrdernessTimestampExtractor[Event](Time.seconds(watermarkSec)) {
+    val wmAssigner = new BoundedOutOfOrdernessTimestampExtractor[Event](Time.milliseconds(eventOutOfOrdernessMillis)) {
       override def extractTimestamp(event: Event): Long = event.timestamp.getTime
     }
 
@@ -80,7 +80,7 @@ object FlinkSocketSessionPredictor {
       .assignTimestampsAndWatermarks(wmAssigner)
       //Assume all events come from the same site
       .keyBy(_ => "site1")
-      .window(EventTimeSessionWindows.withGap(Time.seconds(sessionTimeoutSec)))
+      .window(EventTimeSessionWindows.withGap(Time.milliseconds(sessionTimeoutMillis)))
       .trigger(new CustomTrigger())
       .aggregate(
         preAggregator,

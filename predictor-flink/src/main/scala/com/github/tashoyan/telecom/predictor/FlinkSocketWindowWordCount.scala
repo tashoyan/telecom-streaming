@@ -32,9 +32,9 @@ $ mvn -pl :predictor-flink exec:java -Dexec.mainClass=com.github.tashoyan.teleco
 //scalastyle:off
 @deprecated(message = "to remove", since = "now")
 object FlinkSocketWindowWordCount {
-  private val windowSizeSec = 5L
-  private val windowSlideSec = 5L
-  private val watermarkSec = 5L
+  private val windowSizeMillis = 5000L
+  private val windowSlideMillis = 5000L
+  private val eventOutOfOrdernessMillis = 5000L
   private val watermarkCheckIntervalMillis = 1000L
 
   def main(args: Array[String]): Unit = {
@@ -65,7 +65,7 @@ object FlinkSocketWindowWordCount {
       .setParallelism(1)
 
     //TODO What is the preferred way to assign watermarks?
-    val wmAssigner = new BoundedOutOfOrdernessTimestampExtractor[TimestampWord](Time.seconds(watermarkSec)) {
+    val wmAssigner = new BoundedOutOfOrdernessTimestampExtractor[TimestampWord](Time.milliseconds(eventOutOfOrdernessMillis)) {
       override def extractTimestamp(tsWord: TimestampWord): Long = tsWord.timestamp.getTime
     }
 
@@ -102,7 +102,7 @@ object FlinkSocketWindowWordCount {
     val windowCounts: DataStream[WindowWordCount] = timestampWords
       .assignTimestampsAndWatermarks(wmAssigner)
       .keyBy(_.word)
-      .timeWindow(Time.seconds(windowSizeSec), Time.seconds(windowSlideSec))
+      .timeWindow(Time.milliseconds(windowSizeMillis), Time.milliseconds(windowSlideMillis))
       .aggregate[Long, Long, WindowWordCount](
         preAggregator,
         windowFunction

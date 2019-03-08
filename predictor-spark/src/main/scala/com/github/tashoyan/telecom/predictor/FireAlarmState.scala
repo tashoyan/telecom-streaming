@@ -1,21 +1,21 @@
 package com.github.tashoyan.telecom.predictor
 
-import com.github.tashoyan.telecom.event.Event
-import com.github.tashoyan.telecom.event.Event._
+import com.github.tashoyan.telecom.spark.SparkEvent
+import com.github.tashoyan.telecom.spark.SparkEvent._
 
 import scala.collection.mutable
 
 //TODO Tests
 trait FireAlarmState {
 
-  def transition(events: Iterator[Event]): FireAlarmState
+  def transition(events: Iterator[SparkEvent]): FireAlarmState
 
 }
 
 abstract class AbstractFireAlarmState extends FireAlarmState {
 
-  protected def findImportantSortedEvents(events: Iterator[Event]): (mutable.SortedSet[Event], mutable.SortedSet[Event]) = {
-    events.foldLeft((new mutable.TreeSet[Event](), new mutable.TreeSet[Event])) { case ((heats, smokes), event) =>
+  protected def findImportantSortedEvents(events: Iterator[SparkEvent]): (mutable.SortedSet[SparkEvent], mutable.SortedSet[SparkEvent]) = {
+    events.foldLeft((new mutable.TreeSet[SparkEvent](), new mutable.TreeSet[SparkEvent])) { case ((heats, smokes), event) =>
       if (event.isHeat) {
         (heats += event, smokes)
       } else if (event.isSmoke) {
@@ -28,7 +28,7 @@ abstract class AbstractFireAlarmState extends FireAlarmState {
 
 case class NoneState()(implicit problemTimeoutMillis: Long) extends AbstractFireAlarmState {
 
-  override def transition(events: Iterator[Event]): FireAlarmState = {
+  override def transition(events: Iterator[SparkEvent]): FireAlarmState = {
     val (heatEvents, smokeEvents) = findImportantSortedEvents(events)
 
     if (heatEvents.isEmpty) {
@@ -45,9 +45,9 @@ case class NoneState()(implicit problemTimeoutMillis: Long) extends AbstractFire
 
 }
 
-case class HeatState(heatEvent: Event)(implicit problemTimeoutMillis: Long) extends AbstractFireAlarmState {
+case class HeatState(heatEvent: SparkEvent)(implicit problemTimeoutMillis: Long) extends AbstractFireAlarmState {
 
-  override def transition(events: Iterator[Event]): FireAlarmState = {
+  override def transition(events: Iterator[SparkEvent]): FireAlarmState = {
     val (heatEvents, smokeEvents) = findImportantSortedEvents(events)
 
     if (smokeEvents.nonEmpty) {
@@ -65,8 +65,8 @@ case class HeatState(heatEvent: Event)(implicit problemTimeoutMillis: Long) exte
 
 }
 
-case class HeatAndSmokeState(heatEvent: Event, smokeEvent: Event) extends FireAlarmState {
+case class HeatAndSmokeState(heatEvent: SparkEvent, smokeEvent: SparkEvent) extends FireAlarmState {
 
-  override def transition(events: Iterator[Event]): FireAlarmState = this
+  override def transition(events: Iterator[SparkEvent]): FireAlarmState = this
 
 }

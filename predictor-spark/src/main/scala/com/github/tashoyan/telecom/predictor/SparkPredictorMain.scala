@@ -1,9 +1,10 @@
 package com.github.tashoyan.telecom.predictor
 
+import com.github.tashoyan.telecom.event.FireAlarmUtil._
 import com.github.tashoyan.telecom.event._
 import com.github.tashoyan.telecom.spark.{DefaultEventDeduplicator, KafkaEventReceiver, KafkaStreamingSender}
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.streaming.OutputMode
-import org.apache.spark.sql.{Dataset, SparkSession}
 
 object SparkPredictorMain extends SparkPredictorArgParser {
 
@@ -21,15 +22,12 @@ object SparkPredictorMain extends SparkPredictorArgParser {
       .getOrCreate()
     spark.sparkContext
       .setLogLevel("WARN")
-    import spark.implicits._
 
     val eventReceiver = new KafkaEventReceiver(config.kafkaBrokers, config.kafkaEventTopic)
     val eventDeduplicator = new DefaultEventDeduplicator(config.watermarkIntervalMillis)
     val kafkaEvents = eventReceiver.receiveEvents()
-    //TODO Filter fire candidates before deduplication
-    val events: Dataset[Event] = eventDeduplicator
-      .deduplicateEvents(kafkaEvents)
-      .map(_.toEvent)
+      .filter(e => isFireCandidate(e))
+    val events = eventDeduplicator.deduplicateEvents(kafkaEvents)
 
     val firePredictor = new GroupStateFirePredictor(config.problemTimeoutMillis, config.watermarkIntervalMillis)
     val alarms = firePredictor.predictAlarms(events)

@@ -1,6 +1,5 @@
 package com.github.tashoyan.telecom.predictor
 
-import com.github.tashoyan.telecom.event.Event
+import com.github.tashoyan.telecom.spark.SparkEvent
 
-//TODO Spark-specific, should use SparkEvent instead of Event
-case class ProblemState(triggerEvent: Event)
+case class ProblemState(triggerEvent: SparkEvent)

@@ -3,7 +3,7 @@ package com.github.tashoyan.telecom.predictor
 import java.sql.Timestamp
 import java.util.concurrent.TimeUnit
 
-import com.github.tashoyan.telecom.event.Event
+import com.github.tashoyan.telecom.spark.SparkEvent
 import com.github.tashoyan.telecom.util.Timestamps.RichTimestamp
 import org.apache.spark.sql.streaming.GroupState
 import org.scalamock.scalatest.MockFactory
@@ -18,11 +18,11 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
   private val heatInfo = "Heat on site"
   private val smokeInfo = "Smoke on site"
 
-  private def heatEvent(timestamp: Timestamp): Event =
-    Event(timestamp.getTime, siteId, severity, heatInfo)
+  private def heatEvent(timestamp: Timestamp): SparkEvent =
+    SparkEvent(timestamp, siteId, severity, heatInfo)
 
-  private def smokeEvent(timestamp: Timestamp): Event =
-    Event(timestamp.getTime, siteId, severity, smokeInfo)
+  private def smokeEvent(timestamp: Timestamp): SparkEvent =
+    SparkEvent(timestamp, siteId, severity, smokeInfo)
 
   private def heatProblemState(timestamp: Timestamp): ProblemState =
     ProblemState(heatEvent(timestamp))

@@ -14,7 +14,7 @@ import org.scalatest.junit.JUnitSuiteLike
 class SessionWindowFirePredictorTest extends AbstractTestBase with JUnitSuiteLike with Inside {
 
   private val problemTimeoutMillis = 1000L
-  private val eventOutOfOrdernessMillis = 2000L
+  private val eventOutOfOrdernessMillis = 0L
 
   private val siteId = 1L
   private val eventSeverity = "MAJOR"
@@ -33,6 +33,7 @@ class SessionWindowFirePredictorTest extends AbstractTestBase with JUnitSuiteLik
   + [heat, smoke, heat]
   + [smoke, smoke, heat]
   + [smoke, smoke, heat, smoke]
+  + now: [smoke, smoke, heat, smoke]
   */
 
   @Test def singleHeat(): Unit = {
@@ -271,6 +272,37 @@ class SessionWindowFirePredictorTest extends AbstractTestBase with JUnitSuiteLik
       info should startWith(s"Fire on site $siteId")
       info should include regex s"(?i)first\\s+heat\\s+at\\s+"
       info should include(new Timestamp(800L).toString)
+    }
+    ()
+  }
+
+  @Test def nowSmokeSmokeHeatSmoke(): Unit = {
+    val env = StreamExecutionEnvironment.getExecutionEnvironment
+    env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
+
+    val zero = System.currentTimeMillis()
+    val events = env.fromElements(
+      Event(timestamp = new Timestamp(zero), siteId, eventSeverity, smokeInfo),
+      Event(timestamp = new Timestamp(zero + 500L), siteId, eventSeverity, smokeInfo),
+      Event(timestamp = new Timestamp(zero + 800L), siteId, eventSeverity, heatInfo),
+      Event(timestamp = new Timestamp(zero + 900L), siteId, eventSeverity, smokeInfo)
+    )
+
+    val firePredictor = new SessionWindowFirePredictor(problemTimeoutMillis, eventOutOfOrdernessMillis = 10000L)
+    val alarms = firePredictor.predictAlarms(events)
+
+    val result = new DataStreamUtils(alarms)
+      .collect()
+      .toList
+    result should have length 1
+    val alarm = result.head
+    inside(alarm) { case Alarm(timestamp, objectId, severity, info) =>
+      timestamp should be(new Timestamp(zero + 900L))
+      objectId should be(siteId)
+      severity should be(alarmSeverity)
+      info should startWith(s"Fire on site $siteId")
+      info should include regex s"(?i)first\\s+heat\\s+at\\s+"
+      info should include(new Timestamp(zero + 800L).toString)
     }
     ()
   }

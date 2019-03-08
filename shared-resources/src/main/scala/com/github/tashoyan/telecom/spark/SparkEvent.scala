@@ -2,15 +2,16 @@ package com.github.tashoyan.telecom.spark
 
 import java.sql.Timestamp
 
-import com.github.tashoyan.telecom.event.Event
+import com.github.tashoyan.telecom.event.{Event, WithEventInfo}
+import com.github.tashoyan.telecom.util.Timestamps.RichTimestamp
 import org.apache.spark.sql.{DataFrame, Dataset, SparkSession}
 
 case class SparkEvent(
     timestamp: Timestamp,
     siteId: Long,
     severity: String,
-    info: String
-) {
+    override val info: String
+) extends WithEventInfo {
 
   def toEvent: Event =
     Event(
@@ -19,6 +20,7 @@ case class SparkEvent(
       severity,
       info
     )
+
 }
 
 object SparkEvent {
@@ -34,6 +36,8 @@ object SparkEvent {
     infoColumn
   )
 
+  implicit val defaultEventOrdering: Ordering[SparkEvent] = Ordering.by(_.timestamp)
+
   def apply(event: Event): SparkEvent =
     SparkEvent(
       new Timestamp(event.timestamp),
@@ -41,6 +45,10 @@ object SparkEvent {
       event.severity,
       event.info
     )
+
+  def isInCausalRelationship(cause: SparkEvent, consequence: SparkEvent, maxIntervalMillis: Long, minIntervalMillis: Long = 0): Boolean =
+    consequence.timestamp.getTime - cause.timestamp.getTime >= minIntervalMillis &&
+      consequence.timestamp.getTime - cause.timestamp.getTime <= maxIntervalMillis
 
   private def dataFrameAsEventDataset(df: DataFrame)(implicit spark: SparkSession): Dataset[SparkEvent] = {
     import spark.implicits._

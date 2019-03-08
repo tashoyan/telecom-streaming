@@ -28,7 +28,7 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
     val eventReceiver = new KafkaEventReceiver(config.kafkaBrokers, config.kafkaEventTopic)
     val eventDeduplicator = new DefaultEventDeduplicator(config.watermarkIntervalMillis)
     val kafkaEvents = eventReceiver.receiveEvents()
-      .filter(_.toEvent.isCommunication)
+      .filter(_.isCommunication)
     val events = eventDeduplicator.deduplicateEvents(kafkaEvents)
 
     val controllerAlarms = correlateEvents(events, config)

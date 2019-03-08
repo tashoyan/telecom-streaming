@@ -8,6 +8,7 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.streaming.OutputMode
 import org.apache.spark.sql.{Dataset, SparkSession}
 
+@deprecated(message = "to remove", since = "now")
 object SparkSocketWindowWordCount {
   private val port = 9998L
   private val windowSizeSec = 5L

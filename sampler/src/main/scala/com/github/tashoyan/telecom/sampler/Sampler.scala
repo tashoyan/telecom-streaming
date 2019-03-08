@@ -2,7 +2,6 @@ package com.github.tashoyan.telecom.sampler
 
 import java.io.{File, FileFilter}
 import java.nio.file.Files
-import java.sql.Timestamp
 
 import com.github.tashoyan.telecom.event.Event
 import org.apache.commons.io.FileUtils.deleteDirectory
@@ -41,10 +40,10 @@ object Sampler {
       .zipWithIndex
       .map { case (station, index) =>
         //Dummy timestamp - will be used as event offset within the event time range
-        (station.toLong, new Timestamp(index * eventIntervalMillis))
+        (station.toLong, index * eventIntervalMillis)
       }
       .flatMap(Seq.fill(perStationMultiplier)(_))
-      .map { case (siteId, timestamp: Timestamp) =>
+      .map { case (siteId, timestamp: Long) =>
         Event(timestamp, siteId, severity, info)
       }
   }

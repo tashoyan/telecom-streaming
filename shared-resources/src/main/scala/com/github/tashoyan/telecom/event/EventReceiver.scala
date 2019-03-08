@@ -13,6 +13,6 @@ trait EventReceiver {
     *
     * @return Streaming data set of events.
     */
-  def receiveEvents(): Dataset[Event]
+  def receiveEvents(): Dataset[SparkEvent]
 
 }

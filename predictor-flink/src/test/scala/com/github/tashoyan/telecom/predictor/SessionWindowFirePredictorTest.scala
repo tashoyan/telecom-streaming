@@ -41,7 +41,7 @@ class SessionWindowFirePredictorTest extends AbstractTestBase with JUnitSuiteLik
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
 
     val events = env.fromElements(
-      Event(timestamp = new Timestamp(500L), siteId, eventSeverity, heatInfo)
+      Event(timestamp = 500L, siteId, eventSeverity, heatInfo)
     )
 
     val firePredictor = new SessionWindowFirePredictor(problemTimeoutMillis, eventOutOfOrdernessMillis)
@@ -59,7 +59,7 @@ class SessionWindowFirePredictorTest extends AbstractTestBase with JUnitSuiteLik
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
 
     val events = env.fromElements(
-      Event(timestamp = new Timestamp(500L), siteId, eventSeverity, smokeInfo)
+      Event(timestamp = 500L, siteId, eventSeverity, smokeInfo)
     )
 
     val firePredictor = new SessionWindowFirePredictor(problemTimeoutMillis, eventOutOfOrdernessMillis)
@@ -77,8 +77,8 @@ class SessionWindowFirePredictorTest extends AbstractTestBase with JUnitSuiteLik
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
 
     val events = env.fromElements(
-      Event(timestamp = new Timestamp(0L), siteId, eventSeverity, heatInfo),
-      Event(timestamp = new Timestamp(500L), siteId, eventSeverity, smokeInfo)
+      Event(timestamp = 0L, siteId, eventSeverity, heatInfo),
+      Event(timestamp = 500L, siteId, eventSeverity, smokeInfo)
     )
 
     val firePredictor = new SessionWindowFirePredictor(problemTimeoutMillis, eventOutOfOrdernessMillis)
@@ -105,8 +105,8 @@ class SessionWindowFirePredictorTest extends AbstractTestBase with JUnitSuiteLik
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
 
     val events = env.fromElements(
-      Event(timestamp = new Timestamp(0L), siteId, eventSeverity, heatInfo),
-      Event(timestamp = new Timestamp(1500L), siteId, eventSeverity, smokeInfo)
+      Event(timestamp = 0L, siteId, eventSeverity, heatInfo),
+      Event(timestamp = 1500L, siteId, eventSeverity, smokeInfo)
     )
 
     val firePredictor = new SessionWindowFirePredictor(problemTimeoutMillis, eventOutOfOrdernessMillis)
@@ -124,9 +124,9 @@ class SessionWindowFirePredictorTest extends AbstractTestBase with JUnitSuiteLik
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
 
     val events = env.fromElements(
-      Event(timestamp = new Timestamp(0L), siteId, eventSeverity, heatInfo),
-      Event(timestamp = new Timestamp(500L), siteId, eventSeverity, heatInfo),
-      Event(timestamp = new Timestamp(800L), siteId, eventSeverity, smokeInfo)
+      Event(timestamp = 0L, siteId, eventSeverity, heatInfo),
+      Event(timestamp = 500L, siteId, eventSeverity, heatInfo),
+      Event(timestamp = 800L, siteId, eventSeverity, smokeInfo)
     )
 
     val firePredictor = new SessionWindowFirePredictor(problemTimeoutMillis, eventOutOfOrdernessMillis)
@@ -153,9 +153,9 @@ class SessionWindowFirePredictorTest extends AbstractTestBase with JUnitSuiteLik
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
 
     val events = env.fromElements(
-      Event(timestamp = new Timestamp(0L), siteId, eventSeverity, heatInfo),
-      Event(timestamp = new Timestamp(1500L), siteId, eventSeverity, heatInfo),
-      Event(timestamp = new Timestamp(1800L), siteId, eventSeverity, smokeInfo)
+      Event(timestamp = 0L, siteId, eventSeverity, heatInfo),
+      Event(timestamp = 1500L, siteId, eventSeverity, heatInfo),
+      Event(timestamp = 1800L, siteId, eventSeverity, smokeInfo)
     )
 
     val firePredictor = new SessionWindowFirePredictor(problemTimeoutMillis, eventOutOfOrdernessMillis)
@@ -182,9 +182,9 @@ class SessionWindowFirePredictorTest extends AbstractTestBase with JUnitSuiteLik
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
 
     val events = env.fromElements(
-      Event(timestamp = new Timestamp(0L), siteId, eventSeverity, heatInfo),
-      Event(timestamp = new Timestamp(1500L), siteId, eventSeverity, smokeInfo),
-      Event(timestamp = new Timestamp(1800L), siteId, eventSeverity, heatInfo)
+      Event(timestamp = 0L, siteId, eventSeverity, heatInfo),
+      Event(timestamp = 1500L, siteId, eventSeverity, smokeInfo),
+      Event(timestamp = 1800L, siteId, eventSeverity, heatInfo)
     )
 
     val firePredictor = new SessionWindowFirePredictor(problemTimeoutMillis, eventOutOfOrdernessMillis)
@@ -202,9 +202,9 @@ class SessionWindowFirePredictorTest extends AbstractTestBase with JUnitSuiteLik
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
 
     val events = env.fromElements(
-      Event(timestamp = new Timestamp(0L), siteId, eventSeverity, heatInfo),
-      Event(timestamp = new Timestamp(500L), siteId, eventSeverity, smokeInfo),
-      Event(timestamp = new Timestamp(800L), siteId, eventSeverity, heatInfo)
+      Event(timestamp = 0L, siteId, eventSeverity, heatInfo),
+      Event(timestamp = 500L, siteId, eventSeverity, smokeInfo),
+      Event(timestamp = 800L, siteId, eventSeverity, heatInfo)
     )
 
     val firePredictor = new SessionWindowFirePredictor(problemTimeoutMillis, eventOutOfOrdernessMillis)
@@ -231,9 +231,9 @@ class SessionWindowFirePredictorTest extends AbstractTestBase with JUnitSuiteLik
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
 
     val events = env.fromElements(
-      Event(timestamp = new Timestamp(0L), siteId, eventSeverity, smokeInfo),
-      Event(timestamp = new Timestamp(500L), siteId, eventSeverity, smokeInfo),
-      Event(timestamp = new Timestamp(800L), siteId, eventSeverity, heatInfo)
+      Event(timestamp = 0L, siteId, eventSeverity, smokeInfo),
+      Event(timestamp = 500L, siteId, eventSeverity, smokeInfo),
+      Event(timestamp = 800L, siteId, eventSeverity, heatInfo)
     )
 
     val firePredictor = new SessionWindowFirePredictor(problemTimeoutMillis, eventOutOfOrdernessMillis)
@@ -251,10 +251,10 @@ class SessionWindowFirePredictorTest extends AbstractTestBase with JUnitSuiteLik
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
 
     val events = env.fromElements(
-      Event(timestamp = new Timestamp(0L), siteId, eventSeverity, smokeInfo),
-      Event(timestamp = new Timestamp(500L), siteId, eventSeverity, smokeInfo),
-      Event(timestamp = new Timestamp(800L), siteId, eventSeverity, heatInfo),
-      Event(timestamp = new Timestamp(900L), siteId, eventSeverity, smokeInfo)
+      Event(timestamp = 0L, siteId, eventSeverity, smokeInfo),
+      Event(timestamp = 500L, siteId, eventSeverity, smokeInfo),
+      Event(timestamp = 800L, siteId, eventSeverity, heatInfo),
+      Event(timestamp = 900L, siteId, eventSeverity, smokeInfo)
     )
 
     val firePredictor = new SessionWindowFirePredictor(problemTimeoutMillis, eventOutOfOrdernessMillis)
@@ -282,10 +282,10 @@ class SessionWindowFirePredictorTest extends AbstractTestBase with JUnitSuiteLik
 
     val zero = System.currentTimeMillis()
     val events = env.fromElements(
-      Event(timestamp = new Timestamp(zero), siteId, eventSeverity, smokeInfo),
-      Event(timestamp = new Timestamp(zero + 500L), siteId, eventSeverity, smokeInfo),
-      Event(timestamp = new Timestamp(zero + 800L), siteId, eventSeverity, heatInfo),
-      Event(timestamp = new Timestamp(zero + 900L), siteId, eventSeverity, smokeInfo)
+      Event(timestamp = zero, siteId, eventSeverity, smokeInfo),
+      Event(timestamp = zero + 500L, siteId, eventSeverity, smokeInfo),
+      Event(timestamp = zero + 800L, siteId, eventSeverity, heatInfo),
+      Event(timestamp = zero + 900L, siteId, eventSeverity, smokeInfo)
     )
 
     val firePredictor = new SessionWindowFirePredictor(problemTimeoutMillis, eventOutOfOrdernessMillis = 10000L)

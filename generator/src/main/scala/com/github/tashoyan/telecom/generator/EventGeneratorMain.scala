@@ -3,12 +3,11 @@ package com.github.tashoyan.telecom.generator
 import java.sql.Timestamp
 import java.util.concurrent.TimeUnit
 
-import com.github.tashoyan.telecom.event.Event._
-import com.github.tashoyan.telecom.event.SparkEventAdapter.EventDataFrame
+import com.github.tashoyan.telecom.event.SparkEvent._
 import com.github.tashoyan.telecom.event.{Event, KafkaStreamingSender}
-import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.streaming.OutputMode
+import org.apache.spark.sql.{Dataset, SparkSession}
 
 object EventGeneratorMain extends EventGeneratorArgParser {
 
@@ -26,6 +25,7 @@ object EventGeneratorMain extends EventGeneratorArgParser {
       .getOrCreate()
     spark.sparkContext
       .setLogLevel("WARN")
+    import spark.implicits._
 
     val schema = spark.read
       .parquet(config.schemaFile)
@@ -40,10 +40,11 @@ object EventGeneratorMain extends EventGeneratorArgParser {
       new Timestamp(timestampMillis)
     }
     val currentTimeSecColumn = "current_time_sec"
-    val events = inputEvents
+    val events: Dataset[Event] = inputEvents
       .withColumn(currentTimeSecColumn, unix_timestamp())
       .withColumn(timestampColumn, eventTimestampUdf(col(currentTimeSecColumn), col(timestampColumn)))
-      .asEvents
+      .asSparkEvents
+      .map(_.toEvent)
 
     val eventSender = new KafkaStreamingSender[Event](
       config.kafkaBrokers,

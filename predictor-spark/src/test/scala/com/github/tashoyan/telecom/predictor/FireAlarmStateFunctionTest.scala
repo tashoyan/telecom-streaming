@@ -19,10 +19,10 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
   private val smokeInfo = "Smoke on site"
 
   private def heatEvent(timestamp: Timestamp): Event =
-    Event(timestamp, siteId, severity, heatInfo)
+    Event(timestamp.getTime, siteId, severity, heatInfo)
 
   private def smokeEvent(timestamp: Timestamp): Event =
-    Event(timestamp, siteId, severity, smokeInfo)
+    Event(timestamp.getTime, siteId, severity, smokeInfo)
 
   private def heatProblemState(timestamp: Timestamp): ProblemState =
     ProblemState(heatEvent(timestamp))

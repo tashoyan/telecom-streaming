@@ -1,6 +1,6 @@
 package com.github.tashoyan.telecom.correlator
 
-import com.github.tashoyan.telecom.event.Event._
+import com.github.tashoyan.telecom.event.SparkEvent._
 import com.github.tashoyan.telecom.event._
 import com.github.tashoyan.telecom.topology.Topology._
 import org.apache.spark.sql.functions._
@@ -27,7 +27,7 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
     val eventReceiver = new KafkaEventReceiver(config.kafkaBrokers, config.kafkaEventTopic)
     val eventDeduplicator = new DefaultEventDeduplicator(config.watermarkIntervalMillis)
     val kafkaEvents = eventReceiver.receiveEvents()
-      .filter(_.isCommunication)
+      .filter(_.toEvent.isCommunication)
     val events = eventDeduplicator.deduplicateEvents(kafkaEvents)
 
     val controllerAlarms = correlateEvents(events, config)
@@ -43,7 +43,7 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
     query.awaitTermination()
   }
 
-  private def correlateEvents(events: Dataset[Event], config: EventCorrelatorConfig)(implicit spark: SparkSession): Dataset[Alarm] = {
+  private def correlateEvents(events: Dataset[SparkEvent], config: EventCorrelatorConfig)(implicit spark: SparkSession): Dataset[Alarm] = {
     import spark.implicits._
 
     val topology = spark.read

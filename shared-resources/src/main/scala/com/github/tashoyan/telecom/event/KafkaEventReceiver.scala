@@ -1,6 +1,6 @@
 package com.github.tashoyan.telecom.event
 
-import com.github.tashoyan.telecom.event.SparkEventAdapter.EventDataFrame
+import com.github.tashoyan.telecom.event.SparkEvent.SparkEventDataFrame
 import com.github.tashoyan.telecom.spark.DataFrames.RichDataFrame
 import com.github.tashoyan.telecom.spark.KafkaStream._
 import org.apache.spark.sql.functions._
@@ -20,9 +20,9 @@ class KafkaEventReceiver(
 
   import spark.implicits._
 
-  private val eventSchema = spark.emptyDataset[Event].schema
+  private val eventSchema = spark.emptyDataset[SparkEvent].schema
 
-  override def receiveEvents(): Dataset[Event] = {
+  override def receiveEvents(): Dataset[SparkEvent] = {
     /*
     TODO Why only one Kafka consumer?
     https://stackoverflow.com/questions/53605061/spark-structured-streaming-kafka-source-how-many-consumers
@@ -36,10 +36,10 @@ class KafkaEventReceiver(
       .load()
 
     val jsonColumn = "json_value"
-    val events: Dataset[Event] = kafkaEvents
+    val events: Dataset[SparkEvent] = kafkaEvents
       .select(col(valueColumn) cast StringType as jsonColumn)
       .parseJsonColumn(jsonColumn, eventSchema)
-      .asEvents
+      .asSparkEvents
     events
   }
 

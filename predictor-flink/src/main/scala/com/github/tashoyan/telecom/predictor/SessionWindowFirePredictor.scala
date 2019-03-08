@@ -1,5 +1,7 @@
 package com.github.tashoyan.telecom.predictor
 
+import java.sql.Timestamp
+
 import com.github.tashoyan.telecom.event.Event._
 import com.github.tashoyan.telecom.event.FireAlarmUtil._
 import com.github.tashoyan.telecom.event.{Alarm, Event}
@@ -22,7 +24,7 @@ class SessionWindowFirePredictor(
 
   private val timestampAssigner = new BoundedOutOfOrdernessTimestampExtractor[Event](Time.milliseconds(eventOutOfOrdernessMillis)) {
     override def extractTimestamp(event: Event): Long =
-      event.timestamp.getTime
+      event.timestamp
   }
 
   private object TimeGapExtractor extends SessionWindowTimeGapExtractor[Event] {
@@ -51,10 +53,10 @@ class SessionWindowFirePredictor(
         smoke <- acc.find(_.isSmoke)
         heat <- acc.find(e => isInCausalRelationship(e, smoke, problemTimeoutMillis0) && e.isHeat)
       } yield Alarm(
-        smoke.timestamp,
+        new Timestamp(smoke.timestamp),
         smoke.siteId,
         fireAlarmSeverity,
-        s"Fire on site ${smoke.siteId}. First heat at ${heat.timestamp}."
+        s"Fire on site ${smoke.siteId}. First heat at ${new Timestamp(heat.timestamp)}."
       )
     }
   }

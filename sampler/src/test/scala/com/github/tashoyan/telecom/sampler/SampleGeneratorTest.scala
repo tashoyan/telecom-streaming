@@ -1,6 +1,5 @@
 package com.github.tashoyan.telecom.sampler
 
-import java.sql.Timestamp
 import java.util.concurrent.TimeUnit
 
 import com.github.tashoyan.telecom.event.Event
@@ -117,8 +116,8 @@ class SampleGeneratorTest extends FunSuite with SparkTestHarness {
 
     val siteId = 1L
     val events = Seq(
-      Event(new Timestamp(0L), siteId, "MAJOR", s"Smoke on site $siteId"),
-      Event(new Timestamp(15000L), siteId, "MINOR", s"Heat on site $siteId")
+      Event(0L, siteId, "MAJOR", s"Smoke on site $siteId"),
+      Event(15000L, siteId, "MINOR", s"Heat on site $siteId")
     )
       .toDS()
     writeEvents(events, "target/heat_smoke_events-site_1-15sec")

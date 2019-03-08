@@ -4,6 +4,6 @@ import org.apache.spark.sql.Dataset
 
 trait EventDeduplicator {
 
-  def deduplicateEvents(events: Dataset[Event]): Dataset[Event]
+  def deduplicateEvents(events: Dataset[SparkEvent]): Dataset[SparkEvent]
 
 }

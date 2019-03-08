@@ -1,11 +1,11 @@
 package com.github.tashoyan.telecom.event
 
-import com.github.tashoyan.telecom.event.Event._
+import com.github.tashoyan.telecom.event.SparkEvent._
 import org.apache.spark.sql.Dataset
 
 class DefaultEventDeduplicator(watermarkIntervalMillis: Long) extends EventDeduplicator {
 
-  def deduplicateEvents(events: Dataset[Event]): Dataset[Event] = {
+  def deduplicateEvents(events: Dataset[SparkEvent]): Dataset[SparkEvent] = {
     events
       /*
         We have a case when a station does not provide unique identifiers for events.

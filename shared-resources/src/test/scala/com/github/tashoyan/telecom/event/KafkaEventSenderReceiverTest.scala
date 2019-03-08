@@ -1,11 +1,9 @@
 package com.github.tashoyan.telecom.event
 
 import java.nio.file.Files
-import java.sql.Timestamp
 import java.util.concurrent.TimeoutException
 
 import com.github.tashoyan.telecom.test.{KafkaTestHarness, SparkTestHarness}
-import com.github.tashoyan.telecom.util.Timestamps.RichTimestamp
 import org.apache.spark.sql.streaming.{OutputMode, StreamingQuery}
 import org.apache.spark.sql.{Dataset, SaveMode}
 import org.scalatest.FunSuite
@@ -17,9 +15,9 @@ class KafkaEventSenderReceiverTest extends FunSuite with KafkaTestHarness with S
     import spark0.implicits._
 
     val sample = Seq(
-      Event(new Timestamp(1L), siteId = 0L, severity = "MAJOR", info = "event1"),
-      Event(new Timestamp(2L), siteId = 0L, severity = "MAJOR", info = "event2"),
-      Event(new Timestamp(3L), siteId = 0L, severity = "MAJOR", info = "event3")
+      Event(1L, siteId = 0L, severity = "MAJOR", info = "event1"),
+      Event(2L, siteId = 0L, severity = "MAJOR", info = "event2"),
+      Event(3L, siteId = 0L, severity = "MAJOR", info = "event3")
     )
     val eventSample: Dataset[Event] = sample.toDS()
 
@@ -41,7 +39,9 @@ class KafkaEventSenderReceiverTest extends FunSuite with KafkaTestHarness with S
     )
 
     val eventsFromKafka = eventReceiver.receiveEvents()
-    val eventsFromKafkaQuery = eventsFromKafka.writeStream
+    val eventsFromKafkaQuery = eventsFromKafka
+      .map(_.toEvent)
+      .writeStream
       .outputMode(OutputMode.Append())
       .format("parquet")
       .option("path", eventOutputDir)

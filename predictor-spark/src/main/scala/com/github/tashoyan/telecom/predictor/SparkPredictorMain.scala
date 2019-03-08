@@ -29,7 +29,7 @@ object SparkPredictorMain extends SparkPredictorArgParser {
     val kafkaEvents = eventReceiver.receiveEvents()
     val events = eventDeduplicator.deduplicateEvents(kafkaEvents)
 
-    val alarmStateFunction = new FireAlarmStateFunction(TimeUnit.SECONDS.toMillis(config.alarmTriggerIntervalSec.toLong))
+    val alarmStateFunction = new FireAlarmStateFunction(config.problemTimeoutMillis)
     val alarms = events
       //TODO Maybe remove - deduplicator already set this watermark
       .withWatermark(Event.timestampColumn, s"${config.watermarkIntervalSec} seconds")

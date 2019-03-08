@@ -58,15 +58,15 @@ trait SparkPredictorArgParser {
       }
       .text("Watermark interval in seconds, used for time window aggregation and for event deduplication")
 
-    opt[Int]("alarm-trigger-interval-sec")
+    opt[Int]("problem-timeout-millis")
       .required()
       .valueName("<number>")
-      .action((value, conf) => conf.copy(alarmTriggerIntervalSec = value))
+      .action((value, conf) => conf.copy(problemTimeoutMillis = value))
       .validate { value =>
-        if (value <= 0) failure("Alarm trigger interval must be positive number")
+        if (value <= 0) failure("Problem timeout must be positive number")
         else success
       }
-      .text("Alarm trigger interval in seconds. If triggering events fit this time interval, then an alarm will be created")
+      .text("Problem timeout in milliseconds. If triggering events fit this time interval, then an alarm will be created")
 
     help("help")
     version("version")

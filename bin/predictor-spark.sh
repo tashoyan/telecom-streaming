@@ -9,7 +9,7 @@ kafka_event_topic="events"
 kafka_alarm_topic="alarms"
 checkpoint_dir="/stream/checkpoint-predictor-spark"
 watermark_interval_sec=600
-alarm_trigger_interval_sec=20
+problem_timeout_millis=20000
 
 jar_file="$(ls predictor-spark/target/predictor-spark-*.jar | grep -vi javadoc || true)"
 if test -z "$jar_file"
@@ -35,4 +35,4 @@ spark-submit \
 --kafka-alarm-topic "$kafka_alarm_topic" \
 --checkpoint-dir "$checkpoint_dir" \
 --watermark-interval-sec "$watermark_interval_sec" \
---alarm-trigger-interval-sec "$alarm_trigger_interval_sec"
+--problem-timeout-millis "$problem_timeout_millis"

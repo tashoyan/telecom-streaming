@@ -4,7 +4,6 @@ import java.sql.Timestamp
 
 import com.github.tashoyan.telecom.event.FireAlarmUtil._
 import com.github.tashoyan.telecom.event.{Alarm, Event}
-import com.github.tashoyan.telecom.spark.ProblemState
 import org.apache.spark.sql.streaming.GroupState
 
 class FireAlarmStateFunction(problemTimeoutMillis: Long) extends AlarmStateFunction {

@@ -1,7 +1,6 @@
 package com.github.tashoyan.telecom.predictor
 
 import com.github.tashoyan.telecom.event.{Alarm, Event}
-import com.github.tashoyan.telecom.spark.ProblemState
 import org.apache.spark.sql.streaming.GroupState
 
 //TODO Spark-specific, should use SparkEvent instead of Event

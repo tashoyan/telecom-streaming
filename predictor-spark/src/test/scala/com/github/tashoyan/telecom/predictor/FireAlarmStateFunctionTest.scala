@@ -4,7 +4,6 @@ import java.sql.Timestamp
 import java.util.concurrent.TimeUnit
 
 import com.github.tashoyan.telecom.event.Event
-import com.github.tashoyan.telecom.spark.ProblemState
 import com.github.tashoyan.telecom.util.Timestamps.RichTimestamp
 import org.apache.spark.sql.streaming.GroupState
 import org.scalamock.scalatest.MockFactory

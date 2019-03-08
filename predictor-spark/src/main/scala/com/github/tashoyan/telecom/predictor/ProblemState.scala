@@ -1,4 +1,4 @@
-package com.github.tashoyan.telecom.spark
+package com.github.tashoyan.telecom.predictor
 
 import com.github.tashoyan.telecom.event.Event
 

@@ -7,6 +7,6 @@ case class EventCorrelatorConfig(
     checkpointDir: String = "",
     kafkaAlarmTopic: String = "",
     watermarkIntervalMillis: Long = 0,
-    windowSizeSec: Int = 0,
-    windowShiftSec: Int = 0
+    windowSizeMillis: Long = 0,
+    windowSlideMillis: Long = 0
 )

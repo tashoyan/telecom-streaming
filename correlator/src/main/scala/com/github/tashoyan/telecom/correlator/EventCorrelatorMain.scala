@@ -56,7 +56,7 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
       /* Inner join - dropping events with unknown stations. Possible optimization: broadcast join. */
       .join(topology, col(siteIdColumn) === col(stationColumn), "inner")
       .groupBy(
-        window(col(timestampColumn), s"${config.windowSizeSec} seconds", s"${config.windowShiftSec} seconds"),
+        window(col(timestampColumn), s"${config.windowSizeMillis} milliseconds", s"${config.windowSlideMillis} milliseconds"),
         col(controllerColumn)
       )
       /* Workaround: countDistinct() is unsupported for streaming data sets (Spark 2.4.0) */

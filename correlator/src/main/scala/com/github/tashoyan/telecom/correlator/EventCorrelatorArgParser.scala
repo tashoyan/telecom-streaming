@@ -67,29 +67,29 @@ trait EventCorrelatorArgParser {
       }
       .text("Watermark interval in milliseconds, used for time window aggregation and for event deduplication")
 
-    opt[Int]("window-size-sec")
+    opt[Long]("window-size-millis")
       .required()
       .valueName("<number>")
-      .action((value, conf) => conf.copy(windowSizeSec = value))
+      .action((value, conf) => conf.copy(windowSizeMillis = value))
       .validate { value =>
         if (value <= 0) failure("Window size must be positive number")
         else success
       }
-      .text("Sliding window size in seconds, used for time window aggregation")
+      .text("Sliding window size in milliseconds, used for time window aggregation")
 
-    opt[Int]("window-shift-sec")
+    opt[Long]("window-slide-millis")
       .required()
       .valueName("<number>")
-      .action((value, conf) => conf.copy(windowShiftSec = value))
+      .action((value, conf) => conf.copy(windowSlideMillis = value))
       .validate { value =>
-        if (value <= 0) failure("Window shift must be positive number")
+        if (value <= 0) failure("Window slide must be positive number")
         else success
       }
-      .text("Sliding window shift in seconds, used for time window aggregation")
+      .text("Sliding window slide interval in milliseconds, used for time window aggregation")
 
     checkConfig { config =>
-      if (config.windowSizeSec < config.windowShiftSec)
-        failure("Window shift must be less or equal to window size")
+      if (config.windowSizeMillis < config.windowSlideMillis)
+        failure("Window slide must be less or equal to window size")
       else
         success
     }

@@ -10,8 +10,8 @@ kafka_event_topic="events"
 kafka_alarm_topic="alarms"
 checkpoint_dir="/stream/checkpoint-correlator"
 watermark_interval_millis=$((10 * 60 * 1000))
-window_size_sec=60
-window_shift_sec=30
+window_size_millis=$((60 * 1000))
+window_slide_millis=$((30 * 1000))
 
 jar_file="$(ls correlator/target/correlator-*.jar | grep -vi javadoc || true)"
 if test -z "$jar_file"
@@ -41,5 +41,5 @@ spark-submit \
 --kafka-alarm-topic "$kafka_alarm_topic" \
 --checkpoint-dir "$checkpoint_dir" \
 --watermark-interval-millis "$watermark_interval_millis" \
---window-size-sec "$window_size_sec" \
---window-shift-sec "$window_shift_sec"
+--window-size-sec "$window_size_millis" \
+--window-slide-millis "$window_slide_millis"

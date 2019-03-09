@@ -41,5 +41,5 @@ spark-submit \
 --kafka-alarm-topic "$kafka_alarm_topic" \
 --checkpoint-dir "$checkpoint_dir" \
 --watermark-interval-millis "$watermark_interval_millis" \
---window-size-sec "$window_size_millis" \
+--window-size-millis "$window_size_millis" \
 --window-slide-millis "$window_slide_millis"

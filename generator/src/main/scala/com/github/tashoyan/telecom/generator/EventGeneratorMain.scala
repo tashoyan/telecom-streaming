@@ -36,14 +36,17 @@ object EventGeneratorMain extends EventGeneratorArgParser {
       .schema(schema)
       .parquet(config.inputDir)
 
-    val eventTimestampUdf = udf { (currentTimeSec: Long, dummyTimestamp: Timestamp) =>
-      val timestampMillis: Long = TimeUnit.SECONDS.toMillis(currentTimeSec) - dummyTimestamp.getTime
+    val eventTimestampUdf = udf { (currentTimeSec: Long, dummyTimestamp: Long) =>
+      val timestampMillis: Long = TimeUnit.SECONDS.toMillis(currentTimeSec) - dummyTimestamp
       new Timestamp(timestampMillis)
     }
     val currentTimeSecColumn = "current_time_sec"
     val events: Dataset[Event] = inputEvents
       .withColumn(currentTimeSecColumn, unix_timestamp())
-      .withColumn(timestampColumn, eventTimestampUdf(col(currentTimeSecColumn), col(timestampColumn)))
+      .withColumn(
+        timestampColumn,
+        eventTimestampUdf(col(currentTimeSecColumn), col(timestampColumn))
+      )
       .asSparkEvents
       .map(_.toEvent)
 

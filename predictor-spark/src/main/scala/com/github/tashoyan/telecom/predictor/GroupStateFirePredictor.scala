@@ -11,9 +11,9 @@ class GroupStateFirePredictor(
     val watermarkIntervalMillis: Long
 )(implicit spark: SparkSession) extends SparkFirePredictor {
   import spark.implicits._
-  private val alarmStateFunction = new FireAlarmStateFunction(problemTimeoutMillis)
 
   override def predictAlarms(events: Dataset[SparkEvent]): Dataset[Alarm] = {
+    val alarmStateFunction = new FireAlarmStateFunction(problemTimeoutMillis)
     val alarms = events
       .filter(e => isFireCandidate(e))
       .withWatermark(SparkEvent.timestampColumn, s"$watermarkIntervalMillis milliseconds")

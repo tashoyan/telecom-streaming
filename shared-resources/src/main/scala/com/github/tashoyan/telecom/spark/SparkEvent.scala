@@ -29,7 +29,7 @@ object SparkEvent {
   val severityColumn = "severity"
   val infoColumn = "info"
 
-  val columns: Seq[String] = Seq(
+  private val columns: Seq[String] = Seq(
     timestampColumn,
     siteIdColumn,
     severityColumn,
@@ -52,9 +52,8 @@ object SparkEvent {
 
   private def dataFrameAsEventDataset(df: DataFrame)(implicit spark: SparkSession): Dataset[SparkEvent] = {
     import spark.implicits._
-    df.select(Event.columns.head, Event.columns.tail: _*)
-      .as[Event]
-      .map(SparkEvent(_))
+    df.select(columns.head, columns.tail: _*)
+      .as[SparkEvent]
   }
 
   implicit class SparkEventDataFrame(val df: DataFrame) extends AnyVal {

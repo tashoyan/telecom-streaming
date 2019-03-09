@@ -1,5 +1,8 @@
 package com.github.tashoyan.telecom.spark
 
+import java.sql.Timestamp
+
+import com.github.tashoyan.telecom.event.Event
 import com.github.tashoyan.telecom.spark.DataFrames.RichDataFrame
 import com.github.tashoyan.telecom.spark.KafkaStream._
 import com.github.tashoyan.telecom.spark.SparkEvent._
@@ -20,7 +23,7 @@ class KafkaEventReceiver(
 
   import spark.implicits._
 
-  private val eventSchema = spark.emptyDataset[SparkEvent].schema
+  private val eventSchema = spark.emptyDataset[Event].schema
 
   override def receiveEvents(): Dataset[SparkEvent] = {
     /*
@@ -36,11 +39,13 @@ class KafkaEventReceiver(
       .load()
 
     val jsonColumn = "json_value"
-    val events: Dataset[SparkEvent] = kafkaEvents
+    val eventTimestampUdf = udf { timestampMillis: Long => new Timestamp(timestampMillis) }
+    val sparkEvents: Dataset[SparkEvent] = kafkaEvents
       .select(col(valueColumn) cast StringType as jsonColumn)
       .parseJsonColumn(jsonColumn, eventSchema)
+      .withColumn(SparkEvent.timestampColumn, eventTimestampUdf(col(Event.timestampColumn)))
       .asSparkEvents
-    events
+    sparkEvents
   }
 
 }

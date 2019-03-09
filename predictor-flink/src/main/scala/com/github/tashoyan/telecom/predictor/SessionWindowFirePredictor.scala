@@ -17,6 +17,29 @@ import org.apache.flink.util.Collector
 
 import scala.collection.mutable
 
+/**
+  * Fire predictor based on session windows.
+  * <p>
+  * A session window is created for each heat event.
+  * If a smoke event occurs after a heat event,
+  * and within the problem timeout interval,
+  * then an alarm is created for this window.
+  * <p>
+  * <b>Deduplication</b>
+  * <p>
+  * We could partition events by (timestamp, sideId)
+  * and use a tumbling window of a fixed size
+  * to tka only the first event:
+  * https://stackoverflow.com/a/35600175
+  * However, in this case we already have the algorithm,
+  * that takes the first smoke and the first heat events
+  * within each session window.
+  * Makes no sense to introduce a separate deduplication step.
+  *
+  * @param problemTimeoutMillis      Problem timeout interval in milliseconds.
+  *                                  If a heat event is followed by a smoke event not later than after this timeout, then an alarm is generated.
+  * @param eventOutOfOrdernessMillis Max time interval when events may come out of order.
+  */
 class SessionWindowFirePredictor(
     override val problemTimeoutMillis: Long,
     eventOutOfOrdernessMillis: Long

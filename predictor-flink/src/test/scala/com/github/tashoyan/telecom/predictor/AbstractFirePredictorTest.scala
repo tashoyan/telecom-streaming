@@ -28,6 +28,8 @@ abstract class AbstractFirePredictorTest extends AbstractTestBase with JUnitSuit
   + [heat]
   + [smoke]
   + [heat, smoke]
+  + same timestamp: [heat, smoke]
+  + at problem timeout: [heat, smoke]
   + [heat], [smoke]
   + [heat, heat, smoke]
   + [heat], [heat, smoke]
@@ -96,6 +98,42 @@ abstract class AbstractFirePredictorTest extends AbstractTestBase with JUnitSuit
       info should include regex s"(?i)first\\s+heat\\s+at\\s+"
       info should include(new Timestamp(0L).toString)
     }
+    ()
+  }
+
+  @Test def sameTimestampHeatSmoke(): Unit = {
+    val env = StreamExecutionEnvironment.getExecutionEnvironment
+    env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
+
+    val events = env.fromElements(
+      Event(timestamp = 0L, siteId, eventSeverity, heatInfo),
+      Event(timestamp = 0L, siteId, eventSeverity, smokeInfo)
+    )
+
+    val alarms = firePredictor.predictAlarms(events)
+
+    val result = new DataStreamUtils(alarms)
+      .collect()
+      .toList
+    result shouldBe empty
+    ()
+  }
+
+  @Test def atProblemTimeoutHeatSmoke(): Unit = {
+    val env = StreamExecutionEnvironment.getExecutionEnvironment
+    env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
+
+    val events = env.fromElements(
+      Event(timestamp = 0L, siteId, eventSeverity, heatInfo),
+      Event(timestamp = problemTimeoutMillis, siteId, eventSeverity, smokeInfo)
+    )
+
+    val alarms = firePredictor.predictAlarms(events)
+
+    val result = new DataStreamUtils(alarms)
+      .collect()
+      .toList
+    result shouldBe empty
     ()
   }
 

@@ -65,7 +65,7 @@ class SessionWindowFirePredictor(
     override def getResult(acc: SortedEvents): Option[Alarm] = {
       for {
         smoke <- acc.find(_.isSmoke)
-        heat <- acc.find(e => isInCausalRelationship(e, smoke, problemTimeoutMillis0) && e.isHeat)
+        heat <- acc.find(e => isInCausalRelationship(e, smoke, problemTimeoutMillis0 - 1L, 1L) && e.isHeat)
       } yield createFireAlarm(heat, smoke)
     }
   }

@@ -1,16 +1,12 @@
 package com.github.tashoyan.telecom.predictor
 
-import java.sql.Timestamp
-
 import com.github.tashoyan.telecom.event.Event._
 import com.github.tashoyan.telecom.event.FireAlarmUtil._
 import com.github.tashoyan.telecom.event.{Alarm, Event}
 import org.apache.flink.api.common.functions.AggregateFunction
-import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor
 import org.apache.flink.streaming.api.scala.function.ProcessWindowFunction
 import org.apache.flink.streaming.api.scala.{DataStream, _}
 import org.apache.flink.streaming.api.windowing.assigners.{EventTimeSessionWindows, SessionWindowTimeGapExtractor}
-import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.api.windowing.triggers.EventTimeTrigger
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow
 import org.apache.flink.util.Collector
@@ -43,12 +39,7 @@ import scala.collection.mutable
 class SessionWindowFirePredictor(
     override val problemTimeoutMillis: Long,
     eventOutOfOrdernessMillis: Long
-) extends FlinkFirePredictor {
-
-  private val timestampAssigner = new BoundedOutOfOrdernessTimestampExtractor[Event](Time.milliseconds(eventOutOfOrdernessMillis)) {
-    override def extractTimestamp(event: Event): Long =
-      event.timestamp
-  }
+) extends AbstractFlinkFirePredictor(eventOutOfOrdernessMillis) {
 
   private object TimeGapExtractor extends SessionWindowTimeGapExtractor[Event] {
     private val problemTimeoutMillis0 = problemTimeoutMillis
@@ -75,12 +66,7 @@ class SessionWindowFirePredictor(
       for {
         smoke <- acc.find(_.isSmoke)
         heat <- acc.find(e => isInCausalRelationship(e, smoke, problemTimeoutMillis0) && e.isHeat)
-      } yield Alarm(
-        new Timestamp(smoke.timestamp),
-        smoke.siteId,
-        fireAlarmSeverity,
-        s"Fire on site ${smoke.siteId}. First heat at ${new Timestamp(heat.timestamp)}."
-      )
+      } yield createFireAlarm(heat, smoke)
     }
   }
 
@@ -90,10 +76,9 @@ class SessionWindowFirePredictor(
   }
 
   override def predictAlarms(events: DataStream[Event]): DataStream[Alarm] = {
-    //TODO Here we assume that events are already deduplicated. Add deduplicator to the main class.
     val alarms = events
       .filter(e => isFireCandidate(e))
-      .assignTimestampsAndWatermarks(timestampAssigner)
+      .assignTimestampsAndWatermarks(TimestampAssigner)
       .keyBy(_.siteId)
       .window(EventTimeSessionWindows.withDynamicGap(TimeGapExtractor))
       .trigger(EventTimeTrigger.create())

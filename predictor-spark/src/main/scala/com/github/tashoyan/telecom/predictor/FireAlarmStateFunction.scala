@@ -10,11 +10,11 @@ class FireAlarmStateFunction(problemTimeoutMillis: Long) extends AlarmStateFunct
   override def updateAlarmState(siteId: Long, siteEvents: Iterator[SparkEvent], groupState: GroupState[ProblemState]): Iterator[Alarm] = {
     if (!groupState.exists) {
       /* no heat yet; check for heat now */
-      handleNonExistingState(siteId, siteEvents, groupState)
+      handleNonExistingState(siteEvents, groupState)
         .iterator
     } else if (groupState.exists && !groupState.hasTimedOut) {
       /* already observed heat; checking now for smoke */
-      handleExistingState(siteId, siteEvents, groupState)
+      handleExistingState(siteEvents, groupState)
         .iterator
     } else {
       handleTimedOutState(groupState)
@@ -22,7 +22,7 @@ class FireAlarmStateFunction(problemTimeoutMillis: Long) extends AlarmStateFunct
     }
   }
 
-  private def handleNonExistingState(siteId: Long, siteEvents: Iterator[SparkEvent], groupState: GroupState[ProblemState]): Option[Alarm] = {
+  private def handleNonExistingState(siteEvents: Iterator[SparkEvent], groupState: GroupState[ProblemState]): Option[Alarm] = {
     val fireAlarmState = NoneState()(problemTimeoutMillis)
       .transition(siteEvents)
     fireAlarmState match {
@@ -44,13 +44,12 @@ class FireAlarmStateFunction(problemTimeoutMillis: Long) extends AlarmStateFunct
         /* smoke is soon after heat - fire alarm */
         //+ state exists [N] / state timed out [-] / heat [Y] / smoke [Y] / smoke-heat timeout [N]
         //+ state exists [N] / state timed out [-] / heat [Y] multiple / smoke [Y] multiple / smoke-heat timeout [N]
-        val smokeTs = smokeEvent.timestamp
-        val alarm = Alarm(smokeTs, siteId, fireAlarmSeverity, s"Fire on site $siteId. First heat at ${heatEvent.timestamp}.")
+        val alarm = createFireAlarm(heatEvent.toEvent, smokeEvent.toEvent)
         Some(alarm)
     }
   }
 
-  private def handleExistingState(siteId: Long, siteEvents: Iterator[SparkEvent], groupState: GroupState[ProblemState]): Option[Alarm] = {
+  private def handleExistingState(siteEvents: Iterator[SparkEvent], groupState: GroupState[ProblemState]): Option[Alarm] = {
     val heatEvent0 = groupState.get.triggerEvent
     val fireAlarmState = HeatState(heatEvent0)(problemTimeoutMillis)
       .transition(siteEvents)
@@ -76,8 +75,7 @@ class FireAlarmStateFunction(problemTimeoutMillis: Long) extends AlarmStateFunct
         //+ state exists [Y] / state timed out [N] / heat [N] / smoke [Y] / smoke-heat timeout [N]
         //+ state exists [Y] / state timed out [N] / heat [Y] / smoke [Y] / smoke-heat timeout [N]
         //+ state exists [Y] / state timed out [N] / heat [Y] multiple / smoke [Y] multiple / smoke-heat timeout [N]
-        val smokeTs = smokeEvent.timestamp
-        val alarm = Alarm(smokeTs, siteId, fireAlarmSeverity, s"Fire on site $siteId. First heat at ${heatEvent.timestamp}.")
+        val alarm = createFireAlarm(heatEvent.toEvent, smokeEvent.toEvent)
         groupState.remove()
         Some(alarm)
     }

@@ -5,12 +5,13 @@ import java.sql.Timestamp
 import com.github.tashoyan.telecom.event.{Alarm, Event}
 import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.scala.{DataStreamUtils, StreamExecutionEnvironment, _}
+import org.apache.flink.test.util.AbstractTestBase
 import org.junit.Test
 import org.scalatest.Inside
 import org.scalatest.Matchers._
 import org.scalatest.junit.JUnitSuiteLike
 
-trait AbstractFirePredictorTest extends JUnitSuiteLike with Inside {
+abstract class AbstractFirePredictorTest extends AbstractTestBase with JUnitSuiteLike with Inside {
 
   protected val problemTimeoutMillis = 1000L
   protected val eventOutOfOrdernessMillis = 0L

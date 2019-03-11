@@ -14,7 +14,8 @@ import org.apache.flink.util.Collector
 import scala.collection.mutable
 
 /**
-  * Fire predictor based on session windows.
+  * Fire predictor based on
+  * <a href="https://ci.apache.org/projects/flink/flink-docs-release-1.7/dev/stream/operators/windows.html#session-windows"> session windows</a>.
   * <p>
   * A session window is created for each heat event.
   * If a smoke event occurs after a heat event,

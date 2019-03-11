@@ -9,6 +9,23 @@ import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow
 import org.apache.flink.util.Collector
 
+/**
+  * Fire predictor implemented with
+  * <a href="https://ci.apache.org/projects/flink/flink-docs-release-1.7/dev/stream/operators/joining.html#interval-join">interval join</a>.
+  * <p>
+  * A stream of heat events is joined with a stream of smoke events
+  * with interval of (heat timestamp, heat timestamp + problem timeout),
+  * excluding boundaries.
+  * Within each time window, the first occurrence of (heat, smoke) events is taken as an alarm.
+  * <p>
+  * <b>Deduplication</b>
+  * <p>
+  * Deduplication occurs thanks to taking the first occurrence of each (heat, smoke) event pair.
+  *
+  * @param problemTimeoutMillis      Problem timeout interval in milliseconds.
+  *                                  If a heat event is followed by a smoke event not later than after this timeout, then an alarm is generated.
+  * @param eventOutOfOrdernessMillis Max time interval when events may come out of order.
+  */
 class IntervalJoinFirePredictor(
     override val problemTimeoutMillis: Long,
     eventOutOfOrdernessMillis: Long

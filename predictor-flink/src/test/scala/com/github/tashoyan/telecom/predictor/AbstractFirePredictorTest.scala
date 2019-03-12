@@ -339,6 +339,11 @@ abstract class AbstractFirePredictorTest extends AbstractTestBase with JUnitSuit
       info should include regex s"(?i)first\\s+heat\\s+at\\s+"
       info should include(new Timestamp(zero + 800L).toString)
     }
+    /*
+     TODO Illustrate each implementation with visualized execution plans:
+     println(env.getExecutionPlan)
+     https://flink.apache.org/visualizer/
+     */
     ()
   }
 

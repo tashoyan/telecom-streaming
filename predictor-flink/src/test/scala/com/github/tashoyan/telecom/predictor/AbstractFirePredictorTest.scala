@@ -22,7 +22,12 @@ abstract class AbstractFirePredictorTest extends AbstractTestBase with JUnitSuit
   protected val smokeInfo = "Smoke event"
   protected val alarmSeverity = "CRITICAL"
 
-  protected var firePredictor: FlinkFirePredictor = _
+  protected def firePredictor: FlinkFirePredictor = firePredictor(problemTimeoutMillis, eventOutOfOrdernessMillis)
+
+  protected def firePredictor(
+      problemTimeoutMillis: Long,
+      eventOutOfOrdernessMillis: Long
+  ): FlinkFirePredictor
 
   /*
   + [heat]
@@ -318,8 +323,8 @@ abstract class AbstractFirePredictorTest extends AbstractTestBase with JUnitSuit
       Event(timestamp = zero + 900L, siteId, eventSeverity, smokeInfo)
     )
 
-    firePredictor = new SessionWindowFirePredictor(problemTimeoutMillis, eventOutOfOrdernessMillis = 10000L)
-    val alarms = firePredictor.predictAlarms(events)
+    val alarms = firePredictor(problemTimeoutMillis, eventOutOfOrdernessMillis = 10000L)
+      .predictAlarms(events)
 
     val result = new DataStreamUtils(alarms)
       .collect()

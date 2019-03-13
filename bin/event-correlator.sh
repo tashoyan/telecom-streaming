@@ -20,6 +20,8 @@ then
     exit 1
 fi
 
+export SPARK_DIST_CLASSPATH=$(hadoop classpath)
+
 hdfs dfs -test -e "$checkpoint_dir" && hdfs dfs -rm -r -skipTrash "$checkpoint_dir"
 hdfs dfs -test -e "$topology_file" && hdfs dfs -rm -r -skipTrash "$topology_file"
 hdfs dfs -put "resources/topology_controller_station.parquet" "$topology_file"
@@ -33,6 +35,10 @@ spark-submit \
 --conf spark.yarn.maxAppAttempts=1 \
 --conf spark.executor.instances=5 \
 --conf spark.sql.shuffle.partitions=5 \
+--conf spark.driver.memory=1g \
+--conf spark.driver.cores=2 \
+--conf spark.executor.memory=2g \
+--conf spark.executor.cores=2 \
 --class com.github.tashoyan.telecom.correlator.EventCorrelatorMain \
 "$jar_file" \
 --topology-file "$topology_file" \

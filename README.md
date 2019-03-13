@@ -12,9 +12,25 @@ Note that event samples are generated as a part of the build.
 
 ## Runtime dependencies
 
-Spark 2.4.0 built with Scala 2.12
-Hadoop cluster with HDFS and YARN
-Kafka 2.1.0
+The following software is needed to run the applications provided in the `bin` directory.
+
+The local machine:
+* Spark 2.4.0 built with Scala 2.12
+* Spark executables (for example,`spark-submit`) in the PATH
+* Flink 1.7.2 built with Scala 2.12
+* Flink executables (for example,`flink`) in the PATH
+* Hadoop client distribution version 2.7.x
+* Hadoop executables (for example, `hadoop` or `hdfs`) in the PATH
+* The `HADOOP_CONF_DIR` environment variable points to the directory with Hadoop configuration files.
+
+Remote dependencies:
+* Hadoop cluster with HDFS and YARN
+* Kafka cluster 2.1.0
+
+Some references:
+* [Running Spark on YARN](http://spark.apache.org/docs/latest/running-on-yarn.html)
+* [Using Spark's "Hadoop Free" Build](https://spark.apache.org/docs/latest/hadoop-provided.html) - this is relevant for Spark 2.4.0 built with Scala 2.12
+* [Flink YARN Setup](https://ci.apache.org/projects/flink/flink-docs-release-1.7/ops/deployment/yarn_setup.html)
 
 ## Preparing Kafka
 
@@ -25,15 +41,11 @@ Kafka 2.1.0
    kafka-topics.sh --zookeeper localhost:2181 --create --topic alarms --partitions 5 --replication-factor 1
    ```
 
-## Running Spark applications
+## Running applications
 
-You need the following environment:
-- `spark-submit` command available in your `PATH`
-- `HADOOP_CONF_DIR` environment variable points to the directory with Hadoop configuration files.
+All Spark and Flink applications are submitted to YARN.
 
-All Spark applications are submitted to YARN.
-
-You can configure settings by editing the shell launcher of an application.
+You can configure settings by editing the shell launcher of the corresponding application in the `bin` directory.
 
 ### Event Generator
 

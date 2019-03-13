@@ -17,6 +17,8 @@ then
     exit 1
 fi
 
+export SPARK_DIST_CLASSPATH=$(hadoop classpath)
+
 hdfs dfs -test -e "$checkpoint_dir" && hdfs dfs -rm -r -skipTrash "$checkpoint_dir"
 hdfs dfs -test -e "$output_dir" && hdfs dfs -rm -r -skipTrash "$output_dir"
 hdfs dfs -mkdir -p "$output_dir"
@@ -30,6 +32,10 @@ spark-submit \
 --conf spark.yarn.maxAppAttempts=1 \
 --conf spark.executor.instances=5 \
 --conf spark.sql.shuffle.partitions=5 \
+--conf spark.driver.memory=1g \
+--conf spark.driver.cores=2 \
+--conf spark.executor.memory=2g \
+--conf spark.executor.cores=2 \
 --class com.github.tashoyan.telecom.writer.EventWriterMain \
 "$jar_file" \
 --kafka-brokers "$kafka_brokers" \

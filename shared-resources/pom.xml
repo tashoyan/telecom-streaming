@@ -29,6 +29,33 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-streaming-scala_${compiler.scala.compat.version}</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-kafka_${compiler.scala.compat.version}</artifactId>
+        </dependency>
+        <dependency>
+            <!--TODO dependency management-->
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-kafka-base_${compiler.scala.compat.version}</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+        <!--<dependency>-->
+        <!--TODO Enable when needed-->
+            <!--&lt;!&ndash;TODO dependency management&ndash;&gt;-->
+            <!--<groupId>org.apache.flink</groupId>-->
+            <!--<artifactId>flink-json</artifactId>-->
+            <!--<version>${flink.version}</version>-->
+        <!--</dependency>-->
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>test-resources</artifactId>
             <version>${project.version}</version>

@@ -4,7 +4,7 @@ import java.sql.Timestamp
 
 import com.github.tashoyan.telecom.event.Event
 import com.github.tashoyan.telecom.spark.DataFrames.RichDataFrame
-import com.github.tashoyan.telecom.spark.KafkaStream._
+import com.github.tashoyan.telecom.spark.SparkKafkaStream._
 import com.github.tashoyan.telecom.spark.SparkEvent._
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.StringType
@@ -16,10 +16,10 @@ import org.apache.spark.sql.{Dataset, SparkSession}
   * @param kafkaBrokers  Kafka brokers to connect to.
   * @param kafkaTopic    Kafka topic to consume from.
   */
-class KafkaEventReceiver(
+class KafkaSparkEventReceiver(
     kafkaBrokers: String,
     kafkaTopic: String
-)(implicit spark: SparkSession) extends EventReceiver {
+)(implicit spark: SparkSession) extends SparkEventReceiver {
 
   import spark.implicits._
 

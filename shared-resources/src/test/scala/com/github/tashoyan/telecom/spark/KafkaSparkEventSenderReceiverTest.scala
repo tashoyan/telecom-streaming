@@ -9,7 +9,7 @@ import org.apache.spark.sql.streaming.{OutputMode, StreamingQuery}
 import org.apache.spark.sql.{Dataset, SaveMode}
 import org.scalatest.FunSuite
 
-class KafkaEventSenderReceiverTest extends FunSuite with KafkaTestHarness with SparkTestHarness {
+class KafkaSparkEventSenderReceiverTest extends FunSuite with KafkaTestHarness with SparkTestHarness {
 
   test("integration - send + receive events") {
     val spark0 = spark
@@ -27,11 +27,11 @@ class KafkaEventSenderReceiverTest extends FunSuite with KafkaTestHarness with S
 
     val kafkaBrokers = s"localhost:${embeddedKafkaConfig.kafkaPort}"
     val kafkaTopic = randomTopic("event")
-    val eventReceiver = new KafkaEventReceiver(
+    val eventReceiver = new KafkaSparkEventReceiver(
       kafkaBrokers,
       kafkaTopic
     )
-    val eventSender = new KafkaStreamingSender[Event](
+    val eventSender = new KafkaSparkStreamingSender[Event](
       kafkaBrokers,
       kafkaTopic,
       partitionColumn = Event.siteIdColumn,

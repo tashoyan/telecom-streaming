@@ -6,7 +6,7 @@ import org.apache.spark.sql.streaming.StreamingQuery
 /**
   * Streaming sender.
   */
-trait StreamingSender[T <: Product] {
+trait SparkStreamingSender[T <: Product] {
 
   /**
     * Creates a streaming query to send data to a stream.

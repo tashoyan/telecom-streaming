@@ -1,7 +1,7 @@
 package com.github.tashoyan.telecom.spark
 
 import com.github.tashoyan.telecom.spark.DataFrames.RichDataset
-import com.github.tashoyan.telecom.spark.KafkaStream.{keyColumn, valueColumn}
+import com.github.tashoyan.telecom.spark.SparkKafkaStream.{keyColumn, valueColumn}
 import org.apache.spark.sql.Dataset
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.streaming.{OutputMode, StreamingQuery}
@@ -16,13 +16,13 @@ import org.apache.spark.sql.types.StringType
   * @param checkpointDir   Checkpoint directory used by Spark Kafka source.
   * @param outputMode      Output mode of the streaming query.
   */
-class KafkaStreamingSender[T <: Product](
+class KafkaSparkStreamingSender[T <: Product](
     kafkaBrokers: String,
     kafkaTopic: String,
     partitionColumn: String,
     checkpointDir: String,
     outputMode: OutputMode
-) extends StreamingSender[T] {
+) extends SparkStreamingSender[T] {
 
   override def sendingQuery(data: Dataset[T]): StreamingQuery = {
     val jsonData = data

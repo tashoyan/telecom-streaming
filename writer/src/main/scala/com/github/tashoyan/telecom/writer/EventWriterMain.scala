@@ -3,7 +3,7 @@ package com.github.tashoyan.telecom.writer
 import java.sql.Timestamp
 
 import com.github.tashoyan.telecom.spark.SparkEvent._
-import com.github.tashoyan.telecom.spark.{DefaultEventDeduplicator, KafkaEventReceiver}
+import com.github.tashoyan.telecom.spark.{DefaultEventDeduplicator, KafkaSparkEventReceiver}
 import com.github.tashoyan.telecom.util.Timestamps._
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
@@ -26,7 +26,7 @@ object EventWriterMain extends EventWriterArgParser {
     spark.sparkContext
       .setLogLevel("WARN")
 
-    val eventReceiver = new KafkaEventReceiver(config.kafkaBrokers, config.kafkaTopic)
+    val eventReceiver = new KafkaSparkEventReceiver(config.kafkaBrokers, config.kafkaTopic)
     val eventDeduplicator = new DefaultEventDeduplicator(config.watermarkIntervalMillis)
     val kafkaEvents = eventReceiver.receiveEvents()
     val events = eventDeduplicator.deduplicateEvents(kafkaEvents)

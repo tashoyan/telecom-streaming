@@ -2,7 +2,7 @@ package com.github.tashoyan.telecom.correlator
 
 import com.github.tashoyan.telecom.event._
 import com.github.tashoyan.telecom.spark.SparkEvent._
-import com.github.tashoyan.telecom.spark.{DefaultEventDeduplicator, KafkaEventReceiver, KafkaStreamingSender, SparkEvent}
+import com.github.tashoyan.telecom.spark.{DefaultEventDeduplicator, KafkaSparkEventReceiver, KafkaSparkStreamingSender, SparkEvent}
 import com.github.tashoyan.telecom.topology.Topology._
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.streaming.OutputMode
@@ -25,7 +25,7 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
     spark.sparkContext
       .setLogLevel("WARN")
 
-    val eventReceiver = new KafkaEventReceiver(config.kafkaBrokers, config.kafkaEventTopic)
+    val eventReceiver = new KafkaSparkEventReceiver(config.kafkaBrokers, config.kafkaEventTopic)
     val eventDeduplicator = new DefaultEventDeduplicator(config.watermarkIntervalMillis)
     val kafkaEvents = eventReceiver.receiveEvents()
       .filter(_.isCommunication)
@@ -33,7 +33,7 @@ object EventCorrelatorMain extends EventCorrelatorArgParser {
 
     val controllerAlarms = correlateEvents(events, config)
 
-    val alarmSender = new KafkaStreamingSender[Alarm](
+    val alarmSender = new KafkaSparkStreamingSender[Alarm](
       config.kafkaBrokers,
       config.kafkaAlarmTopic,
       Alarm.objectIdColumn,

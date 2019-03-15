@@ -5,7 +5,7 @@ import org.apache.spark.sql.Dataset
 /**
   * Streaming event receiver.
   */
-trait EventReceiver {
+trait SparkEventReceiver {
 
   /**
     * Receives a data set of events from a stream.

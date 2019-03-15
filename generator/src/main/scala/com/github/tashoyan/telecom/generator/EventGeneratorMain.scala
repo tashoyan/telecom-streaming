@@ -4,7 +4,7 @@ import java.sql.Timestamp
 import java.util.concurrent.TimeUnit
 
 import com.github.tashoyan.telecom.event.Event
-import com.github.tashoyan.telecom.spark.KafkaStreamingSender
+import com.github.tashoyan.telecom.spark.KafkaSparkStreamingSender
 import com.github.tashoyan.telecom.spark.SparkEvent._
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.streaming.OutputMode
@@ -50,7 +50,7 @@ object EventGeneratorMain extends EventGeneratorArgParser {
       .asSparkEvents
       .map(_.toEvent)
 
-    val eventSender = new KafkaStreamingSender[Event](
+    val eventSender = new KafkaSparkStreamingSender[Event](
       config.kafkaBrokers,
       config.kafkaTopic,
       siteIdColumn,

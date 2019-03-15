@@ -2,7 +2,7 @@ package com.github.tashoyan.telecom.predictor
 
 import com.github.tashoyan.telecom.event.FireAlarmUtil._
 import com.github.tashoyan.telecom.event._
-import com.github.tashoyan.telecom.spark.{DefaultEventDeduplicator, KafkaEventReceiver, KafkaStreamingSender}
+import com.github.tashoyan.telecom.spark.{DefaultEventDeduplicator, KafkaSparkEventReceiver, KafkaSparkStreamingSender}
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.streaming.OutputMode
 
@@ -23,7 +23,7 @@ object SparkPredictorMain extends SparkPredictorArgParser {
     spark.sparkContext
       .setLogLevel("WARN")
 
-    val eventReceiver = new KafkaEventReceiver(config.kafkaBrokers, config.kafkaEventTopic)
+    val eventReceiver = new KafkaSparkEventReceiver(config.kafkaBrokers, config.kafkaEventTopic)
     val eventDeduplicator = new DefaultEventDeduplicator(config.watermarkIntervalMillis)
     val kafkaEvents = eventReceiver.receiveEvents()
       .filter(e => isFireCandidate(e))
@@ -32,7 +32,7 @@ object SparkPredictorMain extends SparkPredictorArgParser {
     val firePredictor = new GroupStateFirePredictor(config.problemTimeoutMillis, config.watermarkIntervalMillis)
     val alarms = firePredictor.predictAlarms(events)
 
-    val alarmSender = new KafkaStreamingSender[Alarm](
+    val alarmSender = new KafkaSparkStreamingSender[Alarm](
       config.kafkaBrokers,
       config.kafkaAlarmTopic,
       Alarm.objectIdColumn,

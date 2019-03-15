@@ -6,6 +6,17 @@ import com.github.tashoyan.telecom.event.{Event, WithEventInfo}
 import com.github.tashoyan.telecom.util.Timestamps.RichTimestamp
 import org.apache.spark.sql.{DataFrame, Dataset, SparkSession}
 
+/**
+  * Spark-specific representation of [[Event]].
+  * <p>
+  * Spark Streaming functions like watermarking or time windows require
+  * that the timestamp attribute has data type `java.sql.Timestamp`.
+  *
+  * @param timestamp Event timestamp.
+  * @param siteId    Identifier of the site where the event occurred.
+  * @param severity  Event severity.
+  * @param info      Any textual information.
+  */
 case class SparkEvent(
     timestamp: Timestamp,
     siteId: Long,

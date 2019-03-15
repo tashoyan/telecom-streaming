@@ -1,5 +1,18 @@
 package com.github.tashoyan.telecom.event
 
+/**
+  * Event.
+  * <p>
+  * <b>Deduplication</b>
+  * <p>
+  * Events are not supposed to have unique identifiers.
+  * The proposed way to deduplicate them is by the pair: `(timestamp, siteId)`.
+  *
+  * @param timestamp Event timestamp - milliseconds since the Epoch.
+  * @param siteId    Identifier of the site where the event occurred.
+  * @param severity  Event severity.
+  * @param info      Any textual information.
+  */
 case class Event(
     timestamp: Long,
     siteId: Long,

@@ -7,9 +7,17 @@ import com.github.tashoyan.telecom.event.Event
 import com.github.tashoyan.telecom.test.{KafkaTestHarness, SparkTestHarness}
 import org.apache.spark.sql.streaming.{OutputMode, StreamingQuery}
 import org.apache.spark.sql.{Dataset, SaveMode}
-import org.scalatest.FunSuite
+import org.scalatest.{BeforeAndAfterAll, FunSuite}
 
-class KafkaSparkEventSenderReceiverTest extends FunSuite with KafkaTestHarness with SparkTestHarness {
+class KafkaSparkEventSenderReceiverTest extends FunSuite with KafkaTestHarness with SparkTestHarness with BeforeAndAfterAll {
+
+  override protected def beforeAll(): Unit = {
+    startKafka()
+  }
+
+  override protected def afterAll(): Unit = {
+    stopKafka()
+  }
 
   test("integration - send + receive events") {
     val spark0 = spark

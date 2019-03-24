@@ -45,7 +45,6 @@ class KafkaFlinkEventReceiverTest extends AbstractTestBase with JUnitSuiteLike w
       .take(sendingEvents.length)
       .toSeq
     receivedEvents should be(sendingEvents)
-    println(s"Received: $receivedEvents")
     ()
   }
 

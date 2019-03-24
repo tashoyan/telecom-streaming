@@ -130,7 +130,7 @@ class KafkaFlinkEventReceiverTest extends AbstractTestBase with JUnitSuiteLike w
     }
   }
 
-  @Test(timeout = 10000L) def flinkCheckSinkStartedToReceive(): Unit = {
+  @Ignore def flinkCheckSinkStartedToReceive(): Unit = {
     val kafkaBrokers = s"localhost:${embeddedKafkaConfig.kafkaPort}"
     val kafkaTopic = randomTopic("event")
     println(kafkaBrokers)
@@ -164,6 +164,32 @@ class KafkaFlinkEventReceiverTest extends AbstractTestBase with JUnitSuiteLike w
 
     receivedEvents should be(sendingEvents)
     println(s"Received: $receivedEvents")
+  }
+
+  @Test(timeout = 10000L) def receiveEvents(): Unit = {
+    val kafkaBrokers = s"localhost:${embeddedKafkaConfig.kafkaPort}"
+    val kafkaTopic = randomTopic("event")
+    val sendingEvents = Seq(
+      "AAA",
+      "BBB",
+      "CCC"
+    )
+
+    implicit val env: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
+    val eventReceiver = new KafkaFlinkEventReceiver(kafkaBrokers, kafkaTopic)
+    val eventStream = eventReceiver.receiveEvents()
+
+    val receivedEventsIter = setupReceive(kafkaTopic, eventStream, "test")
+
+    sendingEvents.foreach { event =>
+      EmbeddedKafka.publishStringMessageToKafka(kafkaTopic, event)
+    }
+
+    val receivedEvents = receivedEventsIter
+      .take(sendingEvents.length)
+      .toSeq
+    receivedEvents should be(sendingEvents)
+    ()
   }
 
   /**

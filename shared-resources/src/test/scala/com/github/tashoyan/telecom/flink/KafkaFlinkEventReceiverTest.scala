@@ -1,5 +1,6 @@
 package com.github.tashoyan.telecom.flink
 
+import com.github.tashoyan.telecom.event.Event
 import com.github.tashoyan.telecom.test.KafkaTestHarness
 import net.manub.embeddedkafka.EmbeddedKafka
 import org.apache.flink.api.common.typeinfo.TypeInformation
@@ -25,27 +26,39 @@ class KafkaFlinkEventReceiverTest extends AbstractTestBase with JUnitSuiteLike w
     val kafkaBrokers = s"localhost:${embeddedKafkaConfig.kafkaPort}"
     val kafkaTopic = randomTopic("event")
     val sendingEvents = Seq(
-      "AAA",
-      "BBB",
-      "CCC"
+      Event(1L, 100L, "major", "AAA"),
+      Event(2L, 200L, "major", "BBB"),
+      Event(3L, 300L, "major", "CCC")
     )
 
     implicit val env: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
     val eventReceiver = new KafkaFlinkEventReceiver(kafkaBrokers, kafkaTopic)
     val eventStream = eventReceiver.receiveEvents()
 
-    val receivedEventsIter = setupReceive(kafkaTopic, eventStream, "test")
+    val receivedEventsIter = setupReceive(kafkaTopic, eventStream, testEvent, toJson)
 
     sendingEvents.foreach { event =>
-      EmbeddedKafka.publishStringMessageToKafka(kafkaTopic, event)
+      EmbeddedKafka.publishStringMessageToKafka(kafkaTopic, toJson(event))
     }
 
     val receivedEvents = receivedEventsIter
       .take(sendingEvents.length)
       .toSeq
     receivedEvents should be(sendingEvents)
+    println(s"Received: $receivedEvents")
     ()
   }
+
+  private def toJson(event: Event): String = {
+    import org.json4s._
+    import org.json4s.native.Serialization
+    import org.json4s.native.Serialization.write
+
+    implicit val formats: AnyRef with Formats = Serialization.formats(NoTypeHints)
+    write(event)
+  }
+
+  private val testEvent = Event(0L, 0L, "", "")
 
   /**
     * Sets up the data stream to receive messages sent to a Kafka topic.
@@ -57,10 +70,12 @@ class KafkaFlinkEventReceiverTest extends AbstractTestBase with JUnitSuiteLike w
     * There is a risk that a message gets to the Kafka topic before the stream started to consume,
     * so this message will not be consumed by the stream.
     *
-    * @param kafkaTopic  The topic the data stream consumes from.
-    * @param stream      Data stream.
-    * @param testMessage Special message to test that the stream started to receive messages.
-    *                    This function sends test messages to Kafka until the stream received at least one.
+    * @param kafkaTopic      The topic the data stream consumes from.
+    * @param stream          Data stream.
+    * @param testMessage     Special message to test that the stream started to receive messages.
+    *                        This function sends test messages to Kafka until the stream received at least one.
+    * @param messageToString Function to serialize a message to String.
+    *                        Then, StringSerializer is used to serialize messages to bytes.
     * @tparam T Data type of messages.
     * @return Iterator with blocking `hasNext()` `next()` functions.
     *         These functions block until the data is available.
@@ -68,7 +83,7 @@ class KafkaFlinkEventReceiverTest extends AbstractTestBase with JUnitSuiteLike w
     *         The message order is preserved.
     */
   //TODO Extract to harness
-  private def setupReceive[T: TypeInformation: ClassTag](kafkaTopic: String, stream: DataStream[T], testMessage: T): Iterator[T] = {
+  private def setupReceive[T: TypeInformation: ClassTag](kafkaTopic: String, stream: DataStream[T], testMessage: T, messageToString: T => String): Iterator[T] = {
     val receiveIter = new DataStreamUtils[T](stream)
       .collect()
 
@@ -77,8 +92,7 @@ class KafkaFlinkEventReceiverTest extends AbstractTestBase with JUnitSuiteLike w
 
       override def run(): Unit = {
         while (isActive) {
-          //TODO Serializer
-          EmbeddedKafka.publishStringMessageToKafka(kafkaTopic, testMessage.toString)
+          EmbeddedKafka.publishStringMessageToKafka(kafkaTopic, messageToString(testMessage))
           Thread.sleep(500L)
         }
       }

@@ -5,6 +5,7 @@ import java.util.Properties
 import com.github.tashoyan.telecom.test.KafkaTestHarness
 import net.manub.embeddedkafka.EmbeddedKafka
 import org.apache.flink.api.common.serialization.SimpleStringSchema
+import org.apache.flink.api.common.typeinfo.TypeInformation
 import org.apache.flink.runtime.client.JobExecutionException
 import org.apache.flink.streaming.api.scala.{DataStreamUtils, StreamExecutionEnvironment, _}
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
@@ -13,7 +14,7 @@ import org.junit._
 import org.scalatest.Matchers._
 import org.scalatest.junit.JUnitSuiteLike
 
-import scala.collection.mutable.ArrayBuffer
+import scala.reflect.ClassTag
 
 class KafkaFlinkEventReceiverTest extends AbstractTestBase with JUnitSuiteLike with KafkaTestHarness {
 
@@ -151,38 +152,68 @@ class KafkaFlinkEventReceiverTest extends AbstractTestBase with JUnitSuiteLike w
     eventStream.print()
       .setParallelism(1)
 
-    val receivedEventsIter = new DataStreamUtils[String](eventStream)
+    val receivedEventsIter = setupReceive(kafkaTopic, eventStream, "test")
+
+    sendingEvents.foreach { event =>
+      EmbeddedKafka.publishStringMessageToKafka(kafkaTopic, event)
+    }
+
+    val receivedEvents = receivedEventsIter
+      .take(sendingEvents.length)
+      .toSeq
+
+    receivedEvents should be(sendingEvents)
+    println(s"Received: $receivedEvents")
+  }
+
+  /**
+    * Sets up the data stream to receive messages sent to a Kafka topic.
+    *
+    * This function provides the happens-before relationship:
+    * all messages sent to the Kafka topic after the this function is called
+    * will be eventually available in the returned iterator.
+    * This function is needed for a data stream that consumes messages from Kafka starting from the latest offsets.
+    * There is a risk that a message gets to the Kafka topic before the stream started to consume,
+    * so this message will not be consumed by the stream.
+    *
+    * @param kafkaTopic  The topic the data stream consumes from.
+    * @param stream      Data stream.
+    * @param testMessage Special message to test that the stream started to receive messages.
+    *                    This function sends test messages to Kafka until the stream received at least one.
+    * @tparam T Data type of messages.
+    * @return Iterator with blocking `hasNext()` `next()` functions.
+    *         These functions block until the data is available.
+    *         All the messages sent to the Kafka topic after this iterator is created, will be eventually available in this iterator.
+    *         The message order is preserved.
+    */
+  //TODO Extract to harness
+  private def setupReceive[T: TypeInformation: ClassTag](kafkaTopic: String, stream: DataStream[T], testMessage: T): Iterator[T] = {
+    val receiveIter = new DataStreamUtils[T](stream)
       .collect()
 
-    val testMsg = "test"
-    object TestMsgThread extends Thread() {
+    object SendTestMessages extends Thread(this.getClass.getSimpleName + "-SendTestMessages") {
       @volatile var isActive = true
 
       override def run(): Unit = {
         while (isActive) {
-          EmbeddedKafka.publishStringMessageToKafka(kafkaTopic, testMsg)
+          //TODO Serializer
+          EmbeddedKafka.publishStringMessageToKafka(kafkaTopic, testMessage.toString)
           Thread.sleep(500L)
         }
       }
     }
-    TestMsgThread.start()
+    SendTestMessages.start()
 
-    if (receivedEventsIter.hasNext && receivedEventsIter.next() == testMsg) {
-      TestMsgThread.isActive = false
-      sendingEvents.foreach { event =>
-        EmbeddedKafka.publishStringMessageToKafka(kafkaTopic, event)
+    try {
+      if (receiveIter.contains(testMessage)) {
+        SendTestMessages.isActive = false
+        receiveIter.filterNot(_ == testMessage)
+      } else {
+        throw new RuntimeException(s"Failed to setup a stream consuming from Kafka topic $kafkaTopic - failed to receive test message $testMessage")
       }
-      val receivedEvents = new ArrayBuffer[String](sendingEvents.length)
-      while (receivedEvents.length < sendingEvents.length && receivedEventsIter.hasNext) {
-        val e = receivedEventsIter.next()
-        if (e != testMsg) {
-          println(s"Received: $e")
-          receivedEvents += e
-        }
-      }
-      receivedEvents should be(sendingEvents)
+    } finally {
+      SendTestMessages.join()
     }
-    TestMsgThread.join()
   }
 
 }

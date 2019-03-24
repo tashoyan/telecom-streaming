@@ -12,6 +12,7 @@ class KafkaFlinkEventReceiver(
 )(implicit env: StreamExecutionEnvironment) {
 
   //TODO Should be stream of Event
+  //TODO How many consumers for a multi-partition topic?
   def receiveEvents(): DataStream[String] = {
     val consumerProperties = new Properties()
     consumerProperties.setProperty("bootstrap.servers", kafkaBrokers)

@@ -35,19 +35,17 @@
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
+            <artifactId>flink-scala_${compiler.scala.compat.version}</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
             <artifactId>flink-streaming-scala_${compiler.scala.compat.version}</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-streaming-java_${compiler.scala.compat.version}</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <!--TODO dependency management-->
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-runtime_${compiler.scala.compat.version}</artifactId>
-            <version>${flink.version}</version>
+            <artifactId>flink-shaded-jackson</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -55,16 +53,12 @@
             <artifactId>flink-connector-kafka_${compiler.scala.compat.version}</artifactId>
         </dependency>
         <dependency>
-            <!--TODO dependency management-->
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-connector-kafka-base_${compiler.scala.compat.version}</artifactId>
-            <version>${flink.version}</version>
         </dependency>
         <dependency>
-            <!--TODO dependency management-->
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-json</artifactId>
-            <version>${flink.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -103,11 +97,13 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <!--TODO dependency management-->
             <groupId>org.json4s</groupId>
             <artifactId>json4s-native_${compiler.scala.compat.version}</artifactId>
-            <version>3.5.3</version>
-            <!--<version>3.6.5</version>-->
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.json4s</groupId>
+            <artifactId>json4s-core_${compiler.scala.compat.version}</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

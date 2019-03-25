@@ -37,7 +37,15 @@ trait FlinkPredictorArgParser {
       }
       .text("Kafka topic to send events to")
 
-    //TODO Event out-of-orderness millis
+    opt[Long]("watermark-interval-millis")
+      .required()
+      .valueName("<number>")
+      .action((value, conf) => conf.copy(watermarkIntervalMillis = value))
+      .validate { value =>
+        if (value <= 0) failure("Watermark interval must be positive number")
+        else success
+      }
+      .text("Watermark interval in milliseconds, used for time window aggregation")
 
     opt[Long]("problem-timeout-millis")
       .required()
@@ -47,7 +55,7 @@ trait FlinkPredictorArgParser {
         if (value <= 0) failure("Problem timeout must be positive number")
         else success
       }
-      .text("Problem timeout in milliseconds. If triggering events fit this time interval, then an alarm will be created")
+      .text("Problem timeout in milliseconds. If triggering events fit this time interval, then an alarm will be created.")
 
     help("help")
     version("version")

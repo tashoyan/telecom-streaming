@@ -1,5 +1,14 @@
 package com.github.tashoyan.telecom.predictor
 
+import java.util.{Optional, Properties}
+
+import com.github.tashoyan.telecom.event.Alarm
+import com.github.tashoyan.telecom.flink.{AlarmSerializationSchema, KafkaFlinkEventReceiver}
+import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer
+import org.apache.flink.streaming.connectors.kafka.partitioner.FlinkKafkaPartitioner
+import org.apache.kafka.clients.producer.ProducerConfig
+
 /*
 TODO Checkpoints
  https://ci.apache.org/projects/flink/flink-docs-release-1.7/dev/stream/state/checkpointing.html
@@ -25,6 +34,28 @@ object FlinkPredictorMain extends FlinkPredictorArgParser {
 
   private def doMain(config: FlinkPredictorConfig): Unit = {
     println(config)
+
+    implicit val env: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
+    val eventReceiver = new KafkaFlinkEventReceiver(config.kafkaBrokers, config.kafkaEventTopic)
+    val events = eventReceiver.receiveEvents()
+
+    val firePredictor = new IntervalJoinFirePredictor(config.problemTimeoutMillis, config.watermarkIntervalMillis)
+    val alarms = firePredictor.predictAlarms(events)
+
+    val producerProps = new Properties
+    producerProps.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, config.kafkaBrokers)
+    val kafkaProducer = new FlinkKafkaProducer[Alarm](
+      config.kafkaAlarmTopic,
+      new AlarmSerializationSchema,
+      producerProps,
+      /* Partition according to keys defined by the serialization schema */
+      Optional.empty[FlinkKafkaPartitioner[Alarm]]()
+    )
+    kafkaProducer.setWriteTimestampToKafka(true)
+    alarms.addSink(kafkaProducer)
+
+    env.execute(this.getClass.getSimpleName)
+    ()
   }
 
 }

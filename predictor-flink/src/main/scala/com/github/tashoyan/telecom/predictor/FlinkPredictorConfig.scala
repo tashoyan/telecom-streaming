@@ -8,5 +8,6 @@ case class FlinkPredictorConfig(
     kafkaBrokers: String = "",
     kafkaEventTopic: String = "",
     kafkaAlarmTopic: String = "",
+    watermarkIntervalMillis: Long = 0,
     problemTimeoutMillis: Long = 0
 )

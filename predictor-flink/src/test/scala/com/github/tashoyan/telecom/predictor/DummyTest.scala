@@ -3,6 +3,8 @@ package com.github.tashoyan.telecom.predictor
 import org.apache.flink.streaming.api.datastream.DataStreamUtils
 import org.scalatest.FunSuite
 
+//TODO Remove
+@deprecated(message = "Remove", since = "now")
 class DummyTest extends FunSuite {
 
   test("DataSet from collection") {

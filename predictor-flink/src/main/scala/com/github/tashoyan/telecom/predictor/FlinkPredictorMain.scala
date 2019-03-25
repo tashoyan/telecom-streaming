@@ -22,6 +22,12 @@ TODO Partition discovery when adding new Kafka partitions:
 TODO Idle Kafka partition may cause no progress for watermarks:
  https://issues.apache.org/jira/browse/FLINK-5479
 */
+/*
+TODO Offsets of consumed metrics can be visible only by means of metrics:
+ https://ci.apache.org/projects/flink/flink-docs-release-1.7/dev/connectors/kafka.html#kafka-connector-metrics
+ Note: Flink Kafka Connector does not use consumer groups, it uses assign() Kafka API call;
+ so no way to monitor Flink Kafka Connector progress via kafka-consumer-groups.sh.
+*/
 //TODO Parallelism: Consume in parallel from all Kafka partitions: parallelism = k * n_kafka_partitions
 object FlinkPredictorMain extends FlinkPredictorArgParser {
 

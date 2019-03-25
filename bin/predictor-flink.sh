@@ -27,6 +27,7 @@ flink run \
 -ys 2 \
 -yjm 1G \
 -ytm 2G \
+-c com.github.tashoyan.telecom.predictor.FlinkPredictorMain \
 "$jar_file" \
 --kafka-brokers "$kafka_brokers" \
 --kafka-event-topic "$kafka_event_topic" \

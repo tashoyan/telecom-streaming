@@ -11,10 +11,14 @@ class EventDeserializationSchema extends AbstractDeserializationSchema[Event] {
   override def deserialize(message: Array[Byte]): Event = {
     val objectNode = delegate.deserialize(message)
     Event(
-      timestamp = objectNode.get(timestampColumn).asLong(),
-      siteId = objectNode.get(siteIdColumn).asLong(),
-      severity = objectNode.get(severityColumn).asText(),
-      info = objectNode.get(infoColumn).asText()
+      timestamp = objectNode.get(timestampColumn)
+        .asLong(),
+      siteId = objectNode.get(siteIdColumn)
+        .asLong(),
+      severity = objectNode.get(severityColumn)
+        .asText(),
+      info = objectNode.get(infoColumn)
+        .asText()
     )
   }
 

@@ -66,7 +66,7 @@ trait SparkPredictorArgParser {
         if (value <= 0) failure("Problem timeout must be positive number")
         else success
       }
-      .text("Problem timeout in milliseconds. If triggering events fit this time interval, then an alarm will be created")
+      .text("Problem timeout in milliseconds. If triggering events fit this time interval, then an alarm will be created.")
 
     help("help")
     version("version")

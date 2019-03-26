@@ -11,6 +11,12 @@ import org.scalatest.Inside
 import org.scalatest.Matchers._
 import org.scalatest.junit.JUnitSuiteLike
 
+/*
+TODO Testing should be much easier than with Spark Streaming:
+ Can create DataStream from a collection
+ Can output DataStream to an iterator
+ Helper class: AbstractTestBase, but only for JUnit
+*/
 abstract class AbstractFirePredictorTest extends AbstractTestBase with JUnitSuiteLike with Inside {
 
   protected val problemTimeoutMillis = 1000L

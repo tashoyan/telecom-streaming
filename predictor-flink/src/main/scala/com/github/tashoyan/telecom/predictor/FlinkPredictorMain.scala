@@ -19,8 +19,12 @@ TODO Partition discovery when adding new Kafka partitions:
  https://ci.apache.org/projects/flink/flink-docs-release-1.7/dev/connectors/kafka.html#kafka-consumers-topic-and-partition-discovery
 */
 /*
-TODO Idle Kafka partition may cause no progress for watermarks:
+TODO If the source does not send the data, then operations based on event time cannot progress.
+ https://ci.apache.org/projects/flink/flink-docs-release-1.7/dev/event_time.html#idling-sources
+ Kafka notes:
+ https://ci.apache.org/projects/flink/flink-docs-stable/dev/connectors/kafka.html#kafka-consumers-and-timestamp-extractionwatermark-emission
  https://issues.apache.org/jira/browse/FLINK-5479
+ Workaround: send heartbeat messages (poor workaround, garbage on the wire)
 */
 /*
 TODO Offsets of consumed metrics can be visible only by means of metrics:

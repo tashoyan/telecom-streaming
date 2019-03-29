@@ -177,6 +177,11 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.flink</groupId>
+                <artifactId>flink-cep_${compiler.scala.compat.version}</artifactId>
+                <version>${flink.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.flink</groupId>
                 <artifactId>flink-cep-scala_${compiler.scala.compat.version}</artifactId>
                 <version>${flink.version}</version>
             </dependency>

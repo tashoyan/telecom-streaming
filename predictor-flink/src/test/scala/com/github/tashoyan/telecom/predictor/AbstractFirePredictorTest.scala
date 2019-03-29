@@ -89,8 +89,12 @@ abstract class AbstractFirePredictorTest extends AbstractTestBase with JUnitSuit
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
 
+    /*
+    Note: Don't use event timestamps <= 0 due to https://issues.apache.org/jira/browse/FLINK-12044
+    Flink CEP treats such events as 'late'.
+    */
     val events = env.fromElements(
-      Event(timestamp = 0L, siteId, eventSeverity, heatInfo),
+      Event(timestamp = 100L, siteId, eventSeverity, heatInfo),
       Event(timestamp = 500L, siteId, eventSeverity, smokeInfo)
     )
 
@@ -107,7 +111,7 @@ abstract class AbstractFirePredictorTest extends AbstractTestBase with JUnitSuit
       severity should be(alarmSeverity)
       info should startWith(s"Fire on site $siteId")
       info should include regex s"(?i)first\\s+heat\\s+at\\s+"
-      info should include(new Timestamp(0L).toString)
+      info should include(new Timestamp(100L).toString)
     }
     ()
   }
@@ -117,8 +121,8 @@ abstract class AbstractFirePredictorTest extends AbstractTestBase with JUnitSuit
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
 
     val events = env.fromElements(
-      Event(timestamp = 0L, siteId, eventSeverity, heatInfo),
-      Event(timestamp = 0L, siteId, eventSeverity, smokeInfo)
+      Event(timestamp = 100L, siteId, eventSeverity, heatInfo),
+      Event(timestamp = 100L, siteId, eventSeverity, smokeInfo)
     )
 
     val alarms = firePredictor.predictAlarms(events)
@@ -135,8 +139,8 @@ abstract class AbstractFirePredictorTest extends AbstractTestBase with JUnitSuit
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
 
     val events = env.fromElements(
-      Event(timestamp = 0L, siteId, eventSeverity, heatInfo),
-      Event(timestamp = problemTimeoutMillis, siteId, eventSeverity, smokeInfo)
+      Event(timestamp = 100L, siteId, eventSeverity, heatInfo),
+      Event(timestamp = 100L + problemTimeoutMillis, siteId, eventSeverity, smokeInfo)
     )
 
     val alarms = firePredictor.predictAlarms(events)
@@ -153,7 +157,7 @@ abstract class AbstractFirePredictorTest extends AbstractTestBase with JUnitSuit
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
 
     val events = env.fromElements(
-      Event(timestamp = 0L, siteId, eventSeverity, heatInfo),
+      Event(timestamp = 100L, siteId, eventSeverity, heatInfo),
       Event(timestamp = 1500L, siteId, eventSeverity, smokeInfo)
     )
 
@@ -171,7 +175,7 @@ abstract class AbstractFirePredictorTest extends AbstractTestBase with JUnitSuit
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
 
     val events = env.fromElements(
-      Event(timestamp = 0L, siteId, eventSeverity, heatInfo),
+      Event(timestamp = 100L, siteId, eventSeverity, heatInfo),
       Event(timestamp = 500L, siteId, eventSeverity, heatInfo),
       Event(timestamp = 800L, siteId, eventSeverity, smokeInfo)
     )
@@ -189,7 +193,7 @@ abstract class AbstractFirePredictorTest extends AbstractTestBase with JUnitSuit
       severity should be(alarmSeverity)
       info should startWith(s"Fire on site $siteId")
       info should include regex s"(?i)first\\s+heat\\s+at\\s+"
-      info should include(new Timestamp(0L).toString)
+      info should include(new Timestamp(100L).toString)
     }
     ()
   }
@@ -199,7 +203,7 @@ abstract class AbstractFirePredictorTest extends AbstractTestBase with JUnitSuit
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
 
     val events = env.fromElements(
-      Event(timestamp = 0L, siteId, eventSeverity, heatInfo),
+      Event(timestamp = 100L, siteId, eventSeverity, heatInfo),
       Event(timestamp = 1500L, siteId, eventSeverity, heatInfo),
       Event(timestamp = 1800L, siteId, eventSeverity, smokeInfo)
     )
@@ -227,7 +231,7 @@ abstract class AbstractFirePredictorTest extends AbstractTestBase with JUnitSuit
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
 
     val events = env.fromElements(
-      Event(timestamp = 0L, siteId, eventSeverity, heatInfo),
+      Event(timestamp = 100L, siteId, eventSeverity, heatInfo),
       Event(timestamp = 1500L, siteId, eventSeverity, smokeInfo),
       Event(timestamp = 1800L, siteId, eventSeverity, heatInfo)
     )
@@ -246,7 +250,7 @@ abstract class AbstractFirePredictorTest extends AbstractTestBase with JUnitSuit
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
 
     val events = env.fromElements(
-      Event(timestamp = 0L, siteId, eventSeverity, heatInfo),
+      Event(timestamp = 100L, siteId, eventSeverity, heatInfo),
       Event(timestamp = 500L, siteId, eventSeverity, smokeInfo),
       Event(timestamp = 800L, siteId, eventSeverity, heatInfo)
     )
@@ -264,7 +268,7 @@ abstract class AbstractFirePredictorTest extends AbstractTestBase with JUnitSuit
       severity should be(alarmSeverity)
       info should startWith(s"Fire on site $siteId")
       info should include regex s"(?i)first\\s+heat\\s+at\\s+"
-      info should include(new Timestamp(0L).toString)
+      info should include(new Timestamp(100L).toString)
     }
     ()
   }
@@ -274,7 +278,7 @@ abstract class AbstractFirePredictorTest extends AbstractTestBase with JUnitSuit
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
 
     val events = env.fromElements(
-      Event(timestamp = 0L, siteId, eventSeverity, smokeInfo),
+      Event(timestamp = 100L, siteId, eventSeverity, smokeInfo),
       Event(timestamp = 500L, siteId, eventSeverity, smokeInfo),
       Event(timestamp = 800L, siteId, eventSeverity, heatInfo)
     )
@@ -293,7 +297,7 @@ abstract class AbstractFirePredictorTest extends AbstractTestBase with JUnitSuit
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
 
     val events = env.fromElements(
-      Event(timestamp = 0L, siteId, eventSeverity, smokeInfo),
+      Event(timestamp = 100L, siteId, eventSeverity, smokeInfo),
       Event(timestamp = 500L, siteId, eventSeverity, smokeInfo),
       Event(timestamp = 800L, siteId, eventSeverity, heatInfo),
       Event(timestamp = 900L, siteId, eventSeverity, smokeInfo)

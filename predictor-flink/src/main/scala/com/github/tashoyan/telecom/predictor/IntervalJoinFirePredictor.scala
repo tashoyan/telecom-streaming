@@ -59,14 +59,13 @@ class IntervalJoinFirePredictor(
   override def predictAlarms(events: DataStream[Event]): DataStream[Alarm] = {
     val fireCandidates = events
       .filter(e => isFireCandidate(e))
+      .assignTimestampsAndWatermarks(TimestampAssigner)
 
     val heats = fireCandidates
       .filter(_.isHeat)
-      .assignTimestampsAndWatermarks(TimestampAssigner)
       .keyBy(_.siteId)
     val smokes = fireCandidates
       .filter(_.isSmoke)
-      .assignTimestampsAndWatermarks(TimestampAssigner)
       .keyBy(_.siteId)
 
     val alarmCandidates: DataStream[(Event, Event)] = heats.intervalJoin(smokes)

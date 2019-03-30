@@ -77,10 +77,12 @@ class SessionWindowFirePredictor(
   }
 
   override def predictAlarms(events: DataStream[Event]): DataStream[Alarm] = {
-    val alarms = events
+    val fireCandidates = events
       .filter(e => isFireCandidate(e))
       .assignTimestampsAndWatermarks(TimestampAssigner)
       .keyBy(_.siteId)
+
+    val alarms = fireCandidates
       .window(EventTimeSessionWindows.withDynamicGap(TimeGapExtractor))
       .trigger(EventTimeTrigger.create())
       .aggregate(

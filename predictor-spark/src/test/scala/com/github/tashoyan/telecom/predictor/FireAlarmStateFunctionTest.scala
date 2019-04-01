@@ -24,15 +24,19 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
   private def smokeEvent(timestamp: Timestamp): SparkEvent =
     SparkEvent(timestamp, siteId, severity, smokeInfo)
 
-  private def heatProblemState(timestamp: Timestamp): ProblemState =
-    ProblemState(heatEvent(timestamp))
+  private def fireAlarmState(heatEvents: Seq[SparkEvent], smokeEvents: Seq[SparkEvent]): SparkFireAlarmState =
+    SparkFireAlarmState(
+      heatEvents.map(_.toEvent),
+      smokeEvents.map(_.toEvent),
+      problemTimeoutMillis
+    )
 
   /* Non-existing state */
 
   test("state exists [N] / state timed out [-] / heat [N] / smoke [N] / smoke-heat timeout [-]") {
     val events = Iterator.empty
 
-    val state: GroupState[ProblemState] = mock[GroupState[ProblemState]]
+    val state: GroupState[SparkFireAlarmState] = mock[GroupState[SparkFireAlarmState]]
     (state.exists _)
       .expects()
       .atLeastOnce()
@@ -48,7 +52,7 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
     val heatTimestamp = new Timestamp(1000L)
     val events = Iterator(heatEvent(heatTimestamp))
 
-    val state: GroupState[ProblemState] = mock[GroupState[ProblemState]]
+    val state: GroupState[SparkFireAlarmState] = mock[GroupState[SparkFireAlarmState]]
     inSequence {
       (state.exists _)
         .expects()
@@ -56,7 +60,7 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
         .returns(false)
       inAnyOrder {
         (state.update _)
-          .expects(heatProblemState(heatTimestamp))
+          .expects(fireAlarmState(Seq(heatEvent(heatTimestamp)), Seq()))
           .once()
         (state.setTimeoutTimestamp(_: Long))
           .expects(heatTimestamp.getTime + problemTimeoutMillis)
@@ -74,11 +78,21 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
     val smokeTimestamp = new Timestamp(1000L)
     val events = Iterator(smokeEvent(smokeTimestamp))
 
-    val state: GroupState[ProblemState] = mock[GroupState[ProblemState]]
-    (state.exists _)
-      .expects()
-      .atLeastOnce()
-      .returns(false)
+    val state: GroupState[SparkFireAlarmState] = mock[GroupState[SparkFireAlarmState]]
+    inSequence {
+      (state.exists _)
+        .expects()
+        .atLeastOnce()
+        .returns(false)
+      inAnyOrder {
+        (state.update _)
+          .expects(fireAlarmState(Seq(), Seq(smokeEvent(smokeTimestamp))))
+          .once()
+        (state.setTimeoutTimestamp(_: Long))
+          .expects(smokeTimestamp.getTime + problemTimeoutMillis)
+          .once()
+      }
+    }
 
     val alarmStateFunction = new FireAlarmStateFunction(problemTimeoutMillis)
 
@@ -91,11 +105,14 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
     val smokeTimestamp = new Timestamp(heatTimestamp.getTime + problemTimeoutMillis / 2)
     val events = Iterator(heatEvent(heatTimestamp), smokeEvent(smokeTimestamp))
 
-    val state: GroupState[ProblemState] = mock[GroupState[ProblemState]]
-    (state.exists _)
-      .expects()
-      .atLeastOnce()
-      .returns(false)
+    val state: GroupState[SparkFireAlarmState] = mock[GroupState[SparkFireAlarmState]]
+    inSequence {
+      (state.exists _)
+        .expects()
+        .atLeastOnce()
+        .returns(false)
+    }
+
     val alarmStateFunction = new FireAlarmStateFunction(problemTimeoutMillis)
 
     val alarms = alarmStateFunction.updateAlarmState(siteId, events, state).toSeq
@@ -111,11 +128,22 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
     val smokeTimestamp = new Timestamp(heatTimestamp.getTime + problemTimeoutMillis * 2)
     val events = Iterator(heatEvent(heatTimestamp), smokeEvent(smokeTimestamp))
 
-    val state: GroupState[ProblemState] = mock[GroupState[ProblemState]]
-    (state.exists _)
-      .expects()
-      .atLeastOnce()
-      .returns(false)
+    val state: GroupState[SparkFireAlarmState] = mock[GroupState[SparkFireAlarmState]]
+    inSequence {
+      (state.exists _)
+        .expects()
+        .atLeastOnce()
+        .returns(false)
+      inAnyOrder {
+        (state.update _)
+          .expects(fireAlarmState(Seq(heatEvent(heatTimestamp)), Seq(smokeEvent(smokeTimestamp))))
+          .once()
+        (state.setTimeoutTimestamp(_: Long))
+          .expects(smokeTimestamp.getTime + problemTimeoutMillis)
+          .once()
+      }
+    }
+
     val alarmStateFunction = new FireAlarmStateFunction(problemTimeoutMillis)
 
     val alarms = alarmStateFunction.updateAlarmState(siteId, events, state).toSeq
@@ -128,7 +156,7 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
     val events = Iterator.empty
 
     val heat0Timestamp = new Timestamp(1000L)
-    val state: GroupState[ProblemState] = mock[GroupState[ProblemState]]
+    val state: GroupState[SparkFireAlarmState] = mock[GroupState[SparkFireAlarmState]]
     inSequence {
       inAnyOrder {
         (state.exists _)
@@ -143,10 +171,10 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
       (state.get _)
         .expects()
         .atLeastOnce()
-        .returns(heatProblemState(heat0Timestamp))
+        .returns(fireAlarmState(Seq(heatEvent(heat0Timestamp)), Seq()))
       inAnyOrder {
         (state.update _)
-          .expects(heatProblemState(heat0Timestamp))
+          .expects(fireAlarmState(Seq(heatEvent(heat0Timestamp)), Seq()))
           .once()
         (state.setTimeoutTimestamp(_: Long))
           .expects(heat0Timestamp.getTime + problemTimeoutMillis)
@@ -165,7 +193,7 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
     val heatTimestamp = new Timestamp(heat0Timestamp.getTime + problemTimeoutMillis / 2)
     val events = Iterator(heatEvent(heatTimestamp))
 
-    val state: GroupState[ProblemState] = mock[GroupState[ProblemState]]
+    val state: GroupState[SparkFireAlarmState] = mock[GroupState[SparkFireAlarmState]]
     inSequence {
       inAnyOrder {
         (state.exists _)
@@ -180,10 +208,10 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
       (state.get _)
         .expects()
         .atLeastOnce()
-        .returns(heatProblemState(heat0Timestamp))
+        .returns(fireAlarmState(Seq(heatEvent(heat0Timestamp)), Seq()))
       inAnyOrder {
         (state.update _)
-          .expects(heatProblemState(heatTimestamp))
+          .expects(fireAlarmState(Seq(heatEvent(heat0Timestamp), heatEvent(heatTimestamp)), Seq()))
           .once()
         (state.setTimeoutTimestamp(_: Long))
           .expects(heatTimestamp.getTime + problemTimeoutMillis)
@@ -202,7 +230,7 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
     val smokeTimestamp = new Timestamp(heat0Timestamp.getTime + problemTimeoutMillis / 2)
     val events = Iterator(smokeEvent(smokeTimestamp))
 
-    val state: GroupState[ProblemState] = mock[GroupState[ProblemState]]
+    val state: GroupState[SparkFireAlarmState] = mock[GroupState[SparkFireAlarmState]]
     inSequence {
       inAnyOrder {
         (state.exists _)
@@ -217,7 +245,7 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
       (state.get _)
         .expects()
         .atLeastOnce()
-        .returns(heatProblemState(heat0Timestamp))
+        .returns(fireAlarmState(Seq(heatEvent(heat0Timestamp)), Seq()))
       (state.remove _)
         .expects()
         .once()
@@ -238,7 +266,7 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
     val smokeTimestamp = new Timestamp(heat0Timestamp.getTime + problemTimeoutMillis * 2)
     val events = Iterator(smokeEvent(smokeTimestamp))
 
-    val state: GroupState[ProblemState] = mock[GroupState[ProblemState]]
+    val state: GroupState[SparkFireAlarmState] = mock[GroupState[SparkFireAlarmState]]
     inSequence {
       inAnyOrder {
         (state.exists _)
@@ -253,10 +281,15 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
       (state.get _)
         .expects()
         .atLeastOnce()
-        .returns(heatProblemState(heat0Timestamp))
-      (state.remove _)
-        .expects()
-        .once()
+        .returns(fireAlarmState(Seq(heatEvent(heat0Timestamp)), Seq()))
+      inAnyOrder {
+        (state.update _)
+          .expects(fireAlarmState(Seq(heatEvent(heat0Timestamp)), Seq(smokeEvent(smokeTimestamp))))
+          .once()
+        (state.setTimeoutTimestamp(_: Long))
+          .expects(smokeTimestamp.getTime + problemTimeoutMillis)
+          .once()
+      }
     }
 
     val alarmStateFunction = new FireAlarmStateFunction(problemTimeoutMillis)
@@ -271,7 +304,7 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
     val smokeTimestamp = new Timestamp(heat0Timestamp.getTime + problemTimeoutMillis / 2)
     val events = Iterator(heatEvent(heatTimestamp), smokeEvent(smokeTimestamp))
 
-    val state: GroupState[ProblemState] = mock[GroupState[ProblemState]]
+    val state: GroupState[SparkFireAlarmState] = mock[GroupState[SparkFireAlarmState]]
     inSequence {
       inAnyOrder {
         (state.exists _)
@@ -286,7 +319,7 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
       (state.get _)
         .expects()
         .atLeastOnce()
-        .returns(heatProblemState(heat0Timestamp))
+        .returns(fireAlarmState(Seq(heatEvent(heat0Timestamp)), Seq()))
       (state.remove _)
         .expects()
         .once()
@@ -308,7 +341,7 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
     val smokeTimestamp = new Timestamp(heat0Timestamp.getTime + problemTimeoutMillis * 2)
     val events = Iterator(heatEvent(heatTimestamp), smokeEvent(smokeTimestamp))
 
-    val state: GroupState[ProblemState] = mock[GroupState[ProblemState]]
+    val state: GroupState[SparkFireAlarmState] = mock[GroupState[SparkFireAlarmState]]
     inSequence {
       inAnyOrder {
         (state.exists _)
@@ -323,10 +356,15 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
       (state.get _)
         .expects()
         .atLeastOnce()
-        .returns(heatProblemState(heat0Timestamp))
-      (state.remove _)
-        .expects()
-        .once()
+        .returns(fireAlarmState(Seq(heatEvent(heat0Timestamp)), Seq()))
+      inAnyOrder {
+        (state.update _)
+          .expects(fireAlarmState(Seq(heatEvent(heat0Timestamp), heatEvent(heatTimestamp)), Seq(smokeEvent(smokeTimestamp))))
+          .once()
+        (state.setTimeoutTimestamp(_: Long))
+          .expects(smokeTimestamp.getTime + problemTimeoutMillis)
+          .once()
+      }
     }
 
     val alarmStateFunction = new FireAlarmStateFunction(problemTimeoutMillis)
@@ -340,7 +378,7 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
   test("state exists [Y] / state timed out [Y] / heat [N] / smoke [N] / smoke-heat timeout [-]") {
     val events = Iterator.empty
 
-    val state: GroupState[ProblemState] = mock[GroupState[ProblemState]]
+    val state: GroupState[SparkFireAlarmState] = mock[GroupState[SparkFireAlarmState]]
     inSequence {
       inAnyOrder {
         (state.exists _)
@@ -367,7 +405,7 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
     val heatTimestamp = new Timestamp(1000L)
     val events = Iterator(heatEvent(heatTimestamp))
 
-    val state: GroupState[ProblemState] = mock[GroupState[ProblemState]]
+    val state: GroupState[SparkFireAlarmState] = mock[GroupState[SparkFireAlarmState]]
     inSequence {
       inAnyOrder {
         (state.exists _)
@@ -394,7 +432,7 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
     val smokeTimestamp = new Timestamp(1000L)
     val events = Iterator(smokeEvent(smokeTimestamp))
 
-    val state: GroupState[ProblemState] = mock[GroupState[ProblemState]]
+    val state: GroupState[SparkFireAlarmState] = mock[GroupState[SparkFireAlarmState]]
     inSequence {
       inAnyOrder {
         (state.exists _)
@@ -422,7 +460,7 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
     val smokeTimestamp = new Timestamp(2000L)
     val events = Iterator(heatEvent(heatTimestamp), smokeEvent(smokeTimestamp))
 
-    val state: GroupState[ProblemState] = mock[GroupState[ProblemState]]
+    val state: GroupState[SparkFireAlarmState] = mock[GroupState[SparkFireAlarmState]]
     inSequence {
       inAnyOrder {
         (state.exists _)
@@ -457,7 +495,7 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
     val events = (heatTimestamps.map(heatEvent) ++ smokeTimestamps.map(smokeEvent))
       .toIterator
 
-    val state: GroupState[ProblemState] = mock[GroupState[ProblemState]]
+    val state: GroupState[SparkFireAlarmState] = mock[GroupState[SparkFireAlarmState]]
     (state.exists _)
       .expects()
       .atLeastOnce()
@@ -480,14 +518,26 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
     val smokeTimestamps = Seq(20, 16, 25)
       .map(i => i * problemTimeoutMillis / 10)
       .map(millis => new Timestamp(millis))
-    val events = (heatTimestamps.map(heatEvent) ++ smokeTimestamps.map(smokeEvent))
+    val heatEvents = heatTimestamps.map(heatEvent)
+    val smokeEvents = smokeTimestamps.map(smokeEvent)
+    val events = (heatEvents ++ smokeEvents)
       .toIterator
 
-    val state: GroupState[ProblemState] = mock[GroupState[ProblemState]]
-    (state.exists _)
-      .expects()
-      .atLeastOnce()
-      .returns(false)
+    val state: GroupState[SparkFireAlarmState] = mock[GroupState[SparkFireAlarmState]]
+    inSequence {
+      (state.exists _)
+        .expects()
+        .atLeastOnce()
+        .returns(false)
+      inAnyOrder {
+        (state.update _)
+          .expects(fireAlarmState(heatEvents.sortBy(_.timestamp), smokeEvents.sortBy(_.timestamp)))
+          .once()
+        (state.setTimeoutTimestamp(_: Long))
+          .expects(smokeTimestamps.max.getTime + problemTimeoutMillis)
+          .once()
+      }
+    }
 
     val alarmStateFunction = new FireAlarmStateFunction(problemTimeoutMillis)
 
@@ -507,7 +557,7 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
     val events = (heatTimestamps.map(heatEvent) ++ smokeTimestamps.map(smokeEvent))
       .toIterator
 
-    val state: GroupState[ProblemState] = mock[GroupState[ProblemState]]
+    val state: GroupState[SparkFireAlarmState] = mock[GroupState[SparkFireAlarmState]]
     inSequence {
       inAnyOrder {
         (state.exists _)
@@ -522,7 +572,7 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
       (state.get _)
         .expects()
         .atLeastOnce()
-        .returns(heatProblemState(heat0Timestamp))
+        .returns(fireAlarmState(Seq(heatEvent(heat0Timestamp)), Seq()))
       (state.remove _)
         .expects()
         .once()
@@ -546,10 +596,12 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
     val smokeTimestamps = Seq(20, 16, 25)
       .map(i => i * problemTimeoutMillis / 10)
       .map(millis => new Timestamp(millis))
-    val events = (heatTimestamps.map(heatEvent) ++ smokeTimestamps.map(smokeEvent))
+    val heatEvents = heatTimestamps.map(heatEvent)
+    val smokeEvents = smokeTimestamps.map(smokeEvent)
+    val events = (heatEvents ++ smokeEvents)
       .toIterator
 
-    val state: GroupState[ProblemState] = mock[GroupState[ProblemState]]
+    val state: GroupState[SparkFireAlarmState] = mock[GroupState[SparkFireAlarmState]]
     inSequence {
       inAnyOrder {
         (state.exists _)
@@ -564,10 +616,15 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
       (state.get _)
         .expects()
         .atLeastOnce()
-        .returns(heatProblemState(heat0Timestamp))
-      (state.remove _)
-        .expects()
-        .once()
+        .returns(fireAlarmState(Seq(heatEvent(heat0Timestamp)), Seq()))
+      inAnyOrder {
+        (state.update _)
+          .expects(fireAlarmState(heatEvents.sortBy(_.timestamp), smokeEvents.sortBy(_.timestamp)))
+          .once()
+        (state.setTimeoutTimestamp(_: Long))
+          .expects(smokeTimestamps.max.getTime + problemTimeoutMillis)
+          .once()
+      }
     }
 
     val alarmStateFunction = new FireAlarmStateFunction(problemTimeoutMillis)

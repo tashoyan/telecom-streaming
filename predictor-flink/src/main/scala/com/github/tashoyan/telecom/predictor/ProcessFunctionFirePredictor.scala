@@ -1,7 +1,7 @@
 package com.github.tashoyan.telecom.predictor
 
 import com.github.tashoyan.telecom.event.FireAlarmUtil._
-import com.github.tashoyan.telecom.event.{Alarm, Event}
+import com.github.tashoyan.telecom.event.{Alarm, Event, FireAlarmState}
 import org.apache.flink.api.common.state.{ValueState, ValueStateDescriptor}
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction
 import org.apache.flink.streaming.api.scala.{DataStream, _}

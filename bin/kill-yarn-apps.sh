@@ -13,6 +13,8 @@ then
     exit 1
 fi
 
+export SPARK_DIST_CLASSPATH=$(hadoop classpath)
+
 app_name="$(basename $0)"
 spark-submit \
 --name "$app_name" \

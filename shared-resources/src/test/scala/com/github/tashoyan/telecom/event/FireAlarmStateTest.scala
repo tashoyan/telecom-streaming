@@ -50,4 +50,42 @@ class FireAlarmStateTest extends FunSuite with Inside {
     }
   }
 
+  test("maxTimestamp - heatEvents non-empty, smoke events non-empty") {
+    val fireAlarmState = new FireAlarmState()
+      .update(Iterator(
+        Event(timestamp = 100L, siteId, eventSeverity, smokeInfo),
+        Event(timestamp = 500L, siteId, eventSeverity, heatInfo),
+        Event(timestamp = 800L, siteId, eventSeverity, heatInfo),
+        Event(timestamp = 900L, siteId, eventSeverity, smokeInfo)
+      ))
+    val result = fireAlarmState.maxTimestamp
+    result should be(Some(900L))
+  }
+
+  test("maxTimestamp - heatEvents empty, smoke events non-empty") {
+    val fireAlarmState = new FireAlarmState()
+      .update(Iterator(
+        Event(timestamp = 100L, siteId, eventSeverity, smokeInfo),
+        Event(timestamp = 900L, siteId, eventSeverity, smokeInfo)
+      ))
+    val result = fireAlarmState.maxTimestamp
+    result should be(Some(900L))
+  }
+
+  test("maxTimestamp - heatEvents non-empty, smoke events empty") {
+    val fireAlarmState = new FireAlarmState()
+      .update(Iterator(
+        Event(timestamp = 500L, siteId, eventSeverity, heatInfo),
+        Event(timestamp = 800L, siteId, eventSeverity, heatInfo)
+      ))
+    val result = fireAlarmState.maxTimestamp
+    result should be(Some(800L))
+  }
+
+  test("maxTimestamp - heatEvents empty, smoke events empty") {
+    val fireAlarmState = new FireAlarmState()
+    val result = fireAlarmState.maxTimestamp
+    result should be(None)
+  }
+
 }

@@ -49,10 +49,13 @@ class FireAlarmState private (heatEvents: mutable.SortedSet[Event], smokeEvents:
   def maxTimestamp: Option[Long] = {
     val maxHeatTimestamp = heatEvents.lastOption.map(_.timestamp)
     val maxSmokeTimestamp = smokeEvents.lastOption.map(_.timestamp)
-    for {
+    val maxTs = for {
       heatTs <- maxHeatTimestamp
       smokeTs <- maxSmokeTimestamp
     } yield math.max(heatTs, smokeTs)
+    maxTs
+      .orElse(maxHeatTimestamp)
+      .orElse(maxSmokeTimestamp)
   }
 
   def getHeatEvents: Seq[Event] =

@@ -7,6 +7,7 @@ TODO Align settings for Spark and Flink implementation.
 case class FlinkPredictorConfig(
     kafkaBrokers: String = "",
     kafkaEventTopic: String = "",
+    checkpointDir: String = "",
     kafkaAlarmTopic: String = "",
     watermarkIntervalMillis: Long = 0,
     problemTimeoutMillis: Long = 0

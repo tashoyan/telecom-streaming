@@ -27,6 +27,16 @@ trait FlinkPredictorArgParser {
       }
       .text("Kafka topic to receive events from")
 
+    opt[String]("checkpoint-dir")
+      .required()
+      .valueName("<path>")
+      .action((value, conf) => conf.copy(checkpointDir = value))
+      .validate { value =>
+        if (value.isEmpty) failure("Checkpoint directory must not be empty string")
+        else success
+      }
+      .text(s"Checkpoint directory on HDFS.")
+
     opt[String]("kafka-alarm-topic")
       .required()
       .valueName("<topic>")

@@ -4,6 +4,10 @@ import java.util.{Optional, Properties}
 
 import com.github.tashoyan.telecom.event.Alarm
 import com.github.tashoyan.telecom.flink.{AlarmSerializationSchema, KafkaFlinkEventReceiver}
+import org.apache.flink.api.common.restartstrategy.RestartStrategies
+import org.apache.flink.api.common.time.Time
+import org.apache.flink.runtime.state.StateBackend
+import org.apache.flink.runtime.state.filesystem.FsStateBackend
 import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer
@@ -48,6 +52,14 @@ object FlinkPredictorMain extends FlinkPredictorArgParser {
 
     implicit val env: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
+    /*Restart strategies: https://ci.apache.org/projects/flink/flink-docs-release-1.7/dev/restart_strategies.html*/
+    val restartAttempts = 3
+    val restartTimeoutSeconds = 5L
+    env.setRestartStrategy(RestartStrategies.fixedDelayRestart(restartAttempts, Time.seconds(restartTimeoutSeconds)))
+    /*State backend: https://ci.apache.org/projects/flink/flink-docs-release-1.7/ops/state/state_backends.html*/
+    val stateBackend: StateBackend = new FsStateBackend(config.checkpointDir)
+    env.setStateBackend(stateBackend)
+
     val eventReceiver = new KafkaFlinkEventReceiver(config.kafkaBrokers, config.kafkaEventTopic)
     val events = eventReceiver.receiveEvents()
 

@@ -7,6 +7,7 @@ set -o pipefail
 kafka_brokers="$(hostname):9092"
 kafka_event_topic="events"
 kafka_alarm_topic="alarms"
+checkpoint_dir="hdfs:///stream/checkpoint-predictor-flink"
 watermark_interval_millis=$((2 * 60 * 1000))
 problem_timeout_millis=$((20 * 1000))
 
@@ -18,6 +19,8 @@ then
 fi
 
 export HADOOP_CLASSPATH=$(hadoop classpath)
+
+hdfs dfs -test -e "$checkpoint_dir" && hdfs dfs -rm -r -skipTrash "$checkpoint_dir"
 
 app_name="$(basename $0)"
 flink run \
@@ -32,5 +35,6 @@ flink run \
 --kafka-brokers "$kafka_brokers" \
 --kafka-event-topic "$kafka_event_topic" \
 --kafka-alarm-topic "$kafka_alarm_topic" \
+--checkpoint-dir "$checkpoint_dir" \
 --watermark-interval-millis "$watermark_interval_millis" \
 --problem-timeout-millis "$problem_timeout_millis"

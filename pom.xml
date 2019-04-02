@@ -157,6 +157,11 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.flink</groupId>
+                <artifactId>flink-runtime_${compiler.scala.compat.version}</artifactId>
+                <version>${flink.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.flink</groupId>
                 <artifactId>flink-scala_${compiler.scala.compat.version}</artifactId>
                 <version>${flink.version}</version>
             </dependency>

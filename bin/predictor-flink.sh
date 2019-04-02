@@ -21,13 +21,13 @@ export HADOOP_CLASSPATH=$(hadoop classpath)
 
 app_name="$(basename $0)"
 flink run \
--ynm "$app_name" \
--m yarn-cluster \
--p 10 \
--ys 2 \
--yjm 1G \
--ytm 2G \
--c com.github.tashoyan.telecom.predictor.FlinkPredictorMain \
+-yarnname "$app_name" \
+--jobmanager yarn-cluster \
+--parallelism 10 \
+--yarnslots 2 \
+--yarnjobManagerMemory 1G \
+--yarntaskManagerMemory 2G \
+--class com.github.tashoyan.telecom.predictor.FlinkPredictorMain \
 "$jar_file" \
 --kafka-brokers "$kafka_brokers" \
 --kafka-event-topic "$kafka_event_topic" \

@@ -23,10 +23,10 @@ app_name="$(basename $0)"
 flink run \
 -yarnname "$app_name" \
 --jobmanager yarn-cluster \
---parallelism 10 \
+--parallelism 4 \
 --yarnslots 2 \
---yarnjobManagerMemory 1G \
 --yarntaskManagerMemory 2G \
+--yarnjobManagerMemory 1G \
 --class com.github.tashoyan.telecom.predictor.FlinkPredictorMain \
 "$jar_file" \
 --kafka-brokers "$kafka_brokers" \

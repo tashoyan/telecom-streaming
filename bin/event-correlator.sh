@@ -33,12 +33,12 @@ spark-submit \
 --master yarn \
 --deploy-mode cluster \
 --conf spark.yarn.maxAppAttempts=1 \
---conf spark.executor.instances=5 \
---conf spark.sql.shuffle.partitions=5 \
+--conf spark.executor.instances=2 \
+--conf spark.executor.cores=2 \
+--conf spark.executor.memory=2g \
+--conf spark.sql.shuffle.partitions=20 \
 --conf spark.driver.memory=1g \
 --conf spark.driver.cores=2 \
---conf spark.executor.memory=2g \
---conf spark.executor.cores=2 \
 --class com.github.tashoyan.telecom.correlator.EventCorrelatorMain \
 "$jar_file" \
 --topology-file "$topology_file" \

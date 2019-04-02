@@ -37,8 +37,8 @@ Some references:
 1. Make sure that Zookeeper and Kafka are running.
 1. Create the `events` and `alarms` Kafka topics:
    ```bash
-   kafka-topics.sh --zookeeper localhost:2181 --create --topic events --partitions 5 --replication-factor 1
-   kafka-topics.sh --zookeeper localhost:2181 --create --topic alarms --partitions 5 --replication-factor 1
+   kafka-topics.sh --zookeeper localhost:2181 --create --topic events --partitions 4 --replication-factor 1
+   kafka-topics.sh --zookeeper localhost:2181 --create --topic alarms --partitions 4 --replication-factor 1
    ```
 
 ## Running applications

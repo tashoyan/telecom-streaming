@@ -7,7 +7,7 @@ set -o pipefail
 kafka_brokers="$(hostname):9092"
 kafka_event_topic="events"
 kafka_alarm_topic="alarms"
-watermark_interval_millis=$((10 * 60 * 1000))
+watermark_interval_millis=$((2 * 60 * 1000))
 problem_timeout_millis=$((20 * 1000))
 
 jar_file="$(ls predictor-flink/target/predictor-flink-*.jar | grep -vi javadoc || true)"

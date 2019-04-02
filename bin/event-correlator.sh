@@ -9,7 +9,7 @@ kafka_brokers="$(hostname):9092"
 kafka_event_topic="events"
 kafka_alarm_topic="alarms"
 checkpoint_dir="/stream/checkpoint-correlator"
-watermark_interval_millis=$((10 * 60 * 1000))
+watermark_interval_millis=$((2 * 60 * 1000))
 window_size_millis=$((60 * 1000))
 window_slide_millis=$((30 * 1000))
 

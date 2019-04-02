@@ -8,7 +8,7 @@ kafka_brokers="$(hostname):9092"
 kafka_event_topic="events"
 kafka_alarm_topic="alarms"
 checkpoint_dir="/stream/checkpoint-predictor-spark"
-watermark_interval_millis=$((10 * 60 * 1000))
+watermark_interval_millis=$((2 * 60 * 1000))
 problem_timeout_millis=$((20 * 1000))
 
 jar_file="$(ls predictor-spark/target/predictor-spark-*.jar | grep -vi javadoc || true)"

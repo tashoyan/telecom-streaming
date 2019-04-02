@@ -8,7 +8,7 @@ kafka_brokers="$(hostname):9092"
 kafka_topic="events"
 checkpoint_dir="/stream/checkpoint-writer"
 output_dir="/stream/output"
-watermark_interval_millis=$((10 * 60 * 1000))
+watermark_interval_millis=$((2 * 60 * 1000))
 
 jar_file="$(ls writer/target/writer-*.jar | grep -vi javadoc || true)"
 if test -z "$jar_file"

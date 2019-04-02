@@ -47,6 +47,7 @@ class ProcessFunctionFirePredictor(
         state.clear()
       }
     }
+
   }
 
   override def predictAlarms(events: DataStream[Event]): DataStream[Alarm] = {

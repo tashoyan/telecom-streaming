@@ -24,17 +24,9 @@ class ProcessFunctionFirePredictor(
     }
 
     override def processElement(event: Event, ctx: KeyedProcessFunction[Long, Event, Alarm]#Context, out: Collector[Alarm]): Unit = {
-      val fireAlarmState = state.value() match {
-        /*
-        This is the contract: return null if no state yet.
-        */
-        //scalastyle:off null
-        case null =>
-          //scalastyle:on
-          new FireAlarmState().update(Iterator(event))
-        case previousFireAlarmState =>
-          previousFireAlarmState.update(Iterator(event))
-      }
+      val previousFireAlarmState = Option(state.value())
+        .getOrElse(new FireAlarmState())
+      val fireAlarmState = previousFireAlarmState.update(Iterator(event))
       state.update(fireAlarmState)
       ctx.timerService().registerEventTimeTimer(event.timestamp + eventOutOfOrdernessMillis0)
     }

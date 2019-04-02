@@ -4,6 +4,7 @@ import java.util.{Optional, Properties}
 
 import com.github.tashoyan.telecom.event.Alarm
 import com.github.tashoyan.telecom.flink.{AlarmSerializationSchema, KafkaFlinkEventReceiver}
+import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer
 import org.apache.flink.streaming.connectors.kafka.partitioner.FlinkKafkaPartitioner
@@ -46,10 +47,11 @@ object FlinkPredictorMain extends FlinkPredictorArgParser {
     println(config)
 
     implicit val env: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
+    env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
     val eventReceiver = new KafkaFlinkEventReceiver(config.kafkaBrokers, config.kafkaEventTopic)
     val events = eventReceiver.receiveEvents()
 
-    val firePredictor = new IntervalJoinFirePredictor(config.problemTimeoutMillis, config.watermarkIntervalMillis)
+    val firePredictor = new CepFirePredictor(config.problemTimeoutMillis, config.watermarkIntervalMillis)
     val alarms = firePredictor.predictAlarms(events)
 
     val producerProps = new Properties

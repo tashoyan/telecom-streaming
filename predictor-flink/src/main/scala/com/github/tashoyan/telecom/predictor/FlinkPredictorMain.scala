@@ -1,5 +1,6 @@
 package com.github.tashoyan.telecom.predictor
 
+import java.util.concurrent.TimeUnit
 import java.util.{Optional, Properties}
 
 import com.github.tashoyan.telecom.event.Alarm
@@ -8,8 +9,8 @@ import org.apache.flink.api.common.restartstrategy.RestartStrategies
 import org.apache.flink.api.common.time.Time
 import org.apache.flink.runtime.state.StateBackend
 import org.apache.flink.runtime.state.filesystem.FsStateBackend
-import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
+import org.apache.flink.streaming.api.{CheckpointingMode, TimeCharacteristic}
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer
 import org.apache.flink.streaming.connectors.kafka.partitioner.FlinkKafkaPartitioner
 import org.apache.kafka.clients.producer.ProducerConfig
@@ -52,10 +53,18 @@ object FlinkPredictorMain extends FlinkPredictorArgParser {
 
     implicit val env: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
+
+    /*Checkpointing: https://ci.apache.org/projects/flink/flink-docs-release-1.7/dev/stream/state/checkpointing.html*/
+    val checkpointIntervalSeconds = 5L
+    env.enableCheckpointing(TimeUnit.SECONDS.toMillis(checkpointIntervalSeconds))
+    env.getCheckpointConfig.setCheckpointingMode(CheckpointingMode.EXACTLY_ONCE)
+    env.getCheckpointConfig.setMinPauseBetweenCheckpoints(TimeUnit.SECONDS.toMillis(checkpointIntervalSeconds / 2))
+
     /*Restart strategies: https://ci.apache.org/projects/flink/flink-docs-release-1.7/dev/restart_strategies.html*/
     val restartAttempts = 3
     val restartTimeoutSeconds = 5L
     env.setRestartStrategy(RestartStrategies.fixedDelayRestart(restartAttempts, Time.seconds(restartTimeoutSeconds)))
+
     /*State backend: https://ci.apache.org/projects/flink/flink-docs-release-1.7/ops/state/state_backends.html*/
     val stateBackend: StateBackend = new FsStateBackend(config.checkpointDir)
     env.setStateBackend(stateBackend)

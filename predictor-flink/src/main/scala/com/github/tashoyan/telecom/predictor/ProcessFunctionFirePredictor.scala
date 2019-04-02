@@ -16,6 +16,10 @@ class ProcessFunctionFirePredictor(
     private implicit val problemTimeoutMillis0: Long = problemTimeoutMillis
     private val eventOutOfOrdernessMillis0 = eventOutOfOrdernessMillis
 
+    /*
+    Working with state:
+     https://ci.apache.org/projects/flink/flink-docs-release-1.7/dev/stream/state/state.html
+    */
     private lazy val state: ValueState[FireAlarmState] = {
       val stateName = classOf[FireAlarmState].getSimpleName
       val stateDescriptor = new ValueStateDescriptor[FireAlarmState](stateName, classOf[FireAlarmState])

@@ -11,7 +11,7 @@ import org.apache.flink.util.Collector
 
 /**
   * Fire predictor implemented with
-  * <a href="https://ci.apache.org/projects/flink/flink-docs-release-1.7/dev/stream/operators/joining.html#interval-join">interval join</a>.
+  * Flink [[https://ci.apache.org/projects/flink/flink-docs-release-1.7/dev/stream/operators/joining.html#interval-join interval join]].
   * <p>
   * A stream of heat events is joined with a stream of smoke events
   * with interval of (heat timestamp, heat timestamp + problem timeout),
@@ -22,9 +22,11 @@ import org.apache.flink.util.Collector
   * <p>
   * Deduplication occurs thanks to taking the first occurrence of each (heat, smoke) event pair.
   *
-  * @param problemTimeoutMillis      Problem timeout interval in milliseconds.
-  *                                  If a heat event is followed by a smoke event not later than after this timeout, then an alarm is generated.
-  * @param eventOutOfOrdernessMillis Max time interval when events may come out of order.
+  * @param problemTimeoutMillis      Problem timeout in milliseconds.
+  *                                  If the interval between a heat event and a smoke event exceeds this timeout,
+  *                                  these two events are considered as uncorrelated.
+  * @param eventOutOfOrdernessMillis Out-of-orderness interval in milliseconds.
+  *                                  Events may come to the processor in a wrong order, but only within this time interval.
   */
 class IntervalJoinFirePredictor(
     override val problemTimeoutMillis: Long,

@@ -11,6 +11,20 @@ import org.apache.flink.streaming.api.windowing.time.Time
 
 import scala.collection.Map
 
+/**
+  * Fire Predictor implementation based on
+  * Flink [[https://ci.apache.org/projects/flink/flink-docs-release-1.7/dev/libs/cep.html CEP library]].
+  * <p>
+  * <b>Deduplication</b>
+  * <p>
+  * Just taking the first set of events matching the alarm pattern.
+  *
+  * @param problemTimeoutMillis      Problem timeout in milliseconds.
+  *                                  If the interval between a heat event and a smoke event exceeds this timeout,
+  *                                  these two events are considered as uncorrelated.
+  * @param eventOutOfOrdernessMillis Out-of-orderness interval in milliseconds.
+  *                                  Events may come to the processor in a wrong order, but only within this time interval.
+  */
 class CepFirePredictor(
     override val problemTimeoutMillis: Long,
     eventOutOfOrdernessMillis: Long

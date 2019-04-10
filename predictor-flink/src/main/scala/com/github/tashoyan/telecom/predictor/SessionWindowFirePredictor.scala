@@ -15,7 +15,7 @@ import scala.collection.mutable
 
 /**
   * Fire predictor based on
-  * <a href="https://ci.apache.org/projects/flink/flink-docs-release-1.7/dev/stream/operators/windows.html#session-windows"> session windows</a>.
+  * Flink [[https://ci.apache.org/projects/flink/flink-docs-release-1.7/dev/stream/operators/windows.html#session-windows session windows]].
   * <p>
   * A session window is created for each heat event.
   * If a smoke event occurs after a heat event,
@@ -33,9 +33,11 @@ import scala.collection.mutable
   * within each session window.
   * Makes no sense to introduce a separate deduplication step.
   *
-  * @param problemTimeoutMillis      Problem timeout interval in milliseconds.
-  *                                  If a heat event is followed by a smoke event not later than after this timeout, then an alarm is generated.
-  * @param eventOutOfOrdernessMillis Max time interval when events may come out of order.
+  * @param problemTimeoutMillis      Problem timeout in milliseconds.
+  *                                  If the interval between a heat event and a smoke event exceeds this timeout,
+  *                                  these two events are considered as uncorrelated.
+  * @param eventOutOfOrdernessMillis Out-of-orderness interval in milliseconds.
+  *                                  Events may come to the processor in a wrong order, but only within this time interval.
   */
 class SessionWindowFirePredictor(
     override val problemTimeoutMillis: Long,

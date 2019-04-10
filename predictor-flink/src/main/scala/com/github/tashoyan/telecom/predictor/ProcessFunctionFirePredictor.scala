@@ -7,6 +7,20 @@ import org.apache.flink.streaming.api.functions.KeyedProcessFunction
 import org.apache.flink.streaming.api.scala.{DataStream, _}
 import org.apache.flink.util.Collector
 
+/**
+  * Fire Predictor implementation based on
+  * Flink [[https://ci.apache.org/projects/flink/flink-docs-release-1.7/dev/stream/operators/process_function.html ProcessFunction API]].
+  * <p>
+  * <b>Deduplication</b>
+  * <p>
+  * The implementation of the [[FireAlarmState]] is responsible for events deduplication.
+  *
+  * @param problemTimeoutMillis      Problem timeout in milliseconds.
+  *                                  If the interval between a heat event and a smoke event exceeds this timeout,
+  *                                  these two events are considered as uncorrelated.
+  * @param eventOutOfOrdernessMillis Out-of-orderness interval in milliseconds.
+  *                                  Events may come to the processor in a wrong order, but only within this time interval.
+  */
 class ProcessFunctionFirePredictor(
     override val problemTimeoutMillis: Long,
     eventOutOfOrdernessMillis: Long

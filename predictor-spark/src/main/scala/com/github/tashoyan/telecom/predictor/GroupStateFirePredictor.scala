@@ -6,6 +6,17 @@ import com.github.tashoyan.telecom.spark.SparkEvent
 import org.apache.spark.sql.streaming.{GroupStateTimeout, OutputMode}
 import org.apache.spark.sql.{Dataset, SparkSession}
 
+/**
+  * Fire Predictor implementation based on
+  * Spark [[https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.streaming.GroupState GroupState API]].
+  *
+  * @param problemTimeoutMillis    Problem timeout in milliseconds.
+  *                                If the interval between a heat event and a smoke event exceeds this timeout,
+  *                                these two events are considered as uncorrelated.
+  * @param watermarkIntervalMillis Watermark interval in milliseconds.
+  *                                Used by Spark for grouping aggregation on the stream of events.
+  * @param spark                   Spark session.
+  */
 class GroupStateFirePredictor(
     override val problemTimeoutMillis: Long,
     val watermarkIntervalMillis: Long

@@ -42,7 +42,7 @@
         <maven-shade-plugin.version>3.1.1</maven-shade-plugin.version>
         <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
         <maven-surefire-plugin.version>2.21.0</maven-surefire-plugin.version>
-        <scalariform-maven-plugin.version>0.2.2</scalariform-maven-plugin.version>
+        <scalariform-maven-plugin.version>0.2.3</scalariform-maven-plugin.version>
         <scalastyle-maven-plugin.version>1.0.0</scalastyle-maven-plugin.version>
         <scalatest-maven-plugin.version>2.0.0</scalatest-maven-plugin.version>
 
@@ -553,6 +553,7 @@
                         <placeScaladocAsterisksBeneathSecondAsterisk>true</placeScaladocAsterisksBeneathSecondAsterisk>
                         <singleCasePatternOnNewline>false</singleCasePatternOnNewline>
                         <spacesAroundMultiImports>false</spacesAroundMultiImports>
+                        <useUnicodeArrows>false</useUnicodeArrows>
                     </configuration>
                 </plugin>
 

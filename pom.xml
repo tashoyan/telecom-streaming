@@ -882,7 +882,7 @@
                         <executions>
                             <execution>
                                 <id>scalastyle</id>
-                                <phase>process-sources</phase>
+                                <phase>verify</phase>
                                 <goals>
                                     <goal>check</goal>
                                 </goals>

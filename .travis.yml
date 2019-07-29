@@ -1,7 +1,7 @@
 language: java
 dist: trusty
 install: true
-script: mvn clean install
+script: mvn clean install > /dev/null
 jdk:
   - oraclejdk8
 #cache:

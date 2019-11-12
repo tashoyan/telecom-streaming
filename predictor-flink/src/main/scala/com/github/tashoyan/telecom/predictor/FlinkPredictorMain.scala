@@ -84,6 +84,7 @@ object FlinkPredictorMain extends FlinkPredictorArgParser {
       /* Partition according to keys defined by the serialization schema */
       Optional.empty[FlinkKafkaPartitioner[Alarm]]()
     )
+    // TODO After migration from KeyedSerializationSchema to KafkaSerializationSchema, this seems useless - use timestamp in the ProducerRecord instead
     kafkaProducer.setWriteTimestampToKafka(true)
     alarms.addSink(kafkaProducer)
 

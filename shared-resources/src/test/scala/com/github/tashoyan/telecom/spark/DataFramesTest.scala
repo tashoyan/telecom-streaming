@@ -1,14 +1,15 @@
 package com.github.tashoyan.telecom.spark
 
+import java.io.StringWriter
 import java.sql.Timestamp
 import java.time.{ZoneId, ZonedDateTime}
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.github.tashoyan.telecom.spark.DataFrames.RichDataFrame
 import com.github.tashoyan.telecom.test.SparkTestHarness
 import org.apache.spark.sql.types._
 import org.scalatest.FunSuite
-
-import scala.util.parsing.json.{JSON, JSONObject}
 
 class DataFramesTest extends FunSuite with SparkTestHarness {
 
@@ -31,9 +32,8 @@ class DataFramesTest extends FunSuite with SparkTestHarness {
     val jsonStr = resultDf.select("json_column")
       .as[String]
       .head()
-    val parsedResult = JSON.parseFull(jsonStr)
-      .get
-      .asInstanceOf[Map[String, Any]]
+
+    val parsedResult = jsonToMap(jsonStr)
     assert(parsedResult("int_column") === 1)
     assert(parsedResult("long_column") === 10L)
     assert(parsedResult("double_column") === 2.5)
@@ -56,15 +56,14 @@ class DataFramesTest extends FunSuite with SparkTestHarness {
       StructField("string_column", StringType),
       StructField("timestamp_column", TimestampType)
     ))
-    val sampleStr = Map[String, Any](
+    val sample = Map[String, Any](
       "int_column" -> 1,
       "long_column" -> 10L,
       "double_column" -> 2.5,
       "string_column" -> "one",
       "timestamp_column" -> "1970-01-01T00:00:01.001Z"
     )
-    val sampleJson = JSONObject(sampleStr)
-      .toString()
+    val sampleJson = mapToJson(sample)
 
     val sampleDf = Seq(
       ("something", sampleJson)
@@ -83,6 +82,21 @@ class DataFramesTest extends FunSuite with SparkTestHarness {
     assert(result.getAs[Double]("double_column") === 2.5)
     assert(result.getAs[String]("string_column") === "one")
     assert(result.getAs[Timestamp]("timestamp_column") === new Timestamp(1001L))
+  }
+
+  private val mapper: ObjectMapper = {
+    new ObjectMapper()
+      .registerModule(DefaultScalaModule)
+  }
+
+  private def jsonToMap(json: String): Map[String, Any] = {
+    mapper.readValue(json, classOf[Map[String, Any]])
+  }
+
+  private def mapToJson(map: Map[String, Any]): String = {
+    val out = new StringWriter()
+    mapper.writeValue(out, map)
+    out.toString
   }
 
 }

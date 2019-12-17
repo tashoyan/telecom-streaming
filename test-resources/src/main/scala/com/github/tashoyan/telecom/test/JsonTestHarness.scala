@@ -9,10 +9,9 @@ import org.scalatest.matchers.{MatchResult, Matcher}
 
 trait JsonTestHarness {
 
-  private val mapper: ObjectMapper = {
+  private val mapper: ObjectMapper =
     new ObjectMapper()
       .registerModule(DefaultScalaModule)
-  }
 
   protected def jsonToMap(json: String): Map[String, Any] = {
     mapper.readValue(json, classOf[Map[String, Any]])

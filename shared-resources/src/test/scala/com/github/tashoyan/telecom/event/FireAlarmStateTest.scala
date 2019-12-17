@@ -22,8 +22,8 @@ class FireAlarmStateTest extends FunSuite with Inside {
     val alarm = fireAlarmState.getFireAlarm.get
     inside(alarm) { case Alarm(timestamp, objectId, severity, info) =>
       timestamp shouldBe 500L
-      objectId should be(siteId)
-      severity should be(alarmSeverity)
+      objectId shouldBe siteId
+      severity shouldBe alarmSeverity
       info should startWith(s"Fire on site $siteId")
       info should include regex s"(?i)first\\s+heat\\s+at\\s+"
       info should include(formattedTimestamp(100L))
@@ -41,8 +41,8 @@ class FireAlarmStateTest extends FunSuite with Inside {
     val alarm = fireAlarmState.getFireAlarm.get
     inside(alarm) { case Alarm(timestamp, objectId, severity, info) =>
       timestamp shouldBe 900L
-      objectId should be(siteId)
-      severity should be(alarmSeverity)
+      objectId shouldBe siteId
+      severity shouldBe alarmSeverity
       info should startWith(s"Fire on site $siteId")
       info should include regex s"(?i)first\\s+heat\\s+at\\s+"
       info should include(formattedTimestamp(800L))
@@ -58,7 +58,7 @@ class FireAlarmStateTest extends FunSuite with Inside {
         Event(timestamp = 900L, siteId, eventSeverity, smokeInfo)
       ))
     val result = fireAlarmState.maxTimestamp
-    result should be(Some(900L))
+    result shouldBe Some(900L)
   }
 
   test("maxTimestamp - heatEvents empty, smoke events non-empty") {
@@ -68,7 +68,7 @@ class FireAlarmStateTest extends FunSuite with Inside {
         Event(timestamp = 900L, siteId, eventSeverity, smokeInfo)
       ))
     val result = fireAlarmState.maxTimestamp
-    result should be(Some(900L))
+    result shouldBe Some(900L)
   }
 
   test("maxTimestamp - heatEvents non-empty, smoke events empty") {
@@ -78,13 +78,13 @@ class FireAlarmStateTest extends FunSuite with Inside {
         Event(timestamp = 800L, siteId, eventSeverity, heatInfo)
       ))
     val result = fireAlarmState.maxTimestamp
-    result should be(Some(800L))
+    result shouldBe Some(800L)
   }
 
   test("maxTimestamp - heatEvents empty, smoke events empty") {
     val fireAlarmState = new FireAlarmState()
     val result = fireAlarmState.maxTimestamp
-    result should be(None)
+    result shouldBe None
   }
 
 }

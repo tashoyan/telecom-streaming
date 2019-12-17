@@ -106,8 +106,8 @@ abstract class AbstractFirePredictorTest extends AbstractTestBase with JUnitSuit
     val alarm = result.head
     inside(alarm) { case Alarm(timestamp, objectId, severity, info) =>
       timestamp shouldBe 500L
-      objectId should be(siteId)
-      severity should be(alarmSeverity)
+      objectId shouldBe siteId
+      severity shouldBe alarmSeverity
       info should startWith(s"Fire on site $siteId")
       info should include regex s"(?i)first\\s+heat\\s+at\\s+"
       info should include(formattedTimestamp(100L))
@@ -188,8 +188,8 @@ abstract class AbstractFirePredictorTest extends AbstractTestBase with JUnitSuit
     val alarm = result.head
     inside(alarm) { case Alarm(timestamp, objectId, severity, info) =>
       timestamp shouldBe 800L
-      objectId should be(siteId)
-      severity should be(alarmSeverity)
+      objectId shouldBe siteId
+      severity shouldBe alarmSeverity
       info should startWith(s"Fire on site $siteId")
       info should include regex s"(?i)first\\s+heat\\s+at\\s+"
       info should include(formattedTimestamp(100L))
@@ -216,8 +216,8 @@ abstract class AbstractFirePredictorTest extends AbstractTestBase with JUnitSuit
     val alarm = result.head
     inside(alarm) { case Alarm(timestamp, objectId, severity, info) =>
       timestamp shouldBe 1800L
-      objectId should be(siteId)
-      severity should be(alarmSeverity)
+      objectId shouldBe siteId
+      severity shouldBe alarmSeverity
       info should startWith(s"Fire on site $siteId")
       info should include regex s"(?i)first\\s+heat\\s+at\\s+"
       info should include(formattedTimestamp(1500L))
@@ -263,8 +263,8 @@ abstract class AbstractFirePredictorTest extends AbstractTestBase with JUnitSuit
     val alarm = result.head
     inside(alarm) { case Alarm(timestamp, objectId, severity, info) =>
       timestamp shouldBe 500L
-      objectId should be(siteId)
-      severity should be(alarmSeverity)
+      objectId shouldBe siteId
+      severity shouldBe alarmSeverity
       info should startWith(s"Fire on site $siteId")
       info should include regex s"(?i)first\\s+heat\\s+at\\s+"
       info should include(formattedTimestamp(100L))
@@ -311,8 +311,8 @@ abstract class AbstractFirePredictorTest extends AbstractTestBase with JUnitSuit
     val alarm = result.head
     inside(alarm) { case Alarm(timestamp, objectId, severity, info) =>
       timestamp shouldBe 900L
-      objectId should be(siteId)
-      severity should be(alarmSeverity)
+      objectId shouldBe siteId
+      severity shouldBe alarmSeverity
       info should startWith(s"Fire on site $siteId")
       info should include regex s"(?i)first\\s+heat\\s+at\\s+"
       info should include(formattedTimestamp(800L))
@@ -342,8 +342,8 @@ abstract class AbstractFirePredictorTest extends AbstractTestBase with JUnitSuit
     val alarm = result.head
     inside(alarm) { case Alarm(timestamp, objectId, severity, info) =>
       timestamp shouldBe zero + 900L
-      objectId should be(siteId)
-      severity should be(alarmSeverity)
+      objectId shouldBe siteId
+      severity shouldBe alarmSeverity
       info should startWith(s"Fire on site $siteId")
       info should include regex s"(?i)first\\s+heat\\s+at\\s+"
       info should include(formattedTimestamp(zero + 800L))

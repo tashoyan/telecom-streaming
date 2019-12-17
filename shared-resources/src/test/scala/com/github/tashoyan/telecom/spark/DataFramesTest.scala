@@ -30,10 +30,10 @@ class DataFramesTest extends FunSuite with SparkTestHarness with JsonTestHarness
       .head()
 
     val parsedResult = jsonToMap(jsonStr)
-    assert(parsedResult("int_column") === 1)
-    assert(parsedResult("long_column") === 10L)
-    assert(parsedResult("double_column") === 2.5)
-    assert(parsedResult("string_column") === "one")
+    parsedResult("int_column") shouldBe 1
+    parsedResult("long_column") shouldBe 10L
+    parsedResult("double_column") shouldBe 2.5
+    parsedResult("string_column") shouldBe "one"
     parsedResult("timestamp_column") should matchEpochMillis(1001L)
   }
 
@@ -67,13 +67,13 @@ class DataFramesTest extends FunSuite with SparkTestHarness with JsonTestHarness
     assert(resultDf.count() === 1, "Same count as on input")
 
     val result = resultDf.head()
-    assert(result.getAs[String]("some_column") === "something")
-    assert(result.getAs[String]("json_column") === sampleJson)
-    assert(result.getAs[Int]("int_column") === 1)
-    assert(result.getAs[Long]("long_column") === 10L)
-    assert(result.getAs[Double]("double_column") === 2.5)
-    assert(result.getAs[String]("string_column") === "one")
-    assert(result.getAs[Timestamp]("timestamp_column") === new Timestamp(1001L))
+    result.getAs[String]("some_column") shouldBe "something"
+    result.getAs[String]("json_column") shouldBe sampleJson
+    result.getAs[Int]("int_column") shouldBe 1
+    result.getAs[Long]("long_column") shouldBe 10L
+    result.getAs[Double]("double_column") shouldBe 2.5
+    result.getAs[String]("string_column") shouldBe "one"
+    result.getAs[Timestamp]("timestamp_column") shouldBe new Timestamp(1001L)
   }
 
 }

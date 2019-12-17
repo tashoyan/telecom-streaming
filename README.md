@@ -17,7 +17,7 @@ The following software is needed to run the applications provided in the `bin` d
 The local machine:
 * Spark 2.4.4 built with Scala 2.12
 * Spark executables (for example,`spark-submit`) in the PATH
-* Flink 1.7.2 built with Scala 2.12
+* Flink 1.9.1 built with Scala 2.12
 * Flink executables (for example,`flink`) in the PATH
 * Hadoop client distribution version 2.7.x
 * Hadoop executables (for example, `hadoop` or `hdfs`) in the PATH
@@ -30,7 +30,7 @@ Remote dependencies:
 Some references:
 * [Running Spark on YARN](http://spark.apache.org/docs/latest/running-on-yarn.html)
 * [Using Spark's "Hadoop Free" Build](https://spark.apache.org/docs/latest/hadoop-provided.html) - this is relevant for Spark distribution built without Hadoop
-* [Flink YARN Setup](https://ci.apache.org/projects/flink/flink-docs-release-1.7/ops/deployment/yarn_setup.html)
+* [Flink YARN Setup](https://ci.apache.org/projects/flink/flink-docs-release-1.9/ops/deployment/yarn_setup.html)
 
 ## Preparing Kafka
 

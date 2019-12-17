@@ -1,8 +1,7 @@
 package com.github.tashoyan.telecom.predictor
 
-import java.sql.Timestamp
-
 import com.github.tashoyan.telecom.event.{Alarm, Event}
+import com.github.tashoyan.telecom.util.Timestamps.formattedTimestamp
 import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.scala.{DataStreamUtils, StreamExecutionEnvironment, _}
 import org.apache.flink.test.util.AbstractTestBase
@@ -106,12 +105,12 @@ abstract class AbstractFirePredictorTest extends AbstractTestBase with JUnitSuit
     result should have length 1
     val alarm = result.head
     inside(alarm) { case Alarm(timestamp, objectId, severity, info) =>
-      timestamp should be(new Timestamp(500L))
+      timestamp shouldBe 500L
       objectId should be(siteId)
       severity should be(alarmSeverity)
       info should startWith(s"Fire on site $siteId")
       info should include regex s"(?i)first\\s+heat\\s+at\\s+"
-      info should include(new Timestamp(100L).toString)
+      info should include(formattedTimestamp(100L))
     }
     ()
   }
@@ -188,12 +187,12 @@ abstract class AbstractFirePredictorTest extends AbstractTestBase with JUnitSuit
     result should have length 1
     val alarm = result.head
     inside(alarm) { case Alarm(timestamp, objectId, severity, info) =>
-      timestamp should be(new Timestamp(800L))
+      timestamp shouldBe 800L
       objectId should be(siteId)
       severity should be(alarmSeverity)
       info should startWith(s"Fire on site $siteId")
       info should include regex s"(?i)first\\s+heat\\s+at\\s+"
-      info should include(new Timestamp(100L).toString)
+      info should include(formattedTimestamp(100L))
     }
     ()
   }
@@ -216,12 +215,12 @@ abstract class AbstractFirePredictorTest extends AbstractTestBase with JUnitSuit
     result should have length 1
     val alarm = result.head
     inside(alarm) { case Alarm(timestamp, objectId, severity, info) =>
-      timestamp should be(new Timestamp(1800L))
+      timestamp shouldBe 1800L
       objectId should be(siteId)
       severity should be(alarmSeverity)
       info should startWith(s"Fire on site $siteId")
       info should include regex s"(?i)first\\s+heat\\s+at\\s+"
-      info should include(new Timestamp(1500L).toString)
+      info should include(formattedTimestamp(1500L))
     }
     ()
   }
@@ -263,12 +262,12 @@ abstract class AbstractFirePredictorTest extends AbstractTestBase with JUnitSuit
     result should have length 1
     val alarm = result.head
     inside(alarm) { case Alarm(timestamp, objectId, severity, info) =>
-      timestamp should be(new Timestamp(500L))
+      timestamp shouldBe 500L
       objectId should be(siteId)
       severity should be(alarmSeverity)
       info should startWith(s"Fire on site $siteId")
       info should include regex s"(?i)first\\s+heat\\s+at\\s+"
-      info should include(new Timestamp(100L).toString)
+      info should include(formattedTimestamp(100L))
     }
     ()
   }
@@ -311,12 +310,12 @@ abstract class AbstractFirePredictorTest extends AbstractTestBase with JUnitSuit
     result should have length 1
     val alarm = result.head
     inside(alarm) { case Alarm(timestamp, objectId, severity, info) =>
-      timestamp should be(new Timestamp(900L))
+      timestamp shouldBe 900L
       objectId should be(siteId)
       severity should be(alarmSeverity)
       info should startWith(s"Fire on site $siteId")
       info should include regex s"(?i)first\\s+heat\\s+at\\s+"
-      info should include(new Timestamp(800L).toString)
+      info should include(formattedTimestamp(800L))
     }
     ()
   }
@@ -342,12 +341,12 @@ abstract class AbstractFirePredictorTest extends AbstractTestBase with JUnitSuit
     result should have length 1
     val alarm = result.head
     inside(alarm) { case Alarm(timestamp, objectId, severity, info) =>
-      timestamp should be(new Timestamp(zero + 900L))
+      timestamp shouldBe zero + 900L
       objectId should be(siteId)
       severity should be(alarmSeverity)
       info should startWith(s"Fire on site $siteId")
       info should include regex s"(?i)first\\s+heat\\s+at\\s+"
-      info should include(new Timestamp(zero + 800L).toString)
+      info should include(formattedTimestamp(zero + 800L))
     }
     /*
      TODO Illustrate each implementation with visualized execution plans:

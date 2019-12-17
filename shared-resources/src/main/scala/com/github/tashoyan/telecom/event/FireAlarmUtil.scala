@@ -1,6 +1,6 @@
 package com.github.tashoyan.telecom.event
 
-import java.sql.Timestamp
+import com.github.tashoyan.telecom.util.Timestamps.formattedTimestamp
 
 object FireAlarmUtil {
 
@@ -11,10 +11,10 @@ object FireAlarmUtil {
 
   def createFireAlarm(heatEvent: Event, smokeEvent: Event): Alarm =
     Alarm(
-      new Timestamp(smokeEvent.timestamp),
+      smokeEvent.timestamp,
       smokeEvent.siteId,
       fireAlarmSeverity,
-      s"Fire on site ${smokeEvent.siteId}. First heat at ${new Timestamp(heatEvent.timestamp)}."
+      s"Fire on site ${smokeEvent.siteId}. First heat at ${formattedTimestamp(heatEvent.timestamp)}."
     )
 
 }

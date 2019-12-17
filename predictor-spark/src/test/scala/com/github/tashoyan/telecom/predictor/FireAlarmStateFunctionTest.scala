@@ -118,7 +118,7 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
     val alarms = alarmStateFunction.updateAlarmState(siteId, events, state).toSeq
     assert(alarms.length === 1, "Expected 1 alarm")
     val alarm = alarms.head
-    assert(alarm.timestamp === smokeTimestamp)
+    assert(alarm.timestamp === smokeTimestamp.getTime)
     assert(alarm.objectId === siteId)
     assert(alarm.info.toLowerCase.contains("fire "))
   }
@@ -256,7 +256,7 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
     val alarms = alarmStateFunction.updateAlarmState(siteId, events, state).toSeq
     assert(alarms.length === 1, "Expected 1 alarm")
     val alarm = alarms.head
-    assert(alarm.timestamp === smokeTimestamp)
+    assert(alarm.timestamp === smokeTimestamp.getTime)
     assert(alarm.objectId === siteId)
     assert(alarm.info.toLowerCase.contains("fire "))
   }
@@ -330,7 +330,7 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
     val alarms = alarmStateFunction.updateAlarmState(siteId, events, state).toSeq
     assert(alarms.length === 1, "Expected 1 alarm")
     val alarm = alarms.head
-    assert(alarm.timestamp === smokeTimestamp)
+    assert(alarm.timestamp === smokeTimestamp.getTime)
     assert(alarm.objectId === siteId)
     assert(alarm.info.toLowerCase.contains("fire "))
   }
@@ -506,7 +506,7 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
     val alarms = alarmStateFunction.updateAlarmState(siteId, events, state).toSeq
     assert(alarms.length === 1, "Expected 1 alarm")
     val alarm = alarms.head
-    assert(alarm.timestamp === smokeTimestamps.min)
+    assert(alarm.timestamp === smokeTimestamps.min.getTime)
     assert(alarm.objectId === siteId)
     assert(alarm.info.toLowerCase.contains("fire "))
   }
@@ -583,7 +583,7 @@ class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
     val alarms = alarmStateFunction.updateAlarmState(siteId, events, state).toSeq
     assert(alarms.length === 1, "Expected 1 alarm")
     val alarm = alarms.head
-    assert(alarm.timestamp === smokeTimestamps.min)
+    assert(alarm.timestamp === smokeTimestamps.min.getTime)
     assert(alarm.objectId === siteId)
     assert(alarm.info.toLowerCase.contains("fire "))
   }

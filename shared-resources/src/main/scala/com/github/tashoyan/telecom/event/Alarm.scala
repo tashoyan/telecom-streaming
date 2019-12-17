@@ -1,9 +1,7 @@
 package com.github.tashoyan.telecom.event
 
-import java.sql.Timestamp
-
 case class Alarm(
-    timestamp: Timestamp,
+    timestamp: Long,
     objectId: Long,
     severity: String,
     info: String

@@ -113,11 +113,6 @@
             <artifactId>flink-test-utils_${compiler.scala.compat.version}</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.module</groupId>
-            <artifactId>jackson-module-scala_${compiler.scala.compat.version}</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>

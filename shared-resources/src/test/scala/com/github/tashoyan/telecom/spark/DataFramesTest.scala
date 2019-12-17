@@ -1,17 +1,13 @@
 package com.github.tashoyan.telecom.spark
 
-import java.io.StringWriter
 import java.sql.Timestamp
-import java.time.{ZoneId, ZonedDateTime}
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.github.tashoyan.telecom.spark.DataFrames.RichDataFrame
-import com.github.tashoyan.telecom.test.SparkTestHarness
+import com.github.tashoyan.telecom.test.{JsonTestHarness, SparkTestHarness}
 import org.apache.spark.sql.types._
-import org.scalatest.FunSuite
+import org.scalatest.{FunSuite, Matchers}
 
-class DataFramesTest extends FunSuite with SparkTestHarness {
+class DataFramesTest extends FunSuite with SparkTestHarness with JsonTestHarness with Matchers {
 
   test("withJsonColumn") {
     val spark0 = spark
@@ -38,11 +34,7 @@ class DataFramesTest extends FunSuite with SparkTestHarness {
     assert(parsedResult("long_column") === 10L)
     assert(parsedResult("double_column") === 2.5)
     assert(parsedResult("string_column") === "one")
-    val parsedTimestamp = ZonedDateTime.parse(parsedResult("timestamp_column").toString)
-    val expectedTimestamp = new Timestamp(1001L)
-      .toLocalDateTime
-      .atZone(ZoneId.systemDefault())
-    assert(parsedTimestamp.isEqual(expectedTimestamp))
+    parsedResult("timestamp_column") should matchEpochMillis(1001L)
   }
 
   test("parseJsonColumn") {
@@ -82,21 +74,6 @@ class DataFramesTest extends FunSuite with SparkTestHarness {
     assert(result.getAs[Double]("double_column") === 2.5)
     assert(result.getAs[String]("string_column") === "one")
     assert(result.getAs[Timestamp]("timestamp_column") === new Timestamp(1001L))
-  }
-
-  private val mapper: ObjectMapper = {
-    new ObjectMapper()
-      .registerModule(DefaultScalaModule)
-  }
-
-  private def jsonToMap(json: String): Map[String, Any] = {
-    mapper.readValue(json, classOf[Map[String, Any]])
-  }
-
-  private def mapToJson(map: Map[String, Any]): String = {
-    val out = new StringWriter()
-    mapper.writeValue(out, map)
-    out.toString
   }
 
 }

@@ -49,8 +49,8 @@
         <spark.version>2.4.4</spark.version>
         <spark.compat.version>2.4</spark.compat.version>
         <graphframes.version>0.7.0-spark${spark.compat.version}-s_${compiler.scala.compat.version}</graphframes.version>
-        <flink.version>1.7.2</flink.version>
-        <flink-shaded-jackson.version>2.7.9-5.0</flink-shaded-jackson.version>
+        <flink.version>1.9.1</flink.version>
+        <flink-shaded-jackson.version>2.9.8-7.0</flink-shaded-jackson.version>
         <scopt.version>3.7.1</scopt.version>
         <scalaj-http.version>2.4.1</scalaj-http.version>
         <scalatest.version>3.0.5</scalatest.version>
@@ -215,6 +215,11 @@
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-shaded-jackson</artifactId>
                 <version>${flink-shaded-jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka-clients</artifactId>
+                <version>${kafka.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.hadoop</groupId>
@@ -518,11 +523,6 @@
                 <groupId>org.apache.zookeeper</groupId>
                 <artifactId>zookeeper</artifactId>
                 <version>${zookeeper.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.kafka</groupId>
-                <artifactId>kafka-clients</artifactId>
-                <version>${kafka.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.github.luben</groupId>

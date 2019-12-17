@@ -66,6 +66,10 @@
             <artifactId>flink-json</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.json4s</groupId>
             <artifactId>json4s-native_${compiler.scala.compat.version}</artifactId>
         </dependency>

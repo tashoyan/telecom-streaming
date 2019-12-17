@@ -1,7 +1,7 @@
 package com.github.tashoyan.telecom.predictor
 
+import java.util.Properties
 import java.util.concurrent.TimeUnit
-import java.util.{Optional, Properties}
 
 import com.github.tashoyan.telecom.event.Alarm
 import com.github.tashoyan.telecom.flink.{AlarmSerializationSchema, KafkaFlinkEventReceiver}
@@ -12,7 +12,7 @@ import org.apache.flink.runtime.state.filesystem.FsStateBackend
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 import org.apache.flink.streaming.api.{CheckpointingMode, TimeCharacteristic}
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer
-import org.apache.flink.streaming.connectors.kafka.partitioner.FlinkKafkaPartitioner
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer.Semantic
 import org.apache.kafka.clients.producer.ProducerConfig
 
 /*
@@ -79,13 +79,10 @@ object FlinkPredictorMain extends FlinkPredictorArgParser {
     producerProps.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, config.kafkaBrokers)
     val kafkaProducer = new FlinkKafkaProducer[Alarm](
       config.kafkaAlarmTopic,
-      new AlarmSerializationSchema,
+      new AlarmSerializationSchema(config.kafkaAlarmTopic),
       producerProps,
-      /* Partition according to keys defined by the serialization schema */
-      Optional.empty[FlinkKafkaPartitioner[Alarm]]()
+      Semantic.AT_LEAST_ONCE
     )
-    // TODO After migration from KeyedSerializationSchema to KafkaSerializationSchema, this seems useless - use timestamp in the ProducerRecord instead
-    kafkaProducer.setWriteTimestampToKafka(true)
     alarms.addSink(kafkaProducer)
 
     env.execute(this.getClass.getSimpleName)

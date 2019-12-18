@@ -23,9 +23,6 @@ object Timestamps {
 
     @inline override def compare(that: Timestamp): Int = timestamp compareTo that
 
-    @inline def notBefore(that: Timestamp): Boolean = !(timestamp before that)
-
-    @inline def notAfter(that: Timestamp): Boolean = !(timestamp after that)
   }
 
 }

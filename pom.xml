@@ -58,8 +58,8 @@
     <scalamock.version>4.4.0</scalamock.version>
     <junit.version>4.13.1</junit.version>
     <scalatestplus.junit413.version>3.2.3.0</scalatestplus.junit413.version>
-    <kafka.version>2.1.0</kafka.version>
-    <embedded-kafka.version>2.1.0</embedded-kafka.version>
+    <kafka.version>2.3.0</kafka.version>
+    <embedded-kafka.version>2.3.0</embedded-kafka.version>
     <guava.version>16.0.1</guava.version>
     <commons-collections.version>3.2.2</commons-collections.version>
     <commons-lang.version>2.6</commons-lang.version>

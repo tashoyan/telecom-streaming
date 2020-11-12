@@ -54,8 +54,8 @@
     <scopt.version>3.7.1</scopt.version>
     <scalaj-http.version>2.4.1</scalaj-http.version>
     <scalatest.version>3.2.3</scalatest.version>
-    <scalamock.version>4.1.0</scalamock.version>
     <scalactic.version>3.2.3</scalactic.version>
+    <scalamock.version>4.1.0</scalamock.version>
     <junit.version>4.13</junit.version>
     <scalatestplus.junit413.version>3.2.3.0</scalatestplus.junit413.version>
     <kafka.version>2.1.0</kafka.version>
@@ -343,14 +343,14 @@
         <version>${scalatestplus.junit413.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.scalamock</groupId>
-        <artifactId>scalamock_${compiler.scala.compat.version}</artifactId>
-        <version>${scalamock.version}</version>
-      </dependency>
-      <dependency>
         <groupId>org.scalactic</groupId>
         <artifactId>scalactic_${compiler.scala.compat.version}</artifactId>
         <version>${scalactic.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.scalamock</groupId>
+        <artifactId>scalamock_${compiler.scala.compat.version}</artifactId>
+        <version>${scalamock.version}</version>
       </dependency>
       <dependency>
         <groupId>junit</groupId>

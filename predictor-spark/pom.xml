@@ -62,13 +62,13 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.scalamock</groupId>
-            <artifactId>scalamock_${compiler.scala.compat.version}</artifactId>
+            <groupId>org.scalactic</groupId>
+            <artifactId>scalactic_${compiler.scala.compat.version}</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.scalactic</groupId>
-            <artifactId>scalactic_${compiler.scala.compat.version}</artifactId>
+            <groupId>org.scalamock</groupId>
+            <artifactId>scalamock_${compiler.scala.compat.version}</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

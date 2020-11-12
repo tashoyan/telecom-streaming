@@ -7,8 +7,8 @@ import org.apache.flink.streaming.api.scala.{DataStreamUtils, StreamExecutionEnv
 import org.apache.flink.test.util.AbstractTestBase
 import org.junit.Test
 import org.scalatest.Inside
-import org.scalatest.Matchers._
-import org.scalatest.junit.JUnitSuiteLike
+import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.junit.JUnitSuiteLike
 
 /*
 TODO Testing should be much easier than with Spark Streaming:
@@ -16,7 +16,7 @@ TODO Testing should be much easier than with Spark Streaming:
  Can output DataStream to an iterator
  Helper class: AbstractTestBase, but only for JUnit
 */
-abstract class AbstractFirePredictorTest extends AbstractTestBase with JUnitSuiteLike with Inside {
+abstract class AbstractFirePredictorTest extends AbstractTestBase with JUnitSuiteLike with Matchers with Inside {
 
   protected val problemTimeoutMillis = 1000L
   protected val eventOutOfOrdernessMillis = 0L

@@ -8,12 +8,13 @@ import com.github.tashoyan.telecom.test.HdfsTestHarness._
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FileSystem, FileUtil, Path, RemoteIterator}
 import org.apache.hadoop.hdfs.MiniDFSCluster
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FunSuite}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 
 import scala.io.Source
 import scala.language.implicitConversions
 
-abstract class HdfsTestHarness extends FunSuite with BeforeAndAfterAll with BeforeAndAfterEach {
+abstract class HdfsTestHarness extends AnyFunSuite with BeforeAndAfterAll with BeforeAndAfterEach {
   protected val hdfsBaseDir: File = Paths.get(sys.props("java.io.tmpdir"), "hdfs").toFile
   protected var hdfsCluster: MiniDFSCluster = _
   protected var hdfsUri: URI = _

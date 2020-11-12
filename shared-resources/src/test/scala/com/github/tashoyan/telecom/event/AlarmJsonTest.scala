@@ -2,9 +2,10 @@ package com.github.tashoyan.telecom.event
 
 import com.github.tashoyan.telecom.event.AlarmJson.toJson
 import com.github.tashoyan.telecom.test.JsonTestHarness
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class AlarmJsonTest extends FunSuite with Matchers with JsonTestHarness {
+class AlarmJsonTest extends AnyFunSuite with Matchers with JsonTestHarness {
 
   test("toJson - full alarm") {
     val alarm = Alarm(

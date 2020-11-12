@@ -7,12 +7,12 @@ import org.apache.flink.api.common.typeinfo.TypeInformation
 import org.apache.flink.streaming.api.scala.{DataStreamUtils, StreamExecutionEnvironment, _}
 import org.apache.flink.test.util.AbstractTestBase
 import org.junit._
-import org.scalatest.Matchers._
-import org.scalatest.junit.JUnitSuiteLike
+import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.junit.JUnitSuiteLike
 
 import scala.reflect.ClassTag
 
-class KafkaFlinkEventReceiverTest extends AbstractTestBase with JUnitSuiteLike with KafkaTestHarness {
+class KafkaFlinkEventReceiverTest extends AbstractTestBase with JUnitSuiteLike with Matchers with KafkaTestHarness {
 
   @Before def beforeAll(): Unit = {
     startKafka()

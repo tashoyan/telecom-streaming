@@ -7,9 +7,9 @@ import com.github.tashoyan.telecom.sampler.Sampler._
 import com.github.tashoyan.telecom.test.SparkTestHarness
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions._
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class SampleGeneratorTest extends FunSuite with SparkTestHarness {
+class SampleGeneratorTest extends AnyFunSuite with SparkTestHarness {
 
   test("event schema") {
     val spark0 = spark

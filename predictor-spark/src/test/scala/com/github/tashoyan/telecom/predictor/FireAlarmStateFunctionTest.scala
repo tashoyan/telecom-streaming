@@ -7,9 +7,9 @@ import com.github.tashoyan.telecom.spark.SparkEvent
 import com.github.tashoyan.telecom.util.Timestamps.RichTimestamp
 import org.apache.spark.sql.streaming.GroupState
 import org.scalamock.scalatest.MockFactory
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class FireAlarmStateFunctionTest extends FunSuite with MockFactory {
+class FireAlarmStateFunctionTest extends AnyFunSuite with MockFactory {
 
   private val problemTimeoutMillis = TimeUnit.SECONDS.toMillis(10)
 

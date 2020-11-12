@@ -1,9 +1,9 @@
 package com.github.tashoyan.telecom.util
 
 import com.github.tashoyan.telecom.util.Collections.RichIterable
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class CollectionsTest extends FunSuite {
+class CollectionsTest extends AnyFunSuite {
 
   test("empty iterable") {
     val it: Iterable[Int] = Seq.empty

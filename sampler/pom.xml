@@ -40,7 +40,12 @@
         </dependency>
         <dependency>
             <groupId>org.scalatest</groupId>
-            <artifactId>scalatest_${compiler.scala.compat.version}</artifactId>
+            <artifactId>scalatest-core_${compiler.scala.compat.version}</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.scalatest</groupId>
+            <artifactId>scalatest-funsuite_${compiler.scala.compat.version}</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -53,10 +53,11 @@
     <flink-shaded-jackson.version>2.9.8-7.0</flink-shaded-jackson.version>
     <scopt.version>3.7.1</scopt.version>
     <scalaj-http.version>2.4.1</scalaj-http.version>
-    <scalatest.version>3.0.5</scalatest.version>
+    <scalatest.version>3.2.3</scalatest.version>
     <scalamock.version>4.1.0</scalamock.version>
-    <scalactic.version>3.0.5</scalactic.version>
-    <junit.version>4.12</junit.version>
+    <scalactic.version>3.2.3</scalactic.version>
+    <junit.version>4.13</junit.version>
+    <scalatestplus.junit413.version>3.2.3.0</scalatestplus.junit413.version>
     <kafka.version>2.1.0</kafka.version>
     <embedded-kafka.version>2.1.0</embedded-kafka.version>
     <guava.version>16.0.1</guava.version>
@@ -313,8 +314,33 @@
       </dependency>
       <dependency>
         <groupId>org.scalatest</groupId>
-        <artifactId>scalatest_${compiler.scala.compat.version}</artifactId>
+        <artifactId>scalatest-core_${compiler.scala.compat.version}</artifactId>
         <version>${scalatest.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.scalatest</groupId>
+        <artifactId>scalatest-matchers-core_${compiler.scala.compat.version}</artifactId>
+        <version>${scalatest.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.scalatest</groupId>
+        <artifactId>scalatest-shouldmatchers_${compiler.scala.compat.version}</artifactId>
+        <version>${scalatest.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.scalatest</groupId>
+        <artifactId>scalatest-funsuite_${compiler.scala.compat.version}</artifactId>
+        <version>${scalatest.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.scalatest</groupId>
+        <artifactId>scalatest-compatible</artifactId>
+        <version>${scalatest.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.scalatestplus</groupId>
+        <artifactId>junit-4-13_${compiler.scala.compat.version}</artifactId>
+        <version>${scalatestplus.junit413.version}</version>
       </dependency>
       <dependency>
         <groupId>org.scalamock</groupId>

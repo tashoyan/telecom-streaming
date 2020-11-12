@@ -5,9 +5,10 @@ import java.sql.Timestamp
 import com.github.tashoyan.telecom.spark.DataFrames.RichDataFrame
 import com.github.tashoyan.telecom.test.{JsonTestHarness, SparkTestHarness}
 import org.apache.spark.sql.types._
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class DataFramesTest extends FunSuite with SparkTestHarness with JsonTestHarness with Matchers {
+class DataFramesTest extends AnyFunSuite with SparkTestHarness with JsonTestHarness with Matchers {
 
   test("withJsonColumn") {
     val spark0 = spark

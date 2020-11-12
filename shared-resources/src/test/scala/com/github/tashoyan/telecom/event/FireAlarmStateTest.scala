@@ -1,10 +1,11 @@
 package com.github.tashoyan.telecom.event
 
 import com.github.tashoyan.telecom.util.Timestamps.formattedTimestamp
-import org.scalatest.Matchers._
-import org.scalatest.{FunSuite, Inside}
+import org.scalatest.Inside
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class FireAlarmStateTest extends FunSuite with Inside {
+class FireAlarmStateTest extends AnyFunSuite with Matchers with Inside {
   private implicit val problemTimeoutMillis: Long = 1000L
   private val siteId = 1L
   private val eventSeverity = "MAJOR"

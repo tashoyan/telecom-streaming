@@ -128,9 +128,14 @@ Run Spark Predictor:
    ```
    Spark Predictor produces these alarms as a result of prediction based on heat and smoke events.
 
-## Killing Spark applications
+## Killing applications in YARN
 
-Use the `kill-yarn-apps.sh` tool and provide YARN identifiers for the applications you want to kill:
+If you have `yarn` command-line client installed, then you can kill an application like this:
+```bash
+yarn application -kill application_1544154479411_0830
+```
+
+Otherwise you can use the `kill-yarn-apps.sh` tool and provide YARN identifiers for the applications you want to kill:
 ```bash
 ./bin/kill-yarn-apps.sh application_1544154479411_0830 application_1544154479411_0831 application_1544154479411_0837
 ```

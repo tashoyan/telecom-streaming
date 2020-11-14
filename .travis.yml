@@ -3,7 +3,7 @@ dist: trusty
 env:
   MVN_VERSION=3.6.3
 install:
-- wget http://apache.mirror.gtcomm.net/maven/maven-3/$MVN_VERSION/binaries/apache-maven-$MVN_VERSION-bin.tar.gz
+- wget https://archive.apache.org/dist/maven/maven-3/$MVN_VERSION/binaries/apache-maven-$MVN_VERSION-bin.tar.gz
 - tar -xzvf apache-maven-$MVN_VERSION-bin.tar.gz
 - export PATH=`pwd`/apache-maven-$MVN_VERSION/bin:$PATH
 script: mvn -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn clean install

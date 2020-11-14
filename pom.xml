@@ -831,7 +831,7 @@
                   <version>${compiler.java.version}</version>
                 </requireJavaVersion>
                 <requireMavenVersion>
-                  <version>3.2.3</version>
+                  <version>3.6.3</version>
                 </requireMavenVersion>
                 <banDuplicatePomDependencyVersions />
               </rules>

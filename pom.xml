@@ -721,13 +721,6 @@
               <log4j.configuration>log4j-unit-tests.xml</log4j.configuration>
             </systemProperties>
           </configuration>
-          <dependencies>
-            <dependency>
-              <groupId>org.scalatest</groupId>
-              <artifactId>scalatest_${compiler.scala.compat.version}</artifactId>
-              <version>${scalatest.version}</version>
-            </dependency>
-          </dependencies>
         </plugin>
 
         <plugin>

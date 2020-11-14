@@ -718,7 +718,7 @@
             <testFailureIgnore>false</testFailureIgnore>
             <systemProperties>
               <java.io.tmpdir>${project.build.directory}</java.io.tmpdir>
-              <log4j.configuration>log4j-unit-tests.xml</log4j.configuration>
+              <log4j.configuration>log4j-tests.xml</log4j.configuration>
             </systemProperties>
           </configuration>
         </plugin>
@@ -731,7 +731,7 @@
             <reuseForks>false</reuseForks>
             <systemPropertyVariables>
               <java.io.tmpdir>${project.build.directory}</java.io.tmpdir>
-              <log4j.configuration>log4j-unit-tests.xml</log4j.configuration>
+              <log4j.configuration>log4j-tests.xml</log4j.configuration>
             </systemPropertyVariables>
           </configuration>
         </plugin>

@@ -8,7 +8,7 @@ install:
 - export PATH=`pwd`/apache-maven-$MVN_VERSION/bin:$PATH
 script: mvn -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn clean install
 jdk:
-- openjdk14
+- openjdk13
 cache:
   directories:
   - $HOME/.m2

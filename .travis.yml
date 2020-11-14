@@ -2,6 +2,7 @@ language: java
 dist: trusty
 env:
   MVN_VERSION=3.6.3
+#TODO Starting from Maven 3.7, mvnw will become a part of Maven - use it
 install:
 - wget https://archive.apache.org/dist/maven/maven-3/$MVN_VERSION/binaries/apache-maven-$MVN_VERSION-bin.tar.gz
 - tar -xzvf apache-maven-$MVN_VERSION-bin.tar.gz

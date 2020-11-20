@@ -642,7 +642,7 @@
               <arg>-Xlint:_</arg>
             </args>
             <jvmArgs>
-              <jvmArg>-Xmx2048m</jvmArg>
+              <jvmArg>-Xmx2g</jvmArg>
             </jvmArgs>
             <source>${compiler.java.version}</source>
             <target>${compiler.java.version}</target>
@@ -712,10 +712,13 @@
           <artifactId>scalatest-maven-plugin</artifactId>
           <version>${scalatest-maven-plugin.version}</version>
           <configuration>
+            <forkMode>once</forkMode>
             <parallel>false</parallel>
             <junitxml>.</junitxml>
             <filereports>WDF TestSuite.txt</filereports>
+            <stdout>F</stdout>
             <testFailureIgnore>false</testFailureIgnore>
+            <argLine>-Xmx2g</argLine>
             <systemProperties>
               <java.io.tmpdir>${project.build.directory}</java.io.tmpdir>
               <log4j.configuration>log4j-tests.xml</log4j.configuration>

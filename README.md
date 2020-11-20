@@ -1,4 +1,4 @@
-# Telecom use cases implemented with popular streaming frameworks: Spark and Flink
+# Telecom use cases implemented with popular streaming frameworks: Apache Spark and Apache Flink
 
 [![Build Status](https://travis-ci.com/tashoyan/telecom-streaming.svg?branch=master)](https://travis-ci.com/tashoyan/telecom-streaming)
 

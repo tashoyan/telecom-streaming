@@ -84,13 +84,13 @@
     <!--END: Spark BOM-->
 
     <!--BEGIN Flink BOM-->
-    <flink.version>1.9.1</flink.version>
-    <flink-shaded-jackson.version>2.9.8-7.0</flink-shaded-jackson.version>
+    <flink.version>1.10.2</flink.version>
+    <flink-shaded-jackson.version>2.10.1-9.0</flink-shaded-jackson.version>
     <!--END Flink BOM-->
 
     <!--BEGIN: Dependency convergence-->
     <jsr305.version>3.0.2</jsr305.version>
-    <scala-java8-compat.version>0.9.0</scala-java8-compat.version>
+    <scala-java8-compat.version>0.8.0</scala-java8-compat.version>
     <!--END: Dependency convergence-->
 
     <kafka-clients.version>2.4.1</kafka-clients.version>

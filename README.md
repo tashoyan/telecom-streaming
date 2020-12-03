@@ -17,7 +17,7 @@ The following software is needed to run the applications provided in the `bin` d
 The local machine:
 * Spark 3.x built with Scala 2.12
 * Spark executables (for example,`spark-submit`) in the PATH
-* Flink 1.9.1 built with Scala 2.12
+* Flink 1.10.x built with Scala 2.12
 * Flink executables (for example,`flink`) in the PATH
 * Hadoop client distribution version 2.7.x
 * Hadoop executables (for example, `hadoop` or `hdfs`) in the PATH

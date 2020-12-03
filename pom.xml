@@ -66,7 +66,7 @@
     <httpclient.version>4.5.6</httpclient.version>
     <fasterxml.jackson-core.version>2.10.0</fasterxml.jackson-core.version>
     <fasterxml.jackson-databind.version>2.10.0</fasterxml.jackson-databind.version>
-    <fasterxml.jackson-module-scala.verdatabindsion>2.10.0</fasterxml.jackson-module-scala.verdatabindsion>
+    <fasterxml.jackson-module-scala.version>2.10.0</fasterxml.jackson-module-scala.version>
     <codehaus.jackson.version>1.9.13</codehaus.jackson.version>
     <avro.version>1.8.2</avro.version>
     <netty-all.version>4.1.47.Final</netty-all.version>
@@ -248,7 +248,7 @@
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
-        <version>${fasterxml.jackson-.version}</version>
+        <version>${fasterxml.jackson-databind.version}</version>
         <scope>provided</scope>
       </dependency>
       <dependency>

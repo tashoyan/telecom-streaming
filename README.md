@@ -15,7 +15,7 @@ Note that event samples are generated as a part of the build.
 The following software is needed to run the applications provided in the `bin` directory.
 
 The local machine:
-* Spark 2.4.4 built with Scala 2.12
+* Spark 3.x built with Scala 2.12
 * Spark executables (for example,`spark-submit`) in the PATH
 * Flink 1.9.1 built with Scala 2.12
 * Flink executables (for example,`flink`) in the PATH
@@ -25,7 +25,7 @@ The local machine:
 
 Remote dependencies:
 * Hadoop cluster with HDFS and YARN
-* Kafka cluster 2.1.0
+* Kafka cluster 2.x
 
 Some references:
 * [Running Spark on YARN](http://spark.apache.org/docs/latest/running-on-yarn.html)

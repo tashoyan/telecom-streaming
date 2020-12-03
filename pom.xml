@@ -148,6 +148,7 @@
         <groupId>org.scala-lang.modules</groupId>
         <artifactId>scala-parser-combinators_${compiler.scala.compat.version}</artifactId>
         <version>${scala-parser-combinators.version}</version>
+        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.scala-lang.modules</groupId>

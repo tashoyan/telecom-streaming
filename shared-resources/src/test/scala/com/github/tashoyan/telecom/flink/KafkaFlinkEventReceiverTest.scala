@@ -4,7 +4,7 @@ import com.github.tashoyan.telecom.event.Event
 import com.github.tashoyan.telecom.test.KafkaTestHarness
 import net.manub.embeddedkafka.EmbeddedKafka
 import org.apache.flink.api.common.typeinfo.TypeInformation
-import org.apache.flink.streaming.api.scala.{DataStreamUtils, StreamExecutionEnvironment, _}
+import org.apache.flink.streaming.api.scala.{DataStream, DataStreamUtils, StreamExecutionEnvironment, createTypeInformation}
 import org.apache.flink.test.util.AbstractTestBase
 import org.junit._
 import org.scalatest.matchers.should.Matchers

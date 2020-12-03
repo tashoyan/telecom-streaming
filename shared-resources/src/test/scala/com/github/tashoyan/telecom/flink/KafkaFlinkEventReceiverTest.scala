@@ -49,9 +49,9 @@ class KafkaFlinkEventReceiverTest extends AbstractTestBase with JUnitSuiteLike w
   }
 
   private def toJson(event: Event): String = {
-    import org.json4s._
-    import org.json4s.native.Serialization
-    import org.json4s.native.Serialization.write
+    import org.json4s.jackson.Serialization
+    import org.json4s.jackson.Serialization.write
+    import org.json4s.{Formats, NoTypeHints}
 
     implicit val formats: AnyRef with Formats = Serialization.formats(NoTypeHints)
     write(event)

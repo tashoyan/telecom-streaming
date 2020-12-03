@@ -21,20 +21,8 @@
       <artifactId>flink-connector-kafka-base_${compiler.scala.compat.version}</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.flink</groupId>
-      <artifactId>flink-json</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.apache.kafka</groupId>
       <artifactId>kafka-clients</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.json4s</groupId>
-      <artifactId>json4s-native_${compiler.scala.compat.version}</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.json4s</groupId>
-      <artifactId>json4s-core_${compiler.scala.compat.version}</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.spark</groupId>
@@ -54,6 +42,16 @@
     <dependency>
       <groupId>org.scala-lang</groupId>
       <artifactId>scala-reflect</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.json4s</groupId>
+      <artifactId>json4s-core_${compiler.scala.compat.version}</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.json4s</groupId>
+      <artifactId>json4s-jackson_${compiler.scala.compat.version}</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>

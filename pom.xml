@@ -91,7 +91,6 @@
     <!--END Flink BOM-->
 
     <!--BEGIN: Dependency convergence-->
-    <nimbus.version>4.41.1</nimbus.version>
     <scala-java8-compat.version>0.8.0</scala-java8-compat.version>
     <!--END: Dependency convergence-->
 
@@ -367,6 +366,10 @@
             <groupId>dnsjava</groupId>
             <artifactId>dnsjava</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>com.nimbusds</groupId>
+            <artifactId>nimbus-jose-jwt</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
@@ -551,6 +554,10 @@
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>com.nimbusds</groupId>
+            <artifactId>nimbus-jose-jwt</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
@@ -571,11 +578,6 @@
         <groupId>org.scala-lang.modules</groupId>
         <artifactId>scala-java8-compat_${compiler.scala.compat.version}</artifactId>
         <version>${scala-java8-compat.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.nimbusds</groupId>
-        <artifactId>nimbus-jose-jwt</artifactId>
-        <version>${nimbus.version}</version>
       </dependency>
       <!--END: Dependency convergence-->
 

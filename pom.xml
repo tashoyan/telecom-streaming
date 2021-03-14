@@ -91,7 +91,7 @@
     <!--END Flink BOM-->
 
     <!--BEGIN: Dependency convergence-->
-    <nimbus.version>4.41.1</nimbus.version>
+    <nimbus.version>7.9</nimbus.version>
     <scala-java8-compat.version>0.8.0</scala-java8-compat.version>
     <!--END: Dependency convergence-->
 

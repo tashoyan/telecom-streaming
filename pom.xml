@@ -26,7 +26,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <resources.filter.delimiter>@{*}</resources.filter.delimiter>
     <compiler.java.version>1.8</compiler.java.version>
-    <compiler.scala.version>2.12.12</compiler.scala.version>
+    <compiler.scala.version>2.12.10</compiler.scala.version>
     <compiler.scala.compat.version>2.12</compiler.scala.compat.version>
 
     <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
@@ -47,37 +47,40 @@
     <scalatest-maven-plugin.version>2.0.2</scalatest-maven-plugin.version>
 
     <!--BEGIN: Spark BOM-->
-    <spark.version>3.0.1</spark.version>
-    <spark.compat.version>3.0</spark.compat.version>
+    <spark.version>3.1.1</spark.version>
+    <spark.compat.version>3.1</spark.compat.version>
     <scala-parser-combinators.version>1.1.2</scala-parser-combinators.version>
     <scala-xml.version>1.2.0</scala-xml.version>
-    <json4s.version>3.6.6</json4s.version>
+    <json4s.version>3.7.0-M5</json4s.version>
     <commons-io.version>2.4</commons-io.version>
+    <commons-net.version>3.1</commons-net.version>
+    <commons-text.version>1.6</commons-text.version>
     <commons-collections.version>3.2.2</commons-collections.version>
     <commons-lang.version>2.6</commons-lang.version>
-    <commons-lang3.version>3.9</commons-lang3.version>
+    <commons-lang3.version>3.10</commons-lang3.version>
     <commons-math3.version>3.4.1</commons-math3.version>
     <commons-codec.version>1.10</commons-codec.version>
-    <commons-compress.version>1.8.1</commons-compress.version>
+    <commons-compress.version>1.20</commons-compress.version>
     <commons-cli.version>1.2</commons-cli.version>
     <guava.version>14.0.1</guava.version>
-    <snappy-java.version>1.1.7.5</snappy-java.version>
+    <snappy-java.version>1.1.8.2</snappy-java.version>
     <httpcore.version>4.4.12</httpcore.version>
     <httpclient.version>4.5.6</httpclient.version>
-    <fasterxml.jackson-core.version>2.10.0</fasterxml.jackson-core.version>
-    <fasterxml.jackson-databind.version>2.10.0</fasterxml.jackson-databind.version>
-    <fasterxml.jackson-module-scala.version>2.10.0</fasterxml.jackson-module-scala.version>
+    <fasterxml.jackson.version>2.10.0</fasterxml.jackson.version>
     <codehaus.jackson.version>1.9.13</codehaus.jackson.version>
     <avro.version>1.8.2</avro.version>
-    <netty-all.version>4.1.47.Final</netty-all.version>
+    <netty-all.version>4.1.51.Final</netty-all.version>
     <paranamer.version>2.8</paranamer.version>
+    <curator.version>2.7.1</curator.version>
+    <jaxb-api.version>2.2.2</jaxb-api.version>
     <javassist.version>3.25.0-GA</javassist.version>
     <activation.version>1.1.1</activation.version>
-    <objenesis.version>2.5.1</objenesis.version>
+    <objenesis.version>2.6</objenesis.version>
     <lz4-java.version>1.7.1</lz4-java.version>
     <chill.version>0.9.5</chill.version>
-    <zstd-jni.version>1.4.4-3</zstd-jni.version>
-    <hadoop.version>2.7.4</hadoop.version>
+    <zstd-jni.version>1.4.8-1</zstd-jni.version>
+    <jsr305.version>3.0.0</jsr305.version>
+    <hadoop.version>3.2.0</hadoop.version>
     <slf4j.version>1.7.30</slf4j.version>
     <log4j.version>1.2.17</log4j.version>
     <!--END: Spark BOM-->
@@ -88,7 +91,7 @@
     <!--END Flink BOM-->
 
     <!--BEGIN: Dependency convergence-->
-    <jsr305.version>3.0.2</jsr305.version>
+    <nimbus.version>4.41.1</nimbus.version>
     <scala-java8-compat.version>0.8.0</scala-java8-compat.version>
     <!--END: Dependency convergence-->
 
@@ -102,9 +105,6 @@
     <scalamock.version>4.4.0</scalamock.version>
     <junit.version>4.13.1</junit.version>
     <scalatestplus.junit413.version>3.2.3.0</scalatestplus.junit413.version>
-    <xz.version>1.5</xz.version>
-    <curator-recipes.version>2.7.1</curator-recipes.version>
-    <netty.version>3.9.9.Final</netty.version>
     <zookeeper.version>3.5.5</zookeeper.version>
 
   </properties>
@@ -174,15 +174,21 @@
         <scope>provided</scope>
       </dependency>
       <dependency>
-        <groupId>commons-collections</groupId>
-        <artifactId>commons-collections</artifactId>
-        <version>${commons-collections.version}</version>
+        <groupId>commons-net</groupId>
+        <artifactId>commons-net</artifactId>
+        <version>${commons-net.version}</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
-        <groupId>commons-lang</groupId>
-        <artifactId>commons-lang</artifactId>
-        <version>${commons-lang.version}</version>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-text</artifactId>
+        <version>${commons-text.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>commons-collections</groupId>
+        <artifactId>commons-collections</artifactId>
+        <version>${commons-collections.version}</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
@@ -228,45 +234,27 @@
         <scope>provided</scope>
       </dependency>
       <dependency>
-        <groupId>org.apache.httpcomponents</groupId>
-        <artifactId>httpcore</artifactId>
-        <version>${httpcore.version}</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.httpcomponents</groupId>
-        <artifactId>httpclient</artifactId>
-        <version>${httpclient.version}</version>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-core</artifactId>
+        <version>${fasterxml.jackson.version}</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-core</artifactId>
-        <version>${fasterxml.jackson-core.version}</version>
+        <artifactId>jackson-annotations</artifactId>
+        <version>${fasterxml.jackson.version}</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
-        <version>${fasterxml.jackson-databind.version}</version>
+        <version>${fasterxml.jackson.version}</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.module</groupId>
         <artifactId>jackson-module-scala_${compiler.scala.compat.version}</artifactId>
-        <version>${fasterxml.jackson-module-scala.version}</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.jackson</groupId>
-        <artifactId>jackson-xc</artifactId>
-        <version>${codehaus.jackson.version}</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.jackson</groupId>
-        <artifactId>jackson-jaxrs</artifactId>
-        <version>${codehaus.jackson.version}</version>
+        <version>${fasterxml.jackson.version}</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
@@ -297,6 +285,30 @@
         <groupId>com.thoughtworks.paranamer</groupId>
         <artifactId>paranamer</artifactId>
         <version>${paranamer.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.curator</groupId>
+        <artifactId>curator-recipes</artifactId>
+        <version>${curator.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.curator</groupId>
+        <artifactId>curator-client</artifactId>
+        <version>${curator.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.curator</groupId>
+        <artifactId>curator-framework</artifactId>
+        <version>${curator.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>javax.xml.bind</groupId>
+        <artifactId>jaxb-api</artifactId>
+        <version>${jaxb-api.version}</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
@@ -336,6 +348,12 @@
         <scope>provided</scope>
       </dependency>
       <dependency>
+        <groupId>com.google.code.findbugs</groupId>
+        <artifactId>jsr305</artifactId>
+        <version>${jsr305.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
         <groupId>org.apache.hadoop</groupId>
         <artifactId>hadoop-common</artifactId>
         <version>${hadoop.version}</version>
@@ -344,6 +362,10 @@
           <exclusion>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>dnsjava</groupId>
+            <artifactId>dnsjava</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -546,14 +568,14 @@
 
       <!--BEGIN: Dependency convergence-->
       <dependency>
-        <groupId>com.google.code.findbugs</groupId>
-        <artifactId>jsr305</artifactId>
-        <version>${jsr305.version}</version>
-      </dependency>
-      <dependency>
         <groupId>org.scala-lang.modules</groupId>
         <artifactId>scala-java8-compat_${compiler.scala.compat.version}</artifactId>
         <version>${scala-java8-compat.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.nimbusds</groupId>
+        <artifactId>nimbus-jose-jwt</artifactId>
+        <version>${nimbus.version}</version>
       </dependency>
       <!--END: Dependency convergence-->
 

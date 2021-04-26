@@ -52,7 +52,7 @@
     <scala-parser-combinators.version>1.1.2</scala-parser-combinators.version>
     <scala-xml.version>1.2.0</scala-xml.version>
     <json4s.version>3.7.0-M5</json4s.version>
-    <commons-io.version>2.4</commons-io.version>
+    <commons-io.version>2.7</commons-io.version>
     <commons-net.version>3.1</commons-net.version>
     <commons-text.version>1.6</commons-text.version>
     <commons-collections.version>3.2.2</commons-collections.version>

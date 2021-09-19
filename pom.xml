@@ -47,7 +47,7 @@
     <scalatest-maven-plugin.version>2.0.2</scalatest-maven-plugin.version>
 
     <!--BEGIN: Spark BOM-->
-    <spark.version>3.1.1</spark.version>
+    <spark.version>3.1.2</spark.version>
     <spark.compat.version>3.1</spark.compat.version>
     <scala-parser-combinators.version>1.1.2</scala-parser-combinators.version>
     <scala-xml.version>1.2.0</scala-xml.version>
@@ -94,17 +94,17 @@
     <scala-java8-compat.version>0.8.0</scala-java8-compat.version>
     <!--END: Dependency convergence-->
 
-    <kafka-clients.version>2.4.1</kafka-clients.version>
-    <embedded-kafka.version>2.4.1</embedded-kafka.version>
-    <graphframes.version>0.7.0-spark${spark.compat.version}-s_${compiler.scala.compat.version}</graphframes.version>
-    <scopt.version>3.7.1</scopt.version>
-    <scalaj-http.version>2.4.1</scalaj-http.version>
-    <scalatest.version>3.2.3</scalatest.version>
-    <scalactic.version>3.2.3</scalactic.version>
-    <scalamock.version>4.4.0</scalamock.version>
-    <junit.version>4.13.1</junit.version>
-    <scalatestplus.junit413.version>3.2.3.0</scalatestplus.junit413.version>
-    <zookeeper.version>3.5.5</zookeeper.version>
+    <kafka-clients.version>2.8.1</kafka-clients.version>
+    <embedded-kafka.version>2.8.0</embedded-kafka.version>
+    <graphframes.version>0.8.1-spark${spark.compat.version}-s_${compiler.scala.compat.version}</graphframes.version>
+    <scopt.version>4.0.1</scopt.version>
+    <scalaj-http.version>2.4.2</scalaj-http.version>
+    <scalatest.version>3.2.10</scalatest.version>
+    <scalactic.version>3.2.10</scalactic.version>
+    <scalamock.version>5.1.0</scalamock.version>
+    <junit.version>4.13.2</junit.version>
+    <scalatestplus.junit413.version>3.2.10.0</scalatestplus.junit413.version>
+    <zookeeper.version>3.5.9</zookeeper.version>
 
   </properties>
 

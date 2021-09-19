@@ -1,6 +1,6 @@
 package com.github.tashoyan.telecom.test
 
-import net.manub.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
+import io.github.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
 
 import scala.util.Random
 

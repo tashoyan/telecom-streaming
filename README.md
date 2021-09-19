@@ -1,6 +1,6 @@
 # Telecom use cases implemented with popular streaming frameworks: Apache Spark and Apache Flink
 
-![build status](https://github.com/tashoyan/telecom-streaming/actions/workflows/main.yml/badge.svg)
+[![CI](https://github.com/tashoyan/telecom-streaming/actions/workflows/main.yml/badge.svg)](https://github.com/tashoyan/telecom-streaming/actions/workflows/main.yml)
 
 ## Building the code
 
